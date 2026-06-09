@@ -3080,13 +3080,10 @@ function buildCard(dx, idx) {
     ? `<button class="dx-table-btn" onclick="event.stopPropagation();openLoadingTable('${dx.loadingTableKey}')">טבלה ▸</button>`
     : '';
 
-  // ----- status tags: anomaly / pending / missing -----
-  const missingCount = (dx.requiredDocs || []).filter(d => !d.received).length;
+  // ----- status tags: pending (the "חוסרים (N)" tag was removed from the beta) -----
   let tagHtml = '';
   if (dx.missingStatus) {
     tagHtml += `<span class="dx-tag dx-tag-pending" title="נשלחה בקשה ללקוח">⏳ ממתין להשלמת מסמכים · ${dx.missingStatus.sentDate}</span>`;
-  } else if (missingCount > 0) {
-    tagHtml += `<span class="dx-tag dx-tag-missing" onclick="event.stopPropagation();openMissingDocs(${idx})" title="לחץ לרשימת המסמכים הנדרשים">חוסרים (${missingCount})</span>`;
   }
   if (dx.tempLoading) {
     const t = dx.tempLoading;
