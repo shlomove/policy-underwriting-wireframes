@@ -1,0 +1,4047 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסך חיתום — יריב אברהם (29094208)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --border: #ccc;
+    --border-light: #e0e0e0;
+    --bg: #fff;
+    --bg-subtle: #f7f7f7;
+    --bg-hover: #f0f0f0;
+    --text: #222;
+    --text-muted: #777;
+    --text-light: #aaa;
+    --radius: 4px;
+    --green: #2e7d32;
+    --orange: #e65100;
+    --red: #c62828;
+    --dot-green: #4caf50;
+    --dot-orange: #ff9800;
+    --dot-red: #f44336;
+  }
+
+  body {
+    font-family: 'Heebo', Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: #efefef;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  #header {
+    background: var(--bg);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 0 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .policy-badge {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .policy-badge span {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+    margin-right: 4px;
+  }
+
+  .id-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-right: 8px;
+  }
+
+  .id-tab {
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    margin-left: 3px;
+    position: relative;
+    top: 1px;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .id-tab:hover { background: var(--bg-hover); }
+  .id-tab.active {
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    border-color: var(--border);
+  }
+
+  .header-label {
+    font-size: 11px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .header-data-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 8px 0;
+    flex-wrap: wrap;
+  }
+
+  .hd-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 70px;
+  }
+
+  .hd-label {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .hd-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .hd-value.ltr { direction: ltr; display: inline-block; font-size: 12px; }
+
+  .tags-row {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tag {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+  }
+
+  .divider-v {
+    width: 1px;
+    background: var(--border-light);
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  /* ===== MAIN BODY ===== */
+  #body {
+    display: flex;
+    flex: 1;
+    gap: 0;
+    min-height: 0;
+  }
+
+  /* RIGHT PANEL */
+  #right-panel {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg);
+    border-left: 1.5px solid var(--border);
+    overflow-y: auto;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 70px;
+  }
+
+  /* LEFT PANEL */
+  #left-panel {
+    width: 380px;
+    flex-shrink: 0;
+    background: var(--bg);
+    overflow-y: auto;
+    padding: 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 70px;
+  }
+
+  /* ===== HEALTH DECLARATION ===== */
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 4px;
+  }
+
+  .health-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-subtle);
+  }
+
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-green { background: var(--dot-green); }
+  .dot-orange { background: var(--dot-orange); }
+  .dot-red { background: var(--dot-red); }
+
+  .health-status-text {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .health-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+
+  .health-missing-badge {
+    margin-right: auto;
+    font-size: 11px;
+    border: 1px solid var(--dot-orange);
+    color: var(--orange);
+    border-radius: 10px;
+    padding: 1px 8px;
+  }
+
+  /* ===== DIAGNOSES ===== */
+  .diagnoses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .diagnosis-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .diagnosis-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    background: var(--bg);
+    transition: background 0.12s;
+    user-select: none;
+  }
+
+  .diagnosis-header:hover { background: var(--bg-hover); }
+
+  .dx-toggle {
+    font-size: 10px;
+    color: var(--text-light);
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .dx-name {
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .dx-full-name {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 400;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dx-loading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .dx-loading-label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .dx-loading-input {
+    width: 52px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    background: var(--bg);
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+  }
+
+  .dx-loading-input:hover { border-color: #999; }
+  .dx-loading-input:focus { outline: none; border-color: #666; }
+
+  .dx-loading-pct { font-size: 12px; color: var(--text-muted); }
+
+  .dx-table-btn {
+    font-size: 10px;
+    color: var(--text-light);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+
+  .dx-table-btn:hover { background: var(--bg-hover); color: var(--text-muted); }
+
+  .dx-edit-btn {
+    font-size: 11px;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: var(--radius);
+  }
+
+  .dx-edit-btn:hover { background: var(--bg-hover); color: var(--text-muted); }
+
+  .timeline-container {
+    display: none;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-subtle);
+    padding: 10px 14px;
+  }
+
+  .timeline-container.open { display: block; }
+
+  .timeline-title {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .timeline-item::after {
+    content: '';
+    position: absolute;
+    right: 59px;
+    top: 14px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--border-light);
+  }
+
+  .timeline-item:last-child::after { display: none; }
+
+  .tl-date {
+    font-size: 10px;
+    color: var(--text-light);
+    white-space: nowrap;
+    width: 52px;
+    text-align: left;
+    direction: ltr;
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .tl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #bbb;
+    border: 1.5px solid #ddd;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .tl-text {
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1.5;
+    flex: 1;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-decoration-style: dotted;
+  }
+
+  .tl-text:hover { text-decoration-color: #888; color: #111; }
+
+  .dx-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: inherit;
+    width: 100%;
+    text-align: right;
+    margin-top: 2px;
+    transition: background 0.12s;
+  }
+
+  .dx-add-btn:hover { background: var(--bg-hover); }
+
+  /* AGGREGATION */
+  .agg-bar {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    background: var(--bg-subtle);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .agg-label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .agg-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-right: auto;
+  }
+
+  .agg-breakdown {
+    font-size: 11px;
+    color: var(--text-light);
+    direction: ltr;
+    text-align: left;
+    margin-top: 3px;
+  }
+
+  /* ===== LEFT PANEL — API ===== */
+  .api-tabs-row {
+    display: flex;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  .api-tab {
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-bottom: 2.5px solid transparent;
+    transition: all 0.15s;
+    font-weight: 500;
+    margin-bottom: -1.5px;
+  }
+
+  .api-tab.active {
+    color: var(--text);
+    border-bottom-color: #555;
+  }
+
+  .api-tab:hover:not(.active) { background: var(--bg-hover); }
+
+  .api-panel { display: none; padding-top: 14px; }
+  .api-panel.active { display: block; }
+
+  /* CMC Form */
+  .cmc-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .form-input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.12s;
+    width: 100%;
+  }
+
+  .form-input:focus { outline: none; border-color: #888; }
+  .form-input.error { border-color: var(--dot-red); background: #fff8f8; }
+
+  .form-select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+  }
+
+  .form-select:focus { outline: none; border-color: #888; }
+  .form-select.error { border-color: var(--dot-red); background: #fff8f8; }
+
+  .submit-btn {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+
+  .submit-btn:hover { background: #444; }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text-muted);
+    transition: background 0.12s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); }
+
+  .cmc-result {
+    display: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--bg-subtle);
+  }
+
+  .cmc-result.show { display: block; }
+  .cmc-result-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .cmc-result-value { font-size: 28px; font-weight: 700; color: var(--text); }
+  .cmc-result-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
+  .error-hint {
+    font-size: 11px;
+    color: var(--dot-red);
+    display: none;
+    padding: 4px 0;
+  }
+
+  .error-hint.show { display: block; }
+
+  /* Scout Chat */
+  .scout-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chat-history {
+    min-height: 140px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    background: var(--bg-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .chat-empty {
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: center;
+    padding: 24px 0;
+  }
+
+  .chat-bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .chat-bubble-label {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .chat-bubble-content {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .chat-bubble.user .chat-bubble-content {
+    background: #f0f0f0;
+    margin-left: 16px;
+  }
+
+  .chat-bubble.ai .chat-bubble-content {
+    margin-right: 16px;
+  }
+
+  .chat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-top: 7px;
+    direction: rtl;
+  }
+
+  .chat-table th, .chat-table td {
+    border: 1px solid var(--border);
+    padding: 4px 7px;
+    text-align: right;
+  }
+
+  .chat-table th { background: var(--bg-subtle); font-weight: 600; font-size: 10px; }
+  .chat-table .hl { font-weight: 700; background: #e0e0e0; }
+
+  .chat-input-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .chat-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    resize: none;
+    min-height: 36px;
+    max-height: 80px;
+    direction: rtl;
+  }
+
+  .chat-input:focus { outline: none; border-color: #888; }
+
+  .chat-send-btn {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 7px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .chat-send-btn:hover { background: #444; }
+
+  .chat-typing {
+    display: none;
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 2px 0;
+  }
+
+  .chat-typing.show { display: block; }
+
+  .scout-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .suggestion-chip {
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px 10px;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    transition: background 0.12s;
+  }
+
+  .suggestion-chip:hover { background: var(--bg-hover); color: var(--text); }
+
+  /* ===== FOOTER ===== */
+  #footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-top: 1.5px solid var(--border);
+    padding: 9px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 200;
+    direction: rtl;
+  }
+
+  .footer-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-label { font-size: 11px; color: var(--text-light); }
+  .footer-value { font-size: 17px; font-weight: 700; color: var(--text); }
+  .footer-sep { color: var(--border); font-size: 16px; }
+  .footer-status { font-size: 12px; color: var(--text-muted); }
+
+  .footer-actions {
+    margin-right: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .footer-save-btn {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 14px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--text);
+    font-weight: 500;
+    transition: background 0.12s;
+  }
+
+  .footer-save-btn:hover { background: var(--bg-hover); }
+
+  .footer-submit-btn {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 6px 16px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .footer-submit-btn:hover { background: #444; }
+
+  /* ===== POPUPS ===== */
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .popup-overlay.open { display: flex; }
+
+  .popup-box {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    max-width: 700px;
+    width: 94%;
+    max-height: 84vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  }
+
+  .popup-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+  }
+
+  .popup-title { font-size: 14px; font-weight: 600; }
+  .popup-meta { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  .popup-close {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+
+  .popup-close:hover { background: var(--bg-hover); }
+
+  .popup-body { padding: 16px; }
+
+  .approval-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .approval-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: right;
+    transition: background 0.12s, border-color 0.12s;
+    font-family: inherit;
+  }
+  .approval-action:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent, #1976d2);
+  }
+  .approval-action-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .approval-action-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .approval-action-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text, #222);
+  }
+  .approval-action-sub {
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  /* Doc popup */
+  .doc-placeholder {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    background: var(--bg-subtle);
+    margin-bottom: 12px;
+  }
+
+  .doc-placeholder-label {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.4px;
+  }
+
+  .doc-excerpt {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .doc-highlight {
+    background: #e4e4e4;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .doc-meta-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .doc-meta-item {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .doc-meta-item span { color: var(--text); font-weight: 500; }
+
+  .doc-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .doc-action-btn {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .doc-action-btn:hover { background: var(--bg-hover); }
+
+  .doc-scan-placeholder {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 12px;
+    background: var(--bg-subtle);
+    margin-bottom: 10px;
+  }
+
+  /* Loading table popup */
+  .loading-table-wrap { overflow-x: auto; }
+
+  .loading-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    direction: rtl;
+  }
+
+  .loading-table th, .loading-table td {
+    border: 1px solid var(--border);
+    padding: 7px 10px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .loading-table th {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .loading-table td:first-child { text-align: right; font-size: 12px; min-width: 200px; }
+  .loading-table th:first-child { text-align: right; }
+
+  .loading-table .active-cell {
+    background: #ddd;
+    font-weight: 700;
+    outline: 2.5px solid #888;
+    outline-offset: -2px;
+  }
+
+  .loading-table .row-active-label {
+    background: #f0f0f0;
+    font-weight: 600;
+  }
+
+  .table-note {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  /* ===== MISC ===== */
+  .risk-flag {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .flag-red { background: #bbb; }
+  .flag-orange { background: #bbb; }
+
+  .placeholder-block {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    color: var(--text-light);
+    font-size: 12px;
+    text-align: center;
+    background: var(--bg-subtle);
+  }
+
+  /* ===== ID SEARCH ===== */
+  .id-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 8px;
+    position: relative;
+  }
+
+  .id-search {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px 26px 4px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    width: 200px;
+    transition: border-color 0.12s, width 0.15s;
+  }
+
+  .id-search:focus { outline: none; border-color: #888; width: 240px; }
+  .id-search::placeholder { color: var(--text-light); }
+
+  .id-search-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-light);
+    pointer-events: none;
+  }
+
+  .id-tab.hidden-tab { display: none; }
+
+  .id-no-results {
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 5px 4px;
+  }
+
+  /* ===== HEALTH DECLARATION ACTIONS ===== */
+  .health-section-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .health-decl-btn {
+    margin-right: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 3px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: background 0.12s;
+  }
+
+  .health-decl-btn:hover { background: var(--bg-hover); color: var(--text); }
+  .health-decl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* PREVIOUS DECLARATIONS */
+  .prev-decl-title {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 4px 0 6px;
+  }
+
+  .prev-decl-card {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    background: var(--bg-subtle);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .prev-decl-date {
+    font-size: 11px;
+    color: var(--text-light);
+    direction: ltr;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 1px;
+    min-width: 56px;
+  }
+
+  .prev-decl-body { flex: 1; min-width: 0; }
+  .prev-decl-summary { font-size: 12px; line-height: 1.5; color: var(--text); }
+
+  .prev-decl-link {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 0;
+    margin-top: 4px;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    font-family: inherit;
+  }
+
+  .prev-decl-link:hover { color: #111; text-decoration-color: #888; }
+
+  /* ===== DOCUMENTS STATUS SECTION ===== */
+  .docs-summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    background: var(--bg-subtle);
+  }
+
+  .docs-summary-bar.has-failed {
+    border-color: var(--dot-orange);
+    background: #fff8f0;
+  }
+
+  .docs-summary-text { font-size: 12px; color: var(--text); flex: 1; }
+  .docs-summary-text strong { font-weight: 700; }
+
+  .docs-fail-count {
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .docs-open-link {
+    margin-right: auto;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: background 0.12s;
+  }
+
+  .docs-open-link:hover { background: var(--bg-hover); color: var(--text); }
+
+  /* DOCUMENTS LIST POPUP */
+  .docs-table { width: 100%; border-collapse: collapse; font-size: 12px; direction: rtl; }
+
+  .docs-table th, .docs-table td {
+    border: 1px solid var(--border-light);
+    padding: 8px 10px;
+    text-align: right;
+    vertical-align: top;
+  }
+
+  .docs-table th {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .docs-table tr.row-failed { background: #fff8f0; }
+
+  .doc-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    border-radius: 10px;
+    padding: 2px 9px;
+    white-space: nowrap;
+  }
+
+  .doc-status-badge.ok { border: 1px solid var(--dot-green); color: var(--green); }
+  .doc-status-badge.failed { border: 1px solid var(--dot-red); color: var(--red); }
+  .doc-status-badge.unknown { border: 1px solid var(--dot-orange); color: var(--orange); }
+
+  .doc-fail-reason { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+  .doc-fail-reason .reason-label { color: var(--red); font-weight: 600; }
+
+  .docs-table-actions { display: flex; flex-direction: column; gap: 5px; }
+
+  .docs-action-sm {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 4px 9px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: background 0.12s;
+  }
+
+  .docs-action-sm:hover { background: var(--bg-hover); color: var(--text); }
+
+  .docs-action-sm.primary {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+
+  .docs-action-sm.primary:hover { background: #444; }
+
+  .docs-action-sm.manual-done {
+    border-color: var(--dot-green);
+    color: var(--green);
+    background: #f3faf3;
+  }
+
+  .docs-popup-note {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* ===== SECTION HEAD + FEEDBACK ===== */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 4px;
+  }
+
+  .section-head .section-title {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    flex: 1;
+  }
+
+  .feedback-btns {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .fb-btn {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 1px 7px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-muted);
+    font-family: inherit;
+    transition: background 0.12s, border-color 0.12s;
+    filter: grayscale(1);
+  }
+
+  .fb-btn:hover { background: var(--bg-hover); }
+  .fb-btn.like.active { border-color: #888; background: var(--bg-hover); }
+  .fb-btn.dislike.active { border-color: #888; background: var(--bg-hover); }
+
+  /* Feedback popup */
+  .fb-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 4px;
+    margin: 4px 0 14px;
+  }
+
+  .fb-star {
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--border);
+    transition: color 0.1s;
+  }
+
+  .fb-star.on, .fb-star:hover, .fb-star:hover ~ .fb-star { color: #f5b301; }
+
+  .fb-field-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .fb-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 72px;
+    direction: rtl;
+    color: var(--text);
+  }
+
+  .fb-textarea:focus { outline: none; border-color: #888; }
+
+  /* ===== LANDING PAGE / LOGIN ===== */
+  #landing, #login {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #f7f7f7 0%, #e9e9ec 100%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #login { z-index: 1100; }
+
+  #landing.hidden, #login.hidden { display: none; }
+
+  .login-field { margin-bottom: 12px; }
+  .login-field .landing-input { text-align: right; }
+
+  .landing-card {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.10);
+    padding: 40px 44px 36px;
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+  }
+
+  .landing-logo {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+
+  .landing-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .landing-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
+
+  .landing-search-wrap { position: relative; margin-bottom: 14px; }
+
+  .landing-input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 40px 12px 14px;
+    font-size: 16px;
+    font-family: inherit;
+    text-align: center;
+    color: var(--text);
+    transition: border-color 0.12s;
+  }
+
+  .landing-input:focus { outline: none; border-color: #555; }
+  .landing-input::placeholder { color: var(--text-light); font-size: 14px; }
+
+  .landing-search-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--text-light);
+    pointer-events: none;
+  }
+
+  .landing-btn {
+    width: 100%;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+
+  .landing-btn:hover { background: #444; }
+
+  .landing-error {
+    display: none;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--red);
+    background: #fff5f5;
+    border: 1px solid var(--dot-red);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+  }
+
+  .landing-error.show { display: block; }
+
+  /* ===== CALCULATOR HIERARCHY (left panel) ===== */
+  .calc-subtabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px 0 6px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 4px;
+  }
+
+  .calc-subtab {
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    border-radius: var(--radius);
+    padding: 4px 13px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-muted);
+    transition: background 0.12s;
+  }
+
+  .calc-subtab:hover { background: var(--bg-hover); }
+  .calc-subtab.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  .calc-placeholder {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--text-light);
+    background: var(--bg-subtle);
+    line-height: 1.5;
+  }
+
+  /* ===== PERMILLE INPUT (diagnoses + lifestyle) ===== */
+  .dx-permille-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .dx-permille-input {
+    width: 52px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+  }
+
+  .dx-permille-input:hover { border-color: #999; }
+  .dx-permille-input:focus { outline: none; border-color: #666; }
+
+  .dx-del-btn {
+    font-size: 12px;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: var(--radius);
+  }
+
+  .dx-del-btn:hover { background: #fff0f0; color: var(--red); }
+
+  /* ===== DIAGNOSIS STATUS TAGS ===== */
+  .dx-tag {
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 1px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .dx-tag-missing {
+    background: #eee;
+    border: 1px solid #ccc;
+    color: #666;
+    cursor: pointer;
+  }
+  .dx-tag-missing:hover { background: #e2e2e2; color: #333; }
+
+  .dx-tag-anomaly {
+    background: #fff3e8;
+    border: 1px solid var(--dot-orange);
+    color: var(--orange);
+  }
+
+  .dx-tag-pending {
+    background: #fff8e6;
+    border: 1px solid #e0b400;
+    color: #8a6d00;
+  }
+
+  .dx-tag-temp {
+    background: #eee;
+    border: 1px solid #ccc;
+    color: #555;
+    cursor: pointer;
+  }
+  .dx-tag-temp:hover { background: #e2e2e2; color: #222; }
+
+  .dx-temp-btn {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 2px 7px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .dx-temp-btn:hover { background: var(--bg-hover); color: var(--text); }
+
+  /* Missing-docs panel */
+  .missing-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+  .missing-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .missing-item.received { background: #f3faf3; }
+  .missing-item.missing { background: #fff8f0; }
+
+  .missing-mark {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .missing-mark.ok { background: var(--dot-green); }
+  .missing-mark.no { background: var(--dot-red); }
+
+  .missing-item-name { flex: 1; }
+  .missing-item-status { font-size: 11px; color: var(--text-muted); }
+
+  .email-field { margin-bottom: 12px; }
+  .email-field-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; display: block; }
+
+  .email-input, .email-body {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    direction: rtl;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  .email-input:focus, .email-body:focus { outline: none; border-color: #888; }
+  .email-input[readonly], .email-body[readonly] { background: var(--bg-subtle); color: var(--text-muted); }
+  .email-body { min-height: 150px; resize: vertical; line-height: 1.6; }
+
+  /* timeline event actions */
+  .tl-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .tl-mini-btn {
+    font-size: 11px;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 3px;
+    border-radius: var(--radius);
+  }
+
+  .tl-mini-btn:hover { background: var(--bg-hover); color: var(--text-muted); }
+  .tl-mini-btn.del:hover { background: #fff0f0; color: var(--red); }
+
+  .tl-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    background: none;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: inherit;
+    margin-top: 4px;
+  }
+
+  .tl-add-btn:hover { background: var(--bg-hover); }
+
+  /* ===== LIFESTYLE (hobby + occupation) ===== */
+  .lifestyle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lifestyle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    background: var(--bg);
+  }
+
+  .ls-kind {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 2px 9px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ls-value {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ls-loading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ls-mini-label { font-size: 11px; color: var(--text-muted); }
+
+  .ls-source-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ls-source-select {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    min-width: 0;
+  }
+
+  .ls-source-select:focus { outline: none; border-color: #888; }
+
+  /* ===== SUMMARY EXTRA FIELDS ===== */
+  .agg-extra {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .agg-extra-field {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .agg-extra-label { font-size: 11px; color: var(--text-muted); }
+
+  .agg-extra-input {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+    text-align: center;
+    direction: ltr;
+  }
+
+  .agg-extra-input:focus { outline: none; border-color: #888; }
+
+  /* ===== HEALTH DECLARATION CHECKLIST ===== */
+  .hd-form-section { margin-bottom: 18px; }
+
+  .hd-form-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    background: var(--bg-subtle);
+    border-right: 3px solid #888;
+    padding: 5px 10px;
+  }
+
+  .hd-insured-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    direction: rtl;
+    margin-bottom: 4px;
+  }
+
+  .hd-insured-table th, .hd-insured-table td {
+    border: 1px solid var(--border-light);
+    padding: 6px 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .hd-insured-table th {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .hd-q {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .hd-q-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg);
+  }
+
+  .hd-q-num {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    min-width: 18px;
+  }
+
+  .hd-q-text { font-size: 12px; line-height: 1.5; flex: 1; }
+
+  .hd-q-answers {
+    display: flex;
+    gap: 16px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .hd-ans-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .hd-ans-name { font-size: 10px; color: var(--text-light); white-space: nowrap; }
+
+  .hd-ans-boxes { display: flex; gap: 8px; }
+
+  .hd-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .hd-box {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg);
+  }
+
+  .hd-box.checked-yes { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+  .hd-box.checked-no { background: #555; border-color: #555; color: #fff; }
+
+  .hd-subq {
+    border-top: 1px dashed var(--border-light);
+    padding: 6px 10px 6px 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-subtle);
+  }
+
+  .hd-subq-text { font-size: 11px; flex: 1; color: var(--text); }
+
+  .hd-q-extra {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-top: 1px dashed var(--border-light);
+    background: var(--bg-subtle);
+    line-height: 1.6;
+  }
+
+  .hd-q-extra strong { color: var(--text); }
+
+  .hd-note-box {
+    border: 1px solid var(--dot-orange);
+    background: #fff8f0;
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .hd-declare-text {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--text);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    background: var(--bg-subtle);
+    margin-bottom: 12px;
+  }
+
+  .hd-declare-text ol { margin: 6px 18px 0; }
+  .hd-declare-text li { margin-bottom: 4px; }
+
+  .hd-sign-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hd-sign-box {
+    flex: 1;
+    min-width: 200px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+  }
+
+  .hd-sign-label { font-size: 10px; color: var(--text-light); text-transform: uppercase; margin-bottom: 6px; }
+  .hd-sign-line { border-bottom: 1px solid var(--border); height: 22px; margin-bottom: 4px; }
+  .hd-sign-caption { font-size: 11px; color: var(--text-muted); }
+  .hd-readonly-note { font-size: 11px; color: var(--text-light); font-style: italic; margin-bottom: 12px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #bbb; }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login">
+  <div class="landing-card">
+    <div class="landing-logo">APEX</div>
+    <div class="landing-title">כניסה למערכת</div>
+    <div class="landing-sub">התחבר/י עם פרטי המשתמש שלך</div>
+    <div class="login-field">
+      <input type="text" id="login-user" class="landing-input" placeholder="שם משתמש" autocomplete="off"
+        onkeydown="if(event.key==='Enter')submitLogin()">
+    </div>
+    <div class="login-field">
+      <input type="password" id="login-pass" class="landing-input" placeholder="סיסמה"
+        onkeydown="if(event.key==='Enter')submitLogin()">
+    </div>
+    <button class="landing-btn" onclick="submitLogin()">כניסה ▸</button>
+    <div class="landing-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ===== LANDING (policy search after login) ===== -->
+<div id="landing">
+  <div class="landing-card">
+    <div class="landing-logo">APEX</div>
+    <div class="landing-title">חיפוש פוליסה</div>
+    <div class="landing-sub">הזן/י את מספר הפוליסה כדי להיכנס למסך החיתום</div>
+    <div class="landing-search-wrap">
+      <input type="text" id="landing-input" class="landing-input" placeholder="מספר פוליסה (לדוגמה: 111)"
+        autocomplete="off" onkeydown="if(event.key==='Enter')submitPolicySearch()">
+      <span class="landing-search-icon">⌕</span>
+    </div>
+    <button class="landing-btn" onclick="submitPolicySearch()">כניסה למסך החיתום ▸</button>
+    <div class="landing-error" id="landing-error"></div>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<div id="header">
+  <div class="header-top">
+    <div class="id-search-wrap">
+      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי פוליסה או שם..."
+        oninput="filterIds(this.value)" autocomplete="off">
+      <span class="id-search-icon">⌕</span>
+    </div>
+    <div class="id-tabs-row" id="id-tabs-row">
+      <div class="header-label" style="margin-left:8px;">בחירת ת״ז:</div>
+      <div class="id-tab active" onclick="switchId(0)" id="id-tab-0">29094208 — יריב אברהם</div>
+      <div class="id-no-results" id="id-no-results" style="display:none;">לא נמצאו מבוטחים תואמים</div>
+    </div>
+    <div class="policy-badge" style="margin-right:auto;">מספר פוליסה <span>POL-2026-00111</span></div>
+  </div>
+  <div class="header-data-row" id="header-data"></div>
+</div>
+
+<!-- ===== BODY ===== -->
+<div id="body">
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">הצהרת בריאות</div>
+        <div class="feedback-btns" id="fb-health"></div>
+      </div>
+      <div class="health-section-wrap">
+        <div id="health-bar" class="health-bar"></div>
+        <div id="health-decl-actions"></div>
+        <div id="prev-declarations"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">עיסוק ותחביבים</div>
+        <div class="feedback-btns" id="fb-lifestyle"></div>
+      </div>
+      <div class="diagnoses-list" id="lifestyle-list"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">אבחנות רפואיות</div>
+        <div class="feedback-btns" id="fb-diagnoses"></div>
+      </div>
+      <div class="diagnoses-list" id="diagnoses-list"></div>
+      <button class="dx-add-btn" onclick="addDiagnosis()">
+        <span style="font-size:15px;line-height:1;">＋</span> הוסף אבחנה
+      </button>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">מסמכים</div>
+        <div class="feedback-btns" id="fb-docs"></div>
+      </div>
+      <div id="docs-status"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">סיכום תוספות</div>
+        <div class="feedback-btns" id="fb-summary"></div>
+      </div>
+      <div class="agg-bar">
+        <div style="flex:1;">
+          <div class="agg-label">סך תוספת מצטברת (כל האבחנות)</div>
+          <div class="agg-breakdown" id="agg-breakdown">—</div>
+        </div>
+        <div class="agg-value" id="agg-total">—%</div>
+      </div>
+      <div class="agg-extra">
+        <div class="agg-extra-field">
+          <span class="agg-extra-label">תוספת מקסימלית <span style="font-weight:400;color:var(--text-light);">(= סך מצטבר)</span></span>
+          <input type="text" class="agg-extra-input" id="agg-max" readonly title="שווה לסך התוספת המצטברת">
+        </div>
+        <div class="agg-extra-field">
+          <span class="agg-extra-label">תוספת מתבטלת <span style="font-weight:400;color:var(--text-light);">(מקסימלית − 50)</span></span>
+          <input type="text" class="agg-extra-input" id="agg-cancelling" readonly title="מחושב אוטומטית — התוספת המקסימלית פחות 50">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="api-tabs-row" id="main-tabs">
+      <div class="api-tab" onclick="switchMainTab('scout')" id="main-tab-scout">Scout</div>
+      <div class="api-tab active" onclick="switchMainTab('calc')" id="main-tab-calc">מחשבונים</div>
+    </div>
+
+    <div class="calc-subtabs" id="calc-subtabs">
+      <button class="calc-subtab active" onclick="switchCalc('cmc')"  id="calc-subtab-cmc">CMC</button>
+      <button class="calc-subtab"        onclick="switchCalc('ckd')"  id="calc-subtab-ckd">CKD</button>
+      <button class="calc-subtab"        onclick="switchCalc('cad')"  id="calc-subtab-cad">CAD</button>
+      <button class="calc-subtab"        onclick="switchCalc('lvmc')" id="calc-subtab-lvmc">LVMC</button>
+      <button class="calc-subtab"        onclick="switchCalc('jvc')"  id="calc-subtab-jvc">JVC</button>
+      <button class="calc-subtab"        onclick="switchCalc('cc')"   id="calc-subtab-cc">CC</button>
+    </div>
+
+    <!-- CMC -->
+    <div class="api-panel active" id="panel-cmc">
+      <div class="section-title" style="margin-bottom:10px;">מחשבון קרדיומטאבולי</div>
+      <div class="cmc-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">גיל</label>
+            <input type="number" class="form-input" id="cmc-age" placeholder="42" min="18" max="100" value="54">
+          </div>
+          <div class="form-field">
+            <label class="form-label">מין</label>
+            <select class="form-select" id="cmc-gender">
+              <option value="">בחר...</option>
+              <option value="f">נקבה</option>
+              <option value="m" selected>זכר</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">BMI (ק״ג/מ״ר)</label>
+            <input type="number" class="form-input" id="cmc-bmi" placeholder="26.4" step="0.1" value="23">
+          </div>
+          <div class="form-field">
+            <label class="form-label">לחץ דם סיסטולי (mmHg)</label>
+            <input type="number" class="form-input" id="cmc-bp" placeholder="128" value="113">
+          </div>
+          <div class="form-field">
+            <label class="form-label">כולסטרול כולל (mg/dL)</label>
+            <input type="number" class="form-input" id="cmc-chol" placeholder="210" value="187">
+          </div>
+          <div class="form-field">
+            <label class="form-label">HDL (mg/dL)</label>
+            <input type="number" class="form-input" id="cmc-hdl" placeholder="55" value="35">
+          </div>
+          <div class="form-field">
+            <label class="form-label">HbA1c (%)</label>
+            <input type="number" class="form-input" id="cmc-hba1c" placeholder="6.2" step="0.1">
+          </div>
+          <div class="form-field">
+            <label class="form-label">עישון</label>
+            <select class="form-select" id="cmc-smoke">
+              <option value="">בחר...</option>
+              <option value="never">אף פעם</option>
+              <option value="past">לשעבר</option>
+              <option value="current" selected>מעשן/ת פעיל</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">סוכרת מאובחנת</label>
+            <select class="form-select" id="cmc-diabetes">
+              <option value="">בחר...</option>
+              <option value="no" selected>לא</option>
+              <option value="type1">כן — Type 1</option>
+              <option value="type2">כן — Type 2</option>
+              <option value="pre">Pre-diabetes</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">תרופות ל-BP</label>
+            <select class="form-select" id="cmc-meds">
+              <option value="">בחר...</option>
+              <option value="no" selected>לא</option>
+              <option value="yes">כן</option>
+            </select>
+          </div>
+        </div>
+        <div class="error-hint" id="cmc-error">⚠ יש למלא את כל השדות לפני שליחה</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="submit-btn" onclick="submitCMC()">חשב תוספת</button>
+          <button class="btn-secondary" onclick="clearCMC()">נקה</button>
+        </div>
+        <div class="cmc-result" id="cmc-result">
+          <div class="cmc-result-label">תוצאת מחשבון CMC</div>
+          <div class="cmc-result-value" id="cmc-result-value">—</div>
+          <div class="cmc-result-note" id="cmc-result-note"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERIC CALCULATORS (built dynamically) -->
+    <div id="generic-calcs"></div>
+
+    <!-- SCOUT -->
+    <div class="api-panel" id="panel-scout">
+      <div class="section-title" style="margin-bottom:6px;">Scout AI — שאילתות חיתום</div>
+      <div class="scout-chat">
+        <div class="scout-suggestions" id="scout-suggestions">
+          <span class="suggestion-chip" onclick="fillSuggestion(this)">Sarcoidosis Stage II יציב — תפקודי ריאה תקינים</span>
+          <span class="suggestion-chip" onclick="fillSuggestion(this)">טינטון / 19% נכות שמיעה</span>
+          <span class="suggestion-chip" onclick="fillSuggestion(this)">Cotinin בשתן גבוה מול הצהרת אי-עישון</span>
+        </div>
+        <div class="chat-history" id="chat-history">
+          <div class="chat-empty" id="chat-empty">שאל/י על מחלה עם נתוני הלקוח לקבלת טבלת תוספות מותאמת</div>
+        </div>
+        <div class="chat-typing" id="chat-typing">Scout מנתח/ת...</div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chat-input" placeholder='כגון: "מה התוספת ל-Crohn בהפוגה עם ביולוגי, גיל 42?"' rows="2"></textarea>
+          <button class="chat-send-btn" onclick="sendScout()">שלח</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div id="footer">
+  <div class="footer-item">
+    <span class="footer-label">תוספת כוללת:</span>
+    <span class="footer-value" id="footer-total">—%</span>
+  </div>
+  <span class="footer-sep">|</span>
+  <div class="footer-item">
+    <span class="footer-label">מצב תיק:</span>
+    <span class="footer-status" id="footer-status">בטיפול — ממתין לאישור חתם</span>
+  </div>
+  <span class="footer-sep">|</span>
+  <div class="footer-item">
+    <span class="footer-label">מבוטח:</span>
+    <span class="footer-status" id="footer-name">כהן יעל</span>
+  </div>
+  <div class="footer-actions">
+    <button class="footer-save-btn">שמור טיוטה</button>
+    <button class="footer-submit-btn" onclick="openApprovalPopup()">שלח לאישור ▸</button>
+  </div>
+</div>
+
+<!-- hidden input for manual source-file upload -->
+<input type="file" id="source-file-input" accept="application/pdf,image/*" style="display:none" onchange="_onSourceFileChosen(this)">
+
+<!-- ===== DOC POPUP ===== -->
+<div class="popup-overlay" id="doc-popup">
+  <div class="popup-box">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="doc-popup-title">מסמך מקור</div>
+        <div class="popup-meta" id="doc-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('doc-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="doc-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== LOADING TABLE POPUP ===== -->
+<div class="popup-overlay" id="loading-popup">
+  <div class="popup-box">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="loading-popup-title">טבלת תוספות</div>
+        <div class="popup-meta" id="loading-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('loading-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="loading-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== DOCUMENTS LIST POPUP ===== -->
+<div class="popup-overlay" id="docs-popup">
+  <div class="popup-box">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="docs-popup-title">רשימת מסמכים</div>
+        <div class="popup-meta" id="docs-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('docs-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="docs-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== APPROVAL ACTIONS POPUP ===== -->
+<div class="popup-overlay" id="approval-popup">
+  <div class="popup-box" style="max-width:560px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">שליחה לאישור — בחר פעולה</div>
+        <div class="popup-meta" id="approval-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('approval-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <div class="approval-actions">
+        <button class="approval-action" onclick="runApproval('issue')">
+          <span class="approval-action-icon">📄</span>
+          <span class="approval-action-text">
+            <span class="approval-action-title">הפקת פוליסה</span>
+            <span class="approval-action-sub">אישור סופי והנפקת הפוליסה למבוטח</span>
+          </span>
+        </button>
+        <button class="approval-action" onclick="runApproval('missing')">
+          <span class="approval-action-icon">📋</span>
+          <span class="approval-action-text">
+            <span class="approval-action-title">שליחת מכתב להשלמת חוסרים</span>
+            <span class="approval-action-sub">בקשת מסמכים / מידע נוסף מהמבוטח</span>
+          </span>
+        </button>
+        <button class="approval-action" onclick="runApproval('reject')">
+          <span class="approval-action-icon">⛔</span>
+          <span class="approval-action-text">
+            <span class="approval-action-title">שליחת מכתב של דחיית פוליסה</span>
+            <span class="approval-action-sub">דחיית הבקשה והודעה רשמית למבוטח</span>
+          </span>
+        </button>
+        <button class="approval-action" onclick="runApproval('loadings')">
+          <span class="approval-action-icon">📊</span>
+          <span class="approval-action-text">
+            <span class="approval-action-title">שליחת מכתב של פירוט תוספות</span>
+            <span class="approval-action-sub">הצגת תוספות חיתום לאישור המבוטח</span>
+          </span>
+        </button>
+        <button class="approval-action" onclick="runApproval('reinsurer')">
+          <span class="approval-action-icon">🏦</span>
+          <span class="approval-action-text">
+            <span class="approval-action-title">שליחה למבטח משנה</span>
+            <span class="approval-action-sub">העברת התיק לבחינת מבטח המשנה (Reinsurer)</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FEEDBACK POPUP ===== -->
+<div class="popup-overlay" id="feedback-popup">
+  <div class="popup-box" style="max-width:440px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">פידבק לסקשן</div>
+        <div class="popup-meta" id="feedback-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('feedback-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">תיאור הפידבק</span>
+      <textarea class="fb-textarea" id="fb-text" placeholder="כתוב/י כאן את הערותיך על הסקשן..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="submitFeedback()">שלח פידבק</button>
+        <button class="btn-secondary" onclick="closePopup('feedback-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HEALTH DECLARATION CHECKLIST POPUP ===== -->
+<div class="popup-overlay" id="hdform-popup">
+  <div class="popup-box" style="max-width:820px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="hdform-popup-title">הצהרת בריאות מקורית</div>
+        <div class="popup-meta" id="hdform-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('hdform-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="hdform-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== MISSING DOCS PANEL POPUP ===== -->
+<div class="popup-overlay" id="missing-popup">
+  <div class="popup-box" style="max-width:560px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="missing-popup-title">מסמכים נדרשים</div>
+        <div class="popup-meta" id="missing-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('missing-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="missing-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== EMAIL TEMPLATE POPUP ===== -->
+<div class="popup-overlay" id="email-popup">
+  <div class="popup-box" style="max-width:600px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">בקשה להשלמת מסמכים — מייל ללקוח</div>
+        <div class="popup-meta">טמפלייט מוכן מראש · ניתן לערוך לפני שליחה</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('email-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <div class="email-field">
+        <span class="email-field-label">נמען</span>
+        <input type="text" class="email-input" id="email-to" readonly>
+      </div>
+      <div class="email-field">
+        <span class="email-field-label">נושא</span>
+        <input type="text" class="email-input" id="email-subject" readonly>
+      </div>
+      <div class="email-field">
+        <span class="email-field-label">גוף ההודעה</span>
+        <textarea class="email-body" id="email-body" readonly></textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="submit-btn" onclick="sendMissingEmail()">📧 שלח</button>
+        <button class="btn-secondary" id="email-edit-btn" onclick="enableEmailEdit()">✏ ערוך לפני שליחה</button>
+        <button class="btn-secondary" onclick="closePopup('email-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TEMPORARY LOADING POPUP ===== -->
+<div class="popup-overlay" id="temp-popup">
+  <div class="popup-box" style="max-width:420px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">תוספת זמנית לקבוצת סיכון</div>
+        <div class="popup-meta" id="temp-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('temp-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <div class="cmc-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">תוספת אחוז (%)</label>
+            <input type="number" class="form-input" id="temp-pct" min="0" max="500" step="25" placeholder="0">
+          </div>
+          <div class="form-field">
+            <label class="form-label">תוספת פרומיל (‰)</label>
+            <input type="number" class="form-input" id="temp-permille" min="0" max="100" step="0.5" placeholder="0">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">עד תאריך (תוקף התוספת הזמנית)</label>
+          <input type="date" class="form-input" id="temp-until">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="submit-btn" onclick="confirmTempLoading()">אישור</button>
+          <button class="btn-secondary" onclick="closePopup('temp-popup')">ביטול</button>
+          <button class="btn-secondary" id="temp-clear-btn" onclick="clearTempLoading()" style="margin-right:auto;">הסר תוספת זמנית</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// DATA
+// =====================================================================
+
+const patients = [
+  {
+    id: '29094208', policy: 'POL-2026-00113', name: 'יריב אברהם', age: 54, weight: 75, height: 180, bmi: 23,
+    policyType: 'ביטוח חיים — ריסק', sumRequested: '—', sumExisting: '—',
+    reasons: ['בחינת תיק רפואי', 'חיתום רפואי', 'מעשן'],
+    email: 'yariv.avraham@example.com',
+    healthStatus: 'declared',
+    healthDetail: 'זוהו 4 אבחנות: עישון כבד, כאבי חזה / בירור לבבי (ללא עדות לאיסכמיה), Junctional nevus בגב לאחר כריתה מלאה, בירור אסטמה / ברונכיטיס כרונית',
+    diagnoses: [
+      {
+        code: 'SMOKING', fullName: 'Heavy Smoking — עישון כבד',
+        loading: 0, loadingPermille: 0, flag: null, loadingTableKey: 'smoking',
+        timeline: [
+          { date: '2007', text: 'הצהרת מועמד לביטוח — סומן כמעשן כיום; במסמכי 2007 צוין עישון כבד', doc: 'doc-2007exam' },
+          { date: '07/2007', text: 'תנאי קבלה לביטוח — צוין עישון כבד; הוטלה תוספת רפואית של ריסק 125%', doc: 'doc-2007terms' },
+          { date: '09/2010', text: 'דוח מיפוי לב — בהיסטוריה הרפואית מצוין עישון כבד', doc: 'doc-spect' },
+        ],
+      },
+      {
+        code: 'CARDIAC', fullName: 'Chest Pain / Cardiac Evaluation — כאבי חזה / בירור לבבי (ללא עדות לאיסכמיה)',
+        loading: 0, loadingPermille: 0, flag: null, loadingTableKey: 'cardiac',
+        timeline: [
+          { date: '09/2010', text: 'מיפוי לב במאמץ GATED SPECT בעקבות כאבי חזה — פרפוזיה מיוקרדיאלית תקינה בכל הדפנות, ללא איסכמיה וללא אוטם ישן, EF לאחר מאמץ 67%, METS 15, התכווצות חדר שמאל תקינה; סבירות למחלה כלילית חסימתית נמוכה', doc: 'doc-spect' },
+          { date: '06/2011', text: 'בדיקות חיתום — כולסטרול 187, LDL 121, HDL 35, טריגליצרידים 156; לחץ דם 113/85; א.ק.ג ובדיקת רופא במסגרת קבלה לביטוח', doc: 'doc-labs' },
+        ],
+      },
+      {
+        code: 'NEVUS', fullName: 'Junctional Nevus (Back), Excised — שומה בגב (Junctional nevus) לאחר כריתה מלאה',
+        loading: 0, loadingPermille: 0, flag: null, loadingTableKey: 'nevus',
+        timeline: [
+          { date: '09/2016', text: 'נגע פיגמנטרי לא טיפוסי בגב — מנתח פלסטי המליץ על Excisional biopsy ובדיקה היסטו-פתולוגית', doc: 'doc-plastic' },
+          { date: '09/2016', text: 'בוצעה כריתה/ביופסיה של הנגע העורי בגב (הרדמה מקומית, מרפאה)', doc: 'doc-plastic' },
+          { date: '09/2016', text: 'תשובת פתולוגיה — Junctional nevus, completely excised (נכרת בשלמות); דגימת עור 0.8×0.3×0.2 ס״מ', doc: 'doc-path' },
+        ],
+      },
+      {
+        code: 'ASTHMA', fullName: 'Asthma / Chronic Bronchitis Evaluation — בירור אסטמה / ברונכיטיס כרונית',
+        loading: 0, loadingPermille: 0, flag: null, loadingTableKey: 'asthma',
+        timeline: [
+          { date: '06/2011', text: 'זוהה שאלון לחולי אסטמה / ברונכיטיס כרונית במסגרת תיק החיתום — לא נמצאו במסמכים שנכללו פרטי אבחנה פעילה, דרגת חומרה או טיפול', doc: 'doc-labs' },
+        ],
+      },
+    ],
+  },
+];
+
+const docs = {
+  'doc-spect': {
+    title: 'דוח מיפוי לב במאמץ (GATED SPECT)', meta: 'אסותא | מקור: 09002565927cf125.pdf | 03.09.2010',
+    excerpt: `מיפוי לב במאמץ <span class="doc-highlight">GATED SPECT</span> — הערכה לאחר אירוע <span class="doc-highlight">כאבי חזה</span>. משך מאמץ 12:00 (שלב 5), METS 15.0, דופק 83→187, ל״ד 100/80→160/80. א.ק.ג במנוחה ובמאמץ ללא צניחות ST. <span class="doc-highlight">פרפוזיה מיוקרדיאלית תקינה בכל הדפנות — ללא איסכמיה וללא אוטם ישן</span>. EF לאחר מאמץ 67%, ESV 24 ml, EDV 72 ml. סיכום: מיפוי תקין, התכווצות חדר שמאל תקינה, סבירות למחלה כלילית חסימתית נמוכה. גובה 180, משקל 75, BMI 23.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מיפוי לב / מבחן מאמץ' }, { label: 'מקור', val: '09002565927cf125.pdf' }, { label: 'תאריך', val: '03.09.2010' }],
+  },
+  'doc-labs': {
+    title: 'תיק בדיקות חיתום + מעבדה 2011', meta: 'מקור: 09002565902699ae.pdf | 29.06.2011',
+    excerpt: `בדיקות חיתום מורחבות (פמי פרימיום / AMC): <span class="doc-highlight">HIV שלילי</span>; Hemoglobin 16.8, WBC 8.0, Platelets 232; <span class="doc-highlight">Cholesterol 187</span>, LDL 121, HDL 35, <span class="doc-highlight">Triglycerides 156</span>; Glucose 108, Creatinine 0.81, Urea 41.1; ל״ד בבדיקת רופא 113/85. כולל שאלון לחולי <span class="doc-highlight">אסטמה / ברונכיטיס כרונית</span>.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תיק בדיקות + מעבדה' }, { label: 'מקור', val: '09002565902699ae.pdf' }, { label: 'תאריך', val: '29.06.2011' }],
+  },
+  'doc-plastic': {
+    title: 'מכתב מנתח פלסטי + הפניה לכריתה', meta: 'ד״ר אמיר זליגובסקי | מקור: 09002565a3774020.pdf | 09.2016',
+    excerpt: `מכתב מנתח פלסטי: ממצא <span class="doc-highlight">נגע פיגמנטרי לא טיפוסי בגב (Atypical pigmented nevus, back)</span>. הטיפול המומלץ: <span class="doc-highlight">Excisional biopsy</span>; הניתוח בוצע ב-06/09/2016 במרפאה בהרדמה מקומית; נדרשה בדיקה היסטו-פתולוגית.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מכתב מנתח / הפניה' }, { label: 'מקור', val: '09002565a3774020.pdf' }, { label: 'תאריך', val: '06.09.2016' }],
+  },
+  'doc-path': {
+    title: 'תשובת פתולוגיה', meta: 'L.E.M Laboratory | מקור: 09002565a3fa41e3.pdf | 12.09.2016',
+    excerpt: `בדיקה פתולוגית (מס׳ 2016/00479/MG): אבחנה קלינית NEVUS back. מאקרוסקופית — קטע עור 0.8×0.3×0.2 ס״מ עם בליטה אפורה בקוטר 0.3 ס״מ. מיקרוסקופית: <span class="doc-highlight">Junctional nevus, completely excised</span> (נכרת בשלמות).`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תשובת פתולוגיה' }, { label: 'מקור', val: '09002565a3fa41e3.pdf' }, { label: 'תאריך', val: '12.09.2016' }],
+  },
+  'doc-2007terms': {
+    title: 'מכתב תנאי קבלה לביטוח 2007', meta: 'מקור: 09002565848c92f5.pdf | 09.07.2007',
+    excerpt: `מכתב תנאי קבלה לביטוח: לא ניתן לקבל את ההצעה כפי שהיא, אך ניתן לשקול קבלה בכפוף לתנאי חיתום. <span class="doc-highlight">תוספת רפואית: ריסק 125%</span>. הערות: <span class="doc-highlight">עישון כבד</span>; תחביב המבוטח — סרפינג.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תנאי קבלה / חיתום' }, { label: 'מקור', val: '09002565848c92f5.pdf' }, { label: 'תאריך', val: '09.07.2007' }],
+  },
+  'doc-2007exam': {
+    title: 'בדיקות קבלה 2007 + הצהרת עישון', meta: 'מקור: 0900256584616518.pdf | 2007',
+    excerpt: `מסמך בדיקות לקראת קבלה לביטוח (2007): טופס הסכמה לבדיקת HIV, <span class="doc-highlight">הצהרת מועמד על עישון — סומן כי המבוטח מעשן כיום</span>, היסטוריה משפחתית חלקית, א.ק.ג ובדיקת רופא (ל״ד סיסטולי 110). חלקים אינם קריאים באופן חד־משמעי.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'בדיקות קבלה / הצהרת עישון' }, { label: 'מקור', val: '0900256584616518.pdf' }, { label: 'תאריך', val: '2007' }],
+  },
+  'doc-hobby': {
+    title: 'הצהרת תחביבים', meta: 'מקור: 090025659631f576.pdf | 27.01.2013',
+    excerpt: `הצהרת מבוטח (סוכנות שגיא יוגב): <span class="doc-highlight">"אין לי תחביב סנפלינג ואיני עושה סנפלינג"</span>; <span class="doc-highlight">"אני עושה סקי חורף כתחביב פעם בשנה"</span>. מופיעה חתימת מבוטח; סומן איכות מקור ירודה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'הצהרת תחביבים' }, { label: 'מקור', val: '090025659631f576.pdf' }, { label: 'תאריך', val: '27.01.2013' }],
+  },
+  'doc-health-yariv': {
+    title: 'בסיס להצהרת בריאות — מקורות רפואיים', meta: 'יריב אברהם | 2007–2018',
+    excerpt: `סיכום מקורות: <span class="doc-highlight">מעשן / עישון כבד</span> (תוספת ריסק 125% בחיתום 2007). <span class="doc-highlight">כאבי חזה</span> עם מיפוי לב תקין (2010, ללא איסכמיה, EF 67%). <span class="doc-highlight">Junctional nevus</span> בגב שנכרת בשלמות (2016). שאלון <span class="doc-highlight">אסטמה / ברונכיטיס</span> ללא אבחנה פעילה. גובה 180, משקל 75, BMI 23. תחביב: סקי חורף פעם בשנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'סיכום מקורות' }, { label: 'תאריך', val: '08.11.2018' }],
+  },
+};
+
+const healthDeclarations = [
+  { docKey: 'doc-health-yariv', date: '08.11.2018' },
+];
+
+const previousDeclarations = [
+  [],
+];
+
+const patientDocuments = [
+  [
+    { name: 'דוח מיפוי לב במאמץ (GATED SPECT)', type: 'מיפוי לב', date: '03.09.2010', status: 'ok', docKey: 'doc-spect' },
+    { name: 'תיק בדיקות חיתום + מעבדה', type: 'תוצאות מעבדה', date: '29.06.2011', status: 'ok', docKey: 'doc-labs' },
+    { name: 'מכתב מנתח פלסטי + הפניה לכריתה', type: 'מכתב מומחה', date: '06.09.2016', status: 'ok', docKey: 'doc-plastic' },
+    { name: 'תשובת פתולוגיה (Junctional nevus)', type: 'פתולוגיה', date: '12.09.2016', status: 'ok', docKey: 'doc-path' },
+    { name: 'מכתב תנאי קבלה לביטוח 2007', type: 'תנאי חיתום', date: '09.07.2007', status: 'ok', docKey: 'doc-2007terms' },
+    { name: 'בדיקות קבלה 2007 + הצהרת עישון', type: 'בדיקות קבלה', date: '2007', status: 'ok', docKey: 'doc-2007exam' },
+    { name: 'הצהרת תחביבים', type: 'הצהרה', date: '27.01.2013', status: 'ok', docKey: 'doc-hobby' },
+    { name: 'הצהרת בריאות 2018 — חלקית', type: 'הצהרת בריאות', date: '08.11.2018', status: 'failed', failReason: 'מסמך חלקי — חלקים אינם קריאים באופן חד־משמעי; לא חולצו אבחנות חדשות.' },
+    { name: 'תביעת בריאות — אלה אברהם', type: 'תביעות', date: '12.2015', status: 'failed', failReason: 'המסמך מתייחס לאלה אברהם (ת.ז 216786491) ואינו שייך ללקוח.' },
+    { name: 'מסמך תנאי חיתום 2012 — איכות ירודה', type: 'תנאי חיתום', date: '18.03.2012', status: 'failed', failReason: 'איכות מקור ירודה — לא חולצו אבחנה/מדד ודאי מהמסמך.' },
+  ],
+];
+
+const loadingTables = {
+  smoking: {
+    title: 'טבלת מקור — Heavy Smoking (עישון כבד)',
+    meta: 'נתוני מקור שחולצו ממסמכי יריב אברהם | 2007–2010',
+    note: '* השורה המסומנת = הסטטוס הנוכחי. בעבר (2007) הוטלה תוספת ריסק 125% בגין עישון כבד ותחביב.',
+    cols: ['ממצא / נתון', 'ערך', 'תאריך', 'מסמך מקור'],
+    rows: [
+      { label: 'הצהרת עישון', vals: ['מעשן כיום', '2007', '0900256584616518.pdf'] },
+      { label: 'תוספת חיתום קודמת', vals: ['ריסק 125% (עישון כבד + תחביב)', '07/2007', '09002565848c92f5.pdf'] },
+      { label: 'היסטוריה רפואית בדוח לב', vals: ['עישון כבד', '09/2010', '09002565927cf125.pdf'] },
+      { label: 'סטטוס נוכחי', vals: ['מעשן / עישון כבד', '09/2010', '09002565927cf125.pdf'], active: true },
+    ],
+  },
+  cardiac: {
+    title: 'טבלת מקור — Chest Pain / Cardiac Evaluation',
+    meta: 'נתוני מקור שחולצו ממסמכי יריב אברהם | 2010–2011',
+    note: '* בירור לבבי בעקבות כאבי חזה — המיפוי נמצא תקין, ללא עדות לאיסכמיה או אוטם.',
+    cols: ['ממצא / נתון', 'ערך', 'תאריך', 'מסמך מקור'],
+    rows: [
+      { label: 'מיפוי לב במאמץ (SPECT)', vals: ['תקין, ללא איסכמיה/אוטם', '09/2010', '09002565927cf125.pdf'] },
+      { label: 'EF לאחר מאמץ', vals: ['67%', '09/2010', '09002565927cf125.pdf'] },
+      { label: 'METS / יכולת מאמץ', vals: ['15.0', '09/2010', '09002565927cf125.pdf'] },
+      { label: 'כולסטרול / LDL / HDL', vals: ['187 / 121 / 35', '06/2011', '09002565902699ae.pdf'] },
+      { label: 'טריגליצרידים', vals: ['156', '06/2011', '09002565902699ae.pdf'] },
+      { label: 'סטטוס נוכחי', vals: ['ללא עדות למחלה כלילית חסימתית', '09/2010', '09002565927cf125.pdf'], active: true },
+    ],
+  },
+  nevus: {
+    title: 'טבלת מקור — Junctional Nevus (Back)',
+    meta: 'נתוני מקור שחולצו ממסמכי יריב אברהם | 09/2016',
+    note: '* נגע עורי בגב שנכרת בשלמות; תשובת הפתולוגיה שפירה (Junctional nevus).',
+    cols: ['ממצא / נתון', 'ערך', 'תאריך', 'מסמך מקור'],
+    rows: [
+      { label: 'ממצא קליני', vals: ['נגע פיגמנטרי לא טיפוסי בגב', '09/2016', '09002565a3774020.pdf'] },
+      { label: 'פעולה', vals: ['Excisional biopsy (הרדמה מקומית)', '06/09/2016', '09002565a3774020.pdf'] },
+      { label: 'ממדי דגימה', vals: ['0.8×0.3×0.2 ס״מ', '09/2016', '09002565a3fa41e3.pdf'] },
+      { label: 'תשובת פתולוגיה', vals: ['Junctional nevus, completely excised', '12/09/2016', '09002565a3fa41e3.pdf'], active: true },
+    ],
+  },
+  asthma: {
+    title: 'טבלת מקור — Asthma / Chronic Bronchitis (בירור)',
+    meta: 'נתוני מקור שחולצו ממסמכי יריב אברהם | 06/2011',
+    note: '* זוהה שאלון בלבד — לא נמצאו במסמכים שנכללו אבחנה פעילה, דרגת חומרה או טיפול.',
+    cols: ['ממצא / נתון', 'ערך', 'תאריך', 'מסמך מקור'],
+    rows: [
+      { label: 'מסמך מזוהה', vals: ['שאלון אסטמה / ברונכיטיס כרונית', '06/2011', '09002565902699ae.pdf'] },
+      { label: 'אבחנה פעילה', vals: ['לא נמצאה במסמכים שנכללו', '06/2011', '09002565902699ae.pdf'] },
+      { label: 'טיפול / דרגת חומרה', vals: ['לא נמצא במסמכים שנכללו', '06/2011', '09002565902699ae.pdf'], active: true },
+    ],
+  },
+};
+
+// Scout responses
+const scoutResponses = {
+  smoking: {
+    intro: 'בהתאם לנתוני הלקוח — מעשן / עישון כבד (בעבר הוטלה תוספת ריסק 125% ב-2007):',
+    tableKey: 'smoking', activeRow: 3,
+    conclusion: 'עישון כבד הוא גורם סיכון מהותי — תוספת ריסק נקבעת לפי מדיניות מעשנים; מומלץ לעדכן הצהרת עישון נוכחית.',
+  },
+  cardiac: {
+    intro: 'כאבי חזה עם בירור לבבי (מיפוי לב במאמץ תקין, ללא איסכמיה, EF 67%):',
+    tableKey: 'cardiac', activeRow: 5,
+    conclusion: 'הבירור הלבבי נמצא תקין וללא עדות למחלה כלילית חסימתית — סיכון לבבי נמוך; לשקול מעקב פרופיל שומנים (LDL/HDL).',
+  },
+  nevus: {
+    intro: 'נגע עורי בגב מסוג Junctional nevus שנכרת בשלמות (2016):',
+    tableKey: 'nevus', activeRow: 3,
+    conclusion: 'נגע שפיר שנכרת בשלמות (completely excised) — ללא משמעות חיתומית מהותית; אין צורך בתוספת.',
+  },
+  asthma: {
+    intro: 'שאלון אסטמה / ברונכיטיס כרונית שזוהה בתיק (2011):',
+    tableKey: 'asthma', activeRow: 2,
+    conclusion: 'זוהה שאלון בלבד ללא אבחנה פעילה או טיפול — נדרשת השלמת מידע (תפקודי ריאה / סיכום רופא) לפני קביעת תוספת.',
+  },
+  default: {
+    intro: 'לפי הפרמטרים שציינת ונתוני הלקוח:',
+    tableKey: 'smoking', activeRow: 3,
+    conclusion: 'לא נמצאה התאמה מדויקת — הוצג מידע לפי האבחנה הראשית. לפירוט נוסף אנא ציין מחלה ספציפית.',
+  },
+};
+
+// ---- Occupation + profession per patient (diagnosis-style rows) ----
+const lifestyleData = [
+  {
+    occupation: { value: 'בעל משרד פרסום לרכב / מנהל', loadingPct: 0, loadingPermille: 0, source: '' },
+    profession: { value: 'סקי חורף פעם בשנה; הצהיר שאינו עוסק בסנפלינג', loadingPct: 0, loadingPermille: 0, source: 'doc-hobby' },
+  },
+];
+
+// ---- Original health-declaration checklist forms ----
+const hdQuestions = [
+  { num: 1, text: 'עיסוקים / תחביבים / אורח חיים בעלי סיכון מיוחד (כולל ספורט אתגרי, רכיבת אופניים, וכל הקשור לכיסוי לאובדן כושר עבודה)' },
+  { num: 2, text: 'עישון', smoking: true },
+  { num: 3, text: 'מומים / הפרעות / מחלות באחת מהמערכות הבאות:', subs: [
+      'א. מערכת הלב / כלי דם / יתר לחץ דם',
+      'ב. סוכרת',
+      'ג. מערכת הריאות ודרכי הנשימה',
+      'ד. סרטן / גידולים',
+      'ה. מעיים / כבד / לבלב',
+      'ו. נפש (דיכאון, PTSD, הפרעת נפש אחרת)',
+      'ז. מערכת העצבים והמוח',
+      'ח. כליות ודרכי שתן',
+  ] },
+  { num: 4, text: 'מחלות מערכת החיסון / מחלות אוטואימוניות (איידס, נשאות, חום ממושך מעל 3 חודשים)' },
+  { num: 5, text: 'נכות / תהליך לקבלת אחוזי נכות' },
+  { num: 6, text: 'אשפוז כתוצאה ממחלה או תאונה בחמש השנים האחרונות' },
+  { num: 7, text: 'בדיקה רפואית אבחנתית / פולשנית / בדיקת דמים בחמש השנים האחרונות (ניתן לצרף תוצאות)' },
+];
+
+const healthForms = [
+  {
+    date: '08.11.2018', sign: 'מבוסס על הצהרת בריאות ומסמכי חיתום',
+    insureds: [
+      { id: '29094208', last: 'אברהם', first: 'יריב', gender: 'זכר', height: 180, weight: 75 },
+    ],
+    answers: {
+      1: ['yes'],
+      2: { smokes: ['yes'], count: ['—'], quit2yrs: ['no'] },
+      3: [['yes'], ['no'], ['yes'], ['no'], ['no'], ['no'], ['no'], ['no']],
+      4: ['no'],
+      5: ['no'],
+      6: ['yes'],
+      7: ['yes'],
+    },
+    extra: {
+      1: '<strong>הערה:</strong> תחביב — סקי חורף פעם בשנה (הצהיר שאינו עוסק בסנפלינג); ב-2007 צוין גם תחביב סרפינג. עיסוק — בעל משרד פרסום לרכב / מנהל.',
+      2: '<strong>שים לב:</strong> מעשן / עישון כבד — בחיתום 2007 הוטלה תוספת רפואית של ריסק 125% בגין עישון כבד. מומלץ לעדכן הצהרת עישון נוכחית (כמות).',
+      3: '<strong>פירוט (לב):</strong> כאבי חזה עם מיפוי לב במאמץ (2010) — תקין, ללא איסכמיה ואוטם, EF 67%. <strong>(ריאות):</strong> זוהה שאלון אסטמה / ברונכיטיס כרונית (2011) ללא אבחנה פעילה מתועדת.',
+      6: '<strong>פירוט:</strong> כריתת נגע עורי בגב (Excisional biopsy) ב-09/2016 — הליך זעיר; פתולוגיה שפירה (Junctional nevus, נכרת בשלמות).',
+      7: '<strong>פירוט:</strong> מיפוי לב במאמץ (2010); בדיקות מעבדה מורחבות + HIV שלילי (2011); ביופסיה/כריתת נגע עורי (2016).',
+    },
+  },
+];
+
+// ---- Required documents + declaration status per diagnosis (by code) ----
+const diagnosisRequirements = {
+  SMOKING: { inDeclaration: true, requiredDocs: [
+    { name: 'הצהרת עישון מעודכנת (כמות)', received: false },
+    { name: 'תנאי קבלה / חיתום קודם', received: true },
+  ]},
+  CARDIAC: { inDeclaration: true, requiredDocs: [
+    { name: 'דוח מיפוי לב / מבחן מאמץ', received: true },
+    { name: 'מכתב קרדיולוג מעקב עדכני', received: false },
+  ]},
+  NEVUS: { inDeclaration: true, requiredDocs: [
+    { name: 'הפניית מנתח', received: true },
+    { name: 'תשובת פתולוגיה', received: true },
+  ]},
+  ASTHMA: { inDeclaration: true, requiredDocs: [
+    { name: 'תפקודי ריאה / ספירומטריה', received: false },
+    { name: 'סיכום רופא ריאות', received: false },
+  ]},
+};
+
+function reqFor(code) {
+  const r = diagnosisRequirements[code];
+  if (!r) return { inDeclaration: true, requiredDocs: [] };
+  return { inDeclaration: r.inDeclaration, requiredDocs: r.requiredDocs.map(d => ({ ...d })) };
+}
+
+// =====================================================================
+// STATE
+// =====================================================================
+let currentIdx = 0;
+let patientsState = patients.map((p, i) => ({
+  ...p,
+  diagnoses: p.diagnoses.map(d => {
+    const req = reqFor(d.code);
+    return { ...d, loadingPermille: d.loadingPermille || 0,
+      requiredDocs: req.requiredDocs, inDeclaration: req.inDeclaration, missingStatus: null };
+  }),
+  lifestyle: {
+    occupation: { ...lifestyleData[i].occupation },
+    profession: { ...lifestyleData[i].profession },
+  },
+  email: p.email || (['yael.cohen','daniel.cohen','michal.cohen'][i] + '@example.com'),
+  maxLoading: '',
+  cancellingLoading: '',
+}));
+let feedbackState = {}; // { sectionKey: {vote, stars, text} }
+let fbContext = { key: null, stars: 0 };
+
+// =====================================================================
+// RENDER
+// =====================================================================
+function switchId(idx) {
+  currentIdx = idx;
+  document.querySelectorAll('.id-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  renderHeader();
+  renderHealthBar();
+  renderHealthDeclActions();
+  renderPrevDeclarations();
+  renderLifestyle();
+  renderDiagnoses();
+  renderDocsStatus();
+  renderAllFeedback();
+  updateAgg();
+}
+
+// ===== ID SEARCH FILTER =====
+function filterIds(query) {
+  const q = (query || '').trim().toLowerCase();
+  let visibleCount = 0;
+  patients.forEach((p, i) => {
+    const tab = document.getElementById('id-tab-' + i);
+    if (!tab) return;
+    const haystack = ((p.policy || '') + ' ' + p.name).toLowerCase();
+    const match = !q || haystack.includes(q);
+    tab.classList.toggle('hidden-tab', !match);
+    if (match) visibleCount++;
+  });
+  document.getElementById('id-no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function renderHeader() {
+  const p = patientsState[currentIdx];
+  document.getElementById('footer-name').textContent = p.name;
+  const tagsHtml = p.reasons.map(r => `<span class="tag">${r}</span>`).join('');
+  document.getElementById('header-data').innerHTML = `
+    <div class="hd-field"><div class="hd-label">שם מלא</div><div class="hd-value">${p.name}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">ת״ז</div><div class="hd-value ltr">${p.id}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">גיל</div><div class="hd-value">${p.age}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">משקל / גובה</div><div class="hd-value ltr">${p.weight}kg / ${p.height}cm</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סוג פוליסה</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
+  `;
+}
+
+function renderHealthBar() {
+  const p = patientsState[currentIdx];
+  const bar = document.getElementById('health-bar');
+  if (p.healthStatus === 'clean') {
+    bar.innerHTML = `<span class="status-dot dot-green"></span><span class="health-status-text">הצהרת בריאות נקייה</span><span class="health-detail">— לא הוצהרו מחלות</span>`;
+  } else if (p.healthStatus === 'declared') {
+    bar.innerHTML = `<span class="status-dot dot-orange"></span><span class="health-status-text">מחלות שהוצהרו</span><span class="health-detail">— ${p.healthDetail}</span>`;
+  } else {
+    bar.innerHTML = `<span class="status-dot dot-red"></span><span class="health-status-text">חסרים נתונים</span><span class="health-detail">— ${p.healthDetail}</span><span class="health-missing-badge">⚠ דרוש השלמה</span>`;
+  }
+}
+
+function renderHealthDeclActions() {
+  const wrap = document.getElementById('health-decl-actions');
+  const decl = healthDeclarations[currentIdx];
+  const p = patientsState[currentIdx];
+  let btns = '';
+  if (decl && decl.docKey && healthForms[currentIdx]) {
+    btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="openHealthForm(${currentIdx})">📄 צפה בהצהרה המקורית <span style="color:var(--text-light);">(${decl.date})</span></button>`;
+  } else {
+    btns += `<button class="health-decl-btn" style="margin-right:0;" disabled title="לא נמצאה הצהרת בריאות חתומה">📄 אין הצהרה מקורית בתיק</button>`;
+  }
+  if (p.uploadedDeclaration) {
+    btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="openUploadedSource('${p.uploadedDeclaration}')">📄 פתח קובץ שהועלה</button>`;
+  }
+  btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="uploadDeclarationSource()">📎 העלה קובץ מקור</button>`;
+  wrap.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;">${btns}</div>`;
+}
+
+function renderPrevDeclarations() {
+  const wrap = document.getElementById('prev-declarations');
+  const prev = previousDeclarations[currentIdx] || [];
+  if (!prev.length) {
+    wrap.innerHTML = '';
+    return;
+  }
+  const cards = prev.map((d, di) => `
+    <div class="prev-decl-card">
+      <div class="prev-decl-date">${d.date}</div>
+      <div class="prev-decl-body">
+        <div class="prev-decl-summary">${d.summary}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          ${d.docKey ? `<button class="prev-decl-link" onclick="openDoc('${d.docKey}')">צפה בהצהרה המלאה ▸</button>` : ''}
+          ${d.uploadedDoc ? `<button class="prev-decl-link" onclick="openUploadedSource('${d.uploadedDoc}')">📄 פתח קובץ שהועלה</button>` : ''}
+          <button class="prev-decl-link" onclick="uploadPrevDeclSource(${di})">📎 העלה קובץ מקור</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  wrap.innerHTML = `<div class="prev-decl-title">הצהרות קודמות של הלקוח (${prev.length})</div>${cards}`;
+}
+
+// ===== DOCUMENTS STATUS =====
+function renderDocsStatus() {
+  const wrap = document.getElementById('docs-status');
+  const docsList = patientDocuments[currentIdx] || [];
+  const total = docsList.length;
+  const failed = docsList.filter(d => d.status === 'failed').length;
+  if (failed > 0) {
+    wrap.innerHTML = `
+      <div class="docs-summary-bar has-failed">
+        <span class="status-dot dot-orange"></span>
+        <span class="docs-summary-text">
+          <span class="docs-fail-count">${failed} מסמכים</span> לא נקראו על ידי המערכת — דרושה בדיקה ידנית
+          <span style="color:var(--text-light);">(מתוך ${total} מסמכים בתיק)</span>
+        </span>
+        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
+      </div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="docs-summary-bar">
+        <span class="status-dot dot-green"></span>
+        <span class="docs-summary-text">כל ${total} המסמכים נקראו בהצלחה</span>
+        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
+      </div>`;
+  }
+}
+
+function openDocsList() {
+  const docsList = patientDocuments[currentIdx] || [];
+  const p = patientsState[currentIdx];
+  const failed = docsList.filter(d => d.status === 'failed').length;
+  document.getElementById('docs-popup-title').textContent = 'רשימת מסמכים — ' + p.name;
+  document.getElementById('docs-popup-meta').textContent =
+    `${docsList.length} מסמכים בתיק · ${failed} לא נקראו` + (p.id ? ' · ת״ז ' + p.id : '');
+
+  const rows = docsList.map((d, i) => {
+    const failedRow = d.status === 'failed';
+    let badge;
+    if (d.status === 'ok') badge = '<span class="doc-status-badge ok">● נקרא בהצלחה</span>';
+    else if (d.status === 'unknown') badge = '<span class="doc-status-badge unknown">● סוג לא מזוהה</span>';
+    else badge = '<span class="doc-status-badge failed">● נכשל בקריאה</span>';
+
+    const reasonCell = failedRow
+      ? `<div class="doc-fail-reason"><span class="reason-label">סיבת הכשל:</span> ${d.failReason || 'לא ידוע'}</div>`
+      : `<span style="color:var(--text-light);font-size:11px;">—</span>`;
+
+    const okManual = d.status === 'ok' && d.manualRead;
+    if (okManual) badge = '<span class="doc-status-badge ok">● נקרא (עודכן ידנית)</span>';
+
+    const openBtn = `<button class="docs-action-sm" onclick="openDocumentOriginal(${i})">📄 פתח מקור</button>`;
+    const markReadBtn = failedRow
+      ? `<button class="docs-action-sm" id="markread-btn-${i}" onclick="markDocRead(${i})">✓ שנה סטטוס ל״נקרא״</button>`
+      : '';
+    const manualBtn = failedRow
+      ? `<button class="docs-action-sm primary" id="manual-btn-${i}" onclick="markManualUnderwriting(${i})">⤷ המשך לחיתום ידני</button>`
+      : '';
+    const uploadBtn = `<button class="docs-action-sm" onclick="uploadDocSource(${i})">📎 העלה קובץ מקור</button>`;
+
+    return `
+      <tr class="${failedRow ? 'row-failed' : ''}">
+        <td>
+          <div style="font-weight:600;">${d.name}</div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px;">${d.type} · ${d.date}</div>
+        </td>
+        <td>${badge}</td>
+        <td>${reasonCell}</td>
+        <td><div class="docs-table-actions">${openBtn}${uploadBtn}${markReadBtn}${manualBtn}</div></td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('docs-popup-body').innerHTML = `
+    <table class="docs-table">
+      <thead>
+        <tr>
+          <th style="min-width:200px;">מסמך</th>
+          <th>סטטוס קריאה</th>
+          <th style="min-width:220px;">פירוט</th>
+          <th>פעולות</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="docs-popup-note">
+      מסמכים שנכשלו בקריאה האוטומטית אינם נכללים בחישוב התוספות עד להשלמת קריאה ידנית.
+      ניתן לפתוח את המסמך המקורי ולהעביר אותו לזרימת חיתום ידני.
+    </div>`;
+  document.getElementById('docs-popup').classList.add('open');
+}
+
+// =====================================================================
+// MANUAL SOURCE-FILE UPLOAD (events / declarations / documents)
+// =====================================================================
+let uploadedSources = {};
+let _uploadSeq = 0;
+let _pendingUpload = null;
+
+function triggerSourceUpload(cb) {
+  _pendingUpload = cb;
+  const inp = document.getElementById('source-file-input');
+  inp.value = '';
+  inp.click();
+}
+
+function _onSourceFileChosen(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const id = 'up-' + (++_uploadSeq);
+  uploadedSources[id] = { name: file.name, type: file.type, url: URL.createObjectURL(file) };
+  const cb = _pendingUpload; _pendingUpload = null;
+  if (typeof cb === 'function') cb(id);
+}
+
+function openUploadedSource(id) {
+  const s = uploadedSources[id];
+  if (!s) return;
+  document.getElementById('doc-popup-title').textContent = s.name || 'מסמך מקור שהועלה';
+  document.getElementById('doc-popup-meta').textContent = 'קובץ מקור שהועלה ידנית' + (s.type ? ' · ' + s.type : '');
+  const isImg = (s.type || '').indexOf('image') === 0 || /\.(png|jpe?g|gif|tiff?|webp)$/i.test(s.name || '');
+  const isPdf = (s.type || '').indexOf('pdf') > -1 || /\.pdf$/i.test(s.name || '');
+  let preview;
+  if (isImg) preview = `<img src="${s.url}" alt="${s.name}" style="max-width:100%;border:1px solid var(--border);border-radius:var(--radius);">`;
+  else if (isPdf) preview = `<iframe src="${s.url}" style="width:100%;height:62vh;border:1px solid var(--border);border-radius:var(--radius);"></iframe>`;
+  else preview = `<div class="doc-scan-placeholder">תצוגה מקדימה אינה זמינה לסוג קובץ זה — ניתן להוריד או לפתוח בכרטיסייה חדשה.</div>`;
+  document.getElementById('doc-popup-body').innerHTML = `
+    <div class="doc-placeholder-label" style="margin-bottom:8px;">קובץ מקור שהועלה ידנית · ${s.name}</div>
+    ${preview}
+    <div class="doc-actions">
+      <a class="doc-action-btn" href="${s.url}" download="${s.name}" style="text-decoration:none;">הורד קובץ</a>
+      <a class="doc-action-btn" href="${s.url}" target="_blank" rel="noopener" style="text-decoration:none;">פתח בכרטיסייה חדשה</a>
+    </div>`;
+  document.getElementById('doc-popup').classList.add('open');
+}
+
+function uploadEventSource(dxIdx, evIdx) {
+  triggerSourceUpload(function (id) {
+    patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx].uploadedDoc = id;
+    renderDiagnoses();
+    const tl = document.getElementById('tl-' + dxIdx);
+    if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+    openUploadedSource(id);
+  });
+}
+
+function uploadDeclarationSource() {
+  triggerSourceUpload(function (id) {
+    patientsState[currentIdx].uploadedDeclaration = id;
+    renderHealthDeclActions();
+    openUploadedSource(id);
+  });
+}
+
+function uploadPrevDeclSource(di) {
+  triggerSourceUpload(function (id) {
+    const arr = previousDeclarations[currentIdx] || [];
+    if (arr[di]) arr[di].uploadedDoc = id;
+    renderPrevDeclarations();
+    openUploadedSource(id);
+  });
+}
+
+function uploadDocSource(i) {
+  triggerSourceUpload(function (id) {
+    const d = (patientDocuments[currentIdx] || [])[i];
+    if (!d) return;
+    d.uploadedDoc = id;
+    openDocsList();
+    openUploadedSource(id);
+  });
+}
+
+function openDocumentOriginal(i) {
+  const d = (patientDocuments[currentIdx] || [])[i];
+  if (!d) return;
+  if (d.uploadedDoc) { openUploadedSource(d.uploadedDoc); return; }
+  if (d.docKey && docs[d.docKey]) {
+    openDoc(d.docKey);
+    return;
+  }
+  // No parsed content — show original scan placeholder
+  document.getElementById('doc-popup-title').textContent = d.name;
+  document.getElementById('doc-popup-meta').textContent = `${d.type} · ${d.date}`;
+  const reasonBlock = d.status === 'failed'
+    ? `<div class="doc-placeholder" style="border-color:var(--dot-red);background:#fff8f8;">
+         <div class="doc-placeholder-label" style="color:var(--red);">המערכת לא הצליחה לקרוא מסמך זה</div>
+         <div class="doc-excerpt" style="font-size:12px;"><span class="reason-label" style="color:var(--red);font-weight:600;">סיבת הכשל:</span> ${d.failReason || 'לא ידוע'}</div>
+       </div>`
+    : '';
+  document.getElementById('doc-popup-body').innerHTML = `
+    ${reasonBlock}
+    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-actions">
+      <button class="doc-action-btn">הורד PDF</button>
+      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
+      <button class="doc-action-btn">הוסף הערה</button>
+    </div>`;
+  document.getElementById('doc-popup').classList.add('open');
+}
+
+function markDocRead(i) {
+  const d = (patientDocuments[currentIdx] || [])[i];
+  if (!d || d.status !== 'failed') return;
+  if (!confirm(`לשנות ידנית את סטטוס המסמך "${d.name}" ל״נקרא״?`)) return;
+  d.status = 'ok';
+  d.manualRead = true;
+  openDocsList();      // refresh popup with updated row
+  renderDocsStatus();  // refresh the summary bar on the panel
+}
+
+function markManualUnderwriting(i) {
+  const d = (patientDocuments[currentIdx] || [])[i];
+  if (!d) return;
+  d.manualRouted = true;
+  const btn = document.getElementById('manual-btn-' + i);
+  if (btn) {
+    btn.textContent = '✓ נשלח לחיתום ידני';
+    btn.classList.remove('primary');
+    btn.classList.add('manual-done');
+    btn.disabled = true;
+    btn.style.cursor = 'default';
+  }
+}
+
+function renderDiagnoses() {
+  const list = document.getElementById('diagnoses-list');
+  const diags = patientsState[currentIdx].diagnoses;
+  if (!diags.length) {
+    list.innerHTML = `<div class="placeholder-block" style="margin-bottom:8px;">אין אבחנות רשומות לת״ז זו</div>`;
+    return;
+  }
+  list.innerHTML = diags.map((dx, idx) => buildCard(dx, idx)).join('');
+}
+
+function buildCard(dx, idx) {
+  const tlHtml = dx.timeline.map((item, ei) => `
+    <div class="timeline-item">
+      <div class="tl-date">${item.date}</div>
+      <div class="tl-dot"></div>
+      <div class="tl-text" ${item.doc ? `onclick="openDoc('${item.doc}')"` : 'style="text-decoration:none;cursor:default;"'}>${item.text}</div>
+      <div class="tl-actions">
+        ${item.uploadedDoc ? `<button class="tl-mini-btn" onclick="event.stopPropagation();openUploadedSource('${item.uploadedDoc}')" title="פתח מסמך מקור שהועלה">📄</button>` : ''}
+        <button class="tl-mini-btn" onclick="event.stopPropagation();uploadEventSource(${idx}, ${ei})" title="העלה קובץ מקור">📎</button>
+        <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
+        <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
+      </div>
+    </div>
+  `).join('');
+
+  const tableBtn = dx.loadingTableKey
+    ? `<button class="dx-table-btn" onclick="event.stopPropagation();openLoadingTable('${dx.loadingTableKey}')">טבלת מקור ▸</button>`
+    : '';
+
+  // ----- status tags: anomaly / pending / missing -----
+  const missingCount = (dx.requiredDocs || []).filter(d => !d.received).length;
+  let tagHtml = '';
+  if (dx.inDeclaration === false) {
+    tagHtml += `<span class="dx-tag dx-tag-anomaly" title="אבחנה שזוהתה במסמכים ואינה מופיעה בהצהרת הבריאות">⚠ אבחנה לא בהצהרה</span>`;
+  }
+  if (dx.missingStatus) {
+    tagHtml += `<span class="dx-tag dx-tag-pending" title="נשלחה בקשה ללקוח">⏳ ממתין להשלמת מסמכים · ${dx.missingStatus.sentDate}</span>`;
+  } else if (missingCount > 0) {
+    tagHtml += `<span class="dx-tag dx-tag-missing" onclick="event.stopPropagation();openMissingDocs(${idx})" title="לחץ לרשימת המסמכים הנדרשים">חוסרים (${missingCount})</span>`;
+  }
+  if (dx.tempLoading) {
+    const t = dx.tempLoading;
+    const parts = [];
+    if (t.pct) parts.push(t.pct + '%');
+    if (t.permille) parts.push(t.permille + '‰');
+    const untilTxt = t.until ? ' · עד ' + fmtDate(t.until) : '';
+    tagHtml += `<span class="dx-tag dx-tag-temp" onclick="event.stopPropagation();openTempLoading(${idx})" title="תוספת זמנית לקבוצת סיכון — לחץ לעריכה">⏱ זמנית ${parts.join(' / ') || '—'}${untilTxt}</span>`;
+  }
+
+  return `
+    <div class="diagnosis-card">
+      <div class="diagnosis-header" onclick="toggleTl(${idx})">
+        <span class="dx-toggle" id="toggle-${idx}">▶</span>
+        <span class="dx-name">${dx.code}</span>
+        ${tagHtml}
+        <span class="dx-full-name">— ${dx.fullName}</span>
+        <div class="dx-loading-wrap" onclick="event.stopPropagation()">
+          <span class="dx-loading-label">תוספת אחוז:</span>
+          <input type="number" class="dx-loading-input" id="loading-${idx}"
+            value="${dx.loading}" min="0" max="500" step="25"
+            onchange="onLoadingChange(${idx}, this.value)"
+            title="לחץ פעמיים לטבלת מקור">
+          <span class="dx-loading-pct">%</span>
+          ${tableBtn}
+        </div>
+        <div class="dx-permille-wrap" onclick="event.stopPropagation()">
+          <span class="dx-loading-label">תוספת פרומיל:</span>
+          <input type="number" class="dx-permille-input" id="permille-${idx}"
+            value="${dx.loadingPermille}" min="0" max="100" step="0.5"
+            onchange="onPermilleChange(${idx}, this.value)">
+          <span class="dx-loading-pct">‰</span>
+        </div>
+        <button class="dx-temp-btn" onclick="event.stopPropagation();openTempLoading(${idx})" title="תוספת זמנית לקבוצת סיכון">⏱ תוספת זמנית</button>
+        <button class="dx-edit-btn" onclick="event.stopPropagation();editDx(${idx})" title="ערוך אבחנה">✏</button>
+        <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
+      </div>
+      <div class="timeline-container" id="tl-${idx}">
+        <div class="timeline-title">אירועים רפואיים — לחץ על פריט לפתיחת מסמך מקור</div>
+        ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
+        <button class="tl-add-btn" onclick="event.stopPropagation();addEvent(${idx})">
+          <span style="font-size:13px;line-height:1;">＋</span> הוסף אירוע רפואי
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleTl(idx) {
+  const tl = document.getElementById('tl-' + idx);
+  const tog = document.getElementById('toggle-' + idx);
+  const open = tl.classList.toggle('open');
+  tog.textContent = open ? '▼' : '▶';
+}
+
+function onLoadingChange(idx, val) {
+  let n = parseInt(val) || 0;
+  n = Math.max(0, Math.round(n / 25) * 25);
+  patientsState[currentIdx].diagnoses[idx].loading = n;
+  document.getElementById('loading-' + idx).value = n;
+  updateAgg();
+}
+
+function onPermilleChange(idx, val) {
+  let n = parseFloat(val) || 0;
+  n = Math.max(0, n);
+  patientsState[currentIdx].diagnoses[idx].loadingPermille = n;
+  document.getElementById('permille-' + idx).value = n;
+  updateAgg();
+}
+
+function onSummaryFieldChange(field, val) {
+  patientsState[currentIdx][field] = (val || '').trim();
+  updateAgg(); // recompute derived fields (e.g. תוספת מתבטלת)
+}
+
+function fmtPct(n) {
+  // integer → no decimals, otherwise one decimal place
+  return (Number.isInteger(n) ? n : Math.round(n * 10) / 10) + '%';
+}
+
+function updateAgg() {
+  const p = patientsState[currentIdx];
+  const diags = p.diagnoses;
+  const maxEl = document.getElementById('agg-max');
+  const cancelEl = document.getElementById('agg-cancelling');
+
+  // maximum addition ALWAYS equals the cumulative total; cancelling = total - 50
+  const total = diags.reduce((s, d) => s + d.loading, 0);
+  if (maxEl) maxEl.value = fmtPct(total);
+  if (cancelEl) cancelEl.value = fmtPct(Math.max(0, total - 50));
+
+  if (!diags.length) {
+    document.getElementById('agg-total').textContent = '0%';
+    document.getElementById('agg-breakdown').textContent = '—';
+    document.getElementById('footer-total').textContent = '0%';
+    return;
+  }
+  const totalPermille = diags.reduce((s, d) => s + (d.loadingPermille || 0), 0);
+  const permilleSuffix = totalPermille > 0 ? ` + ${totalPermille}‰` : '';
+  document.getElementById('agg-total').textContent = total + '%' + permilleSuffix;
+  document.getElementById('agg-breakdown').textContent = diags.map(d =>
+    d.code + ' ' + d.loading + '%' + (d.loadingPermille ? ` / ${d.loadingPermille}‰` : '')
+  ).join(' + ');
+  document.getElementById('footer-total').textContent = total + '%' + permilleSuffix;
+}
+
+function addDiagnosis() {
+  const code = prompt('קוד אבחנה (לדוגמה: HTN, ASTHMA):');
+  if (!code || !code.trim()) return;
+  const full = prompt('שם מלא של האבחנה:') || code;
+  patientsState[currentIdx].diagnoses.push({
+    code: code.trim().toUpperCase(), fullName: full.trim(),
+    loading: 25, loadingPermille: 0, flag: null, loadingTableKey: null, timeline: [],
+    requiredDocs: [], inDeclaration: true, missingStatus: null,
+  });
+  renderDiagnoses();
+  updateAgg();
+}
+
+function editDx(idx) {
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  const nc = prompt('קוד אבחנה:', dx.code);
+  if (nc !== null && nc.trim()) dx.code = nc.trim().toUpperCase();
+  const nf = prompt('שם מלא:', dx.fullName);
+  if (nf !== null && nf.trim()) dx.fullName = nf.trim();
+  renderDiagnoses();
+}
+
+function deleteDiagnosis(idx) {
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  if (!confirm(`למחוק את האבחנה "${dx.code}"?`)) return;
+  patientsState[currentIdx].diagnoses.splice(idx, 1);
+  renderDiagnoses();
+  updateAgg();
+}
+
+// ===== TEMPORARY LOADING (risk group) =====
+let tempCtx = null; // diagnosis index
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const p = ('' + iso).split('-');
+  return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : iso;
+}
+
+function openTempLoading(idx) {
+  tempCtx = idx;
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  const t = dx.tempLoading || {};
+  document.getElementById('temp-popup-meta').textContent = dx.code + ' — ' + dx.fullName;
+  document.getElementById('temp-pct').value = (t.pct != null ? t.pct : dx.loading);
+  document.getElementById('temp-permille').value = (t.permille != null ? t.permille : dx.loadingPermille);
+  document.getElementById('temp-until').value = t.until || '';
+  document.getElementById('temp-clear-btn').style.display = dx.tempLoading ? 'inline-block' : 'none';
+  document.getElementById('temp-popup').classList.add('open');
+}
+
+function confirmTempLoading() {
+  const dx = patientsState[currentIdx].diagnoses[tempCtx];
+  if (!dx) return;
+  const pct = Math.max(0, parseFloat(document.getElementById('temp-pct').value) || 0);
+  const permille = Math.max(0, parseFloat(document.getElementById('temp-permille').value) || 0);
+  const until = document.getElementById('temp-until').value;
+  dx.tempLoading = { pct, permille, until };
+  closePopup('temp-popup');
+  renderDiagnoses();
+}
+
+function clearTempLoading() {
+  const dx = patientsState[currentIdx].diagnoses[tempCtx];
+  if (dx) dx.tempLoading = null;
+  closePopup('temp-popup');
+  renderDiagnoses();
+}
+
+// ===== MEDICAL EVENTS (timeline) CRUD =====
+function addEvent(dxIdx) {
+  const date = prompt('תאריך האירוע (לדוגמה: 03/2024):');
+  if (date === null) return;
+  const text = prompt('תיאור האירוע הרפואי:');
+  if (!text || !text.trim()) return;
+  patientsState[currentIdx].diagnoses[dxIdx].timeline.push({
+    date: (date || '').trim() || '—', text: text.trim(), doc: null,
+  });
+  renderDiagnoses();
+  const tl = document.getElementById('tl-' + dxIdx);
+  if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+}
+
+function editEvent(dxIdx, evIdx) {
+  const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
+  const nd = prompt('תאריך האירוע:', ev.date);
+  if (nd !== null && nd.trim()) ev.date = nd.trim();
+  const nt = prompt('תיאור האירוע:', ev.text);
+  if (nt !== null && nt.trim()) ev.text = nt.trim();
+  renderDiagnoses();
+  const tl = document.getElementById('tl-' + dxIdx);
+  if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+}
+
+function deleteEvent(dxIdx, evIdx) {
+  if (!confirm('למחוק אירוע רפואי זה?')) return;
+  patientsState[currentIdx].diagnoses[dxIdx].timeline.splice(evIdx, 1);
+  renderDiagnoses();
+  const tl = document.getElementById('tl-' + dxIdx);
+  if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+}
+
+// =====================================================================
+// MISSING DOCUMENTS + CLIENT EMAIL REQUEST
+// =====================================================================
+let missingCtx = null; // diagnosis index
+let emailMode = 'single'; // 'single' | 'aggregate'
+
+function openMissingDocs(idx) {
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  if (!dx) return;
+  missingCtx = idx;
+  const p = patientsState[currentIdx];
+  const reqs = dx.requiredDocs || [];
+  const missing = reqs.filter(d => !d.received);
+  document.getElementById('missing-popup-title').textContent = 'מסמכים נדרשים — ' + dx.code;
+  document.getElementById('missing-popup-meta').textContent =
+    `${dx.fullName} · ${reqs.length - missing.length}/${reqs.length} התקבלו`;
+
+  const items = reqs.map(d => `
+    <div class="missing-item ${d.received ? 'received' : 'missing'}">
+      <span class="missing-mark ${d.received ? 'ok' : 'no'}">${d.received ? '✓' : '✗'}</span>
+      <span class="missing-item-name">${d.name}</span>
+      <span class="missing-item-status">${d.received ? 'התקבל' : 'חסר'}</span>
+    </div>`).join('');
+
+  const sendBlock = missing.length
+    ? `<button class="submit-btn" onclick="openEmailModal()">📧 שלח בקשה ללקוח</button>`
+    : `<div style="font-size:12px;color:var(--green);">✓ כל המסמכים הנדרשים התקבלו</div>`;
+
+  document.getElementById('missing-popup-body').innerHTML = `
+    <div class="missing-list">${items}</div>
+    ${sendBlock}`;
+  document.getElementById('missing-popup').classList.add('open');
+}
+
+function buildEmailBody(p, dx, missing) {
+  const lines = missing.map((d, i) => `${i + 1}. ${d.name}`).join('\n');
+  return `שלום ${p.name},\n\n`
+    + `במסגרת בחינת בקשתך לפוליסה ${p.policy}, נדרשת השלמת המסמכים הרפואיים הבאים בנוגע לאבחנה ${dx.code} (${dx.fullName}):\n\n`
+    + `${lines}\n\n`
+    + `נודה לך אם תוכל/י להעביר את המסמכים בהקדם דרך אזור האישי או בהשבה למייל זה.\n\n`
+    + `בברכה,\nמחלקת חיתום — APEX`;
+}
+
+function openEmailModal() {
+  emailMode = 'single';
+  const idx = missingCtx;
+  const p = patientsState[currentIdx];
+  const dx = p.diagnoses[idx];
+  const missing = (dx.requiredDocs || []).filter(d => !d.received);
+  document.getElementById('email-to').value = p.email;
+  document.getElementById('email-subject').value = `בקשה להשלמת מסמכים רפואיים – פוליסה ${p.policy}`;
+  document.getElementById('email-body').value = buildEmailBody(p, dx, missing);
+  openEmailPopupReadonly();
+}
+
+// Aggregated draft: ALL missing documents across all diagnoses of the client
+function buildAggregatedBody(p, withMissing) {
+  let count = 0;
+  const blocks = withMissing.map(({ dx, missing }) => {
+    count += missing.length;
+    const lines = missing.map(d => `   • ${d.name}`).join('\n');
+    return `אבחנה ${dx.code} (${dx.fullName}):\n${lines}`;
+  }).join('\n\n');
+  return `שלום ${p.name},\n\n`
+    + `במסגרת בחינת בקשתך לפוליסה ${p.policy}, נדרשת השלמת המסמכים הרפואיים הבאים `
+    + `(${count} מסמכים, ${withMissing.length} אבחנות):\n\n`
+    + `${blocks}\n\n`
+    + `נודה לך אם תוכל/י להעביר את המסמכים בהקדם דרך האזור האישי או בהשבה למייל זה.\n\n`
+    + `בברכה,\nמחלקת חיתום — APEX`;
+}
+
+function openApprovalMissingEmail() {
+  const p = patientsState[currentIdx];
+  const withMissing = p.diagnoses
+    .map(dx => ({ dx, missing: (dx.requiredDocs || []).filter(d => !d.received) }))
+    .filter(x => x.missing.length > 0);
+  if (!withMissing.length) {
+    alert('אין מסמכים חסרים עבור לקוח זה — כל המסמכים הנדרשים התקבלו.');
+    return;
+  }
+  emailMode = 'aggregate';
+  document.getElementById('email-to').value = p.email;
+  document.getElementById('email-subject').value = `בקשה להשלמת מסמכים רפואיים – פוליסה ${p.policy}`;
+  document.getElementById('email-body').value = buildAggregatedBody(p, withMissing);
+  openEmailPopupReadonly();
+}
+
+function openEmailPopupReadonly() {
+  ['email-to', 'email-subject', 'email-body'].forEach(id => document.getElementById(id).setAttribute('readonly', ''));
+  document.getElementById('email-edit-btn').textContent = '✏ ערוך לפני שליחה';
+  document.getElementById('email-popup').classList.add('open');
+}
+
+function enableEmailEdit() {
+  ['email-subject', 'email-body'].forEach(id => document.getElementById(id).removeAttribute('readonly'));
+  document.getElementById('email-edit-btn').textContent = '✓ ניתן לעריכה';
+  document.getElementById('email-body').focus();
+}
+
+function sendMissingEmail() {
+  const today = new Date().toLocaleDateString('he-IL');
+  if (emailMode === 'aggregate') {
+    patientsState[currentIdx].diagnoses.forEach(dx => {
+      const missing = (dx.requiredDocs || []).filter(d => !d.received);
+      if (missing.length) dx.missingStatus = { sentDate: today };
+    });
+  } else {
+    const dx = patientsState[currentIdx].diagnoses[missingCtx];
+    if (dx) dx.missingStatus = { sentDate: today };
+  }
+  closePopup('email-popup');
+  closePopup('missing-popup');
+  renderDiagnoses();
+  alert('הבקשה נשלחה ללקוח. סטטוס האבחנות הרלוונטיות עודכן ל״ממתין להשלמת מסמכים״.');
+}
+
+// =====================================================================
+// OCCUPATION + PROFESSION (diagnosis-style rows)
+// =====================================================================
+const lifestyleLabels = { occupation: 'עיסוק', profession: 'תחביבים' };
+
+function lsSourceOptions(selected) {
+  const docsList = (patientDocuments[currentIdx] || []).filter(d => d.docKey);
+  const opts = ['<option value="">— ללא מקור —</option>'];
+  // include any selected docKey even if not in the patient doc list (e.g. health declaration)
+  const seen = new Set(docsList.map(d => d.docKey));
+  docsList.forEach(d => {
+    opts.push(`<option value="${d.docKey}" ${d.docKey === selected ? 'selected' : ''}>${d.name} · ${d.date}</option>`);
+  });
+  if (selected && !seen.has(selected) && docs[selected]) {
+    opts.push(`<option value="${selected}" selected>${docs[selected].title}</option>`);
+  }
+  return opts.join('');
+}
+
+function renderLifestyle() {
+  const wrap = document.getElementById('lifestyle-list');
+  const ls = patientsState[currentIdx].lifestyle;
+  const rows = ['occupation', 'profession'].map(key => ({ key, kind: lifestyleLabels[key], data: ls[key] }));
+  wrap.innerHTML = rows.map(r => `
+    <div class="diagnosis-card">
+      <div class="diagnosis-header" onclick="toggleLs('${r.key}')">
+        <span class="dx-toggle" id="ls-toggle-${r.key}">▶</span>
+        <span class="dx-name">${r.kind}</span>
+        <span class="dx-full-name">— ${r.data.value || '—'}</span>
+        <div class="dx-loading-wrap" onclick="event.stopPropagation()">
+          <span class="dx-loading-label">תוספת אחוז:</span>
+          <input type="number" class="dx-loading-input" id="ls-pct-${r.key}"
+            value="${r.data.loadingPct}" min="0" max="500" step="25"
+            onchange="onLifestyleChange('${r.key}','loadingPct',this.value)">
+          <span class="dx-loading-pct">%</span>
+        </div>
+        <div class="dx-permille-wrap" onclick="event.stopPropagation()">
+          <span class="dx-loading-label">תוספת פרומיל:</span>
+          <input type="number" class="dx-permille-input" id="ls-permille-${r.key}"
+            value="${r.data.loadingPermille}" min="0" max="100" step="0.5"
+            onchange="onLifestyleChange('${r.key}','loadingPermille',this.value)">
+          <span class="dx-loading-pct">‰</span>
+        </div>
+        <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
+      </div>
+      <div class="timeline-container" id="ls-tl-${r.key}">
+        <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
+        <div class="ls-source-row">
+          <span class="ls-mini-label">מקור:</span>
+          <select class="ls-source-select" onchange="onLsSourceChange('${r.key}', this.value)">
+            ${lsSourceOptions(r.data.source)}
+          </select>
+          <button class="dx-table-btn" onclick="openLsSource('${r.key}')" ${r.data.source ? '' : 'disabled'}>פתח מקור ▸</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleLs(key) {
+  const tl = document.getElementById('ls-tl-' + key);
+  const tog = document.getElementById('ls-toggle-' + key);
+  const open = tl.classList.toggle('open');
+  tog.textContent = open ? '▼' : '▶';
+}
+
+function onLifestyleChange(key, field, val) {
+  let n = parseFloat(val) || 0;
+  n = Math.max(0, field === 'loadingPct' ? Math.round(n / 25) * 25 : n);
+  patientsState[currentIdx].lifestyle[key][field] = n;
+  const id = (field === 'loadingPct' ? 'ls-pct-' : 'ls-permille-') + key;
+  const el = document.getElementById(id);
+  if (el) el.value = n;
+}
+
+function onLsSourceChange(key, val) {
+  patientsState[currentIdx].lifestyle[key].source = val;
+  renderLifestyle();
+  const tl = document.getElementById('ls-tl-' + key);
+  if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-' + key).textContent = '▼'; }
+}
+
+function openLsSource(key) {
+  const src = patientsState[currentIdx].lifestyle[key].source;
+  if (src && docs[src]) openDoc(src);
+}
+
+function editLifestyle(key) {
+  const item = patientsState[currentIdx].lifestyle[key];
+  const nv = prompt('תיאור ' + lifestyleLabels[key] + ':', item.value);
+  if (nv !== null) item.value = nv.trim() || '—';
+  renderLifestyle();
+}
+
+// =====================================================================
+// POPUPS
+// =====================================================================
+function openDoc(key) {
+  const d = docs[key];
+  if (!d) return;
+  document.getElementById('doc-popup-title').textContent = d.title;
+  document.getElementById('doc-popup-meta').textContent = d.meta;
+  const metaRow = d.metaItems.map(m => `<div class="doc-meta-item">${m.label}: <span>${m.val}</span></div>`).join('');
+  document.getElementById('doc-popup-body').innerHTML = `
+    <div class="doc-placeholder">
+      <div class="doc-placeholder-label">תמצית תוכן מסמך</div>
+      <div class="doc-excerpt">${d.excerpt}</div>
+      <div class="doc-meta-row">${metaRow}</div>
+    </div>
+    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-actions">
+      <button class="doc-action-btn">הורד PDF</button>
+      <button class="doc-action-btn">צפה במקור</button>
+      <button class="doc-action-btn">הוסף הערה</button>
+    </div>
+  `;
+  document.getElementById('doc-popup').classList.add('open');
+}
+
+function openLoadingTable(key) {
+  const t = loadingTables[key];
+  if (!t) return;
+  document.getElementById('loading-popup-title').textContent = t.title;
+  document.getElementById('loading-popup-meta').textContent = t.meta;
+
+  const colH = t.cols.map(c => `<th>${c}</th>`).join('');
+  const rowsH = t.rows.map(row => {
+    const isActive = row.active;
+    const cells = row.vals.map(v => `<td class="${isActive ? 'active-cell' : ''}">${v}</td>`).join('');
+    return `<tr><td class="${isActive ? 'row-active-label' : ''}">${row.label}</td>${cells}</tr>`;
+  }).join('');
+
+  document.getElementById('loading-popup-body').innerHTML = `
+    <div class="loading-table-wrap">
+      <table class="loading-table">
+        <thead><tr>${colH}</tr></thead>
+        <tbody>${rowsH}</tbody>
+      </table>
+    </div>
+    <div class="table-note">${t.note}</div>
+  `;
+  document.getElementById('loading-popup').classList.add('open');
+}
+
+function closePopup(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ===== APPROVAL POPUP =====
+function openApprovalPopup() {
+  const p = patientsState[currentIdx];
+  const total = document.getElementById('footer-total').textContent;
+  document.getElementById('approval-popup-meta').textContent =
+    `${p.name}${p.policy ? ' · פוליסה ' + p.policy : ''} · תוספת כוללת ${total}`;
+  document.getElementById('approval-popup').classList.add('open');
+}
+
+function runApproval(action) {
+  const labels = {
+    issue: 'הפקת פוליסה',
+    missing: 'שליחת מכתב להשלמת חוסרים',
+    reject: 'שליחת מכתב של דחיית פוליסה',
+    loadings: 'שליחת מכתב של פירוט תוספות',
+    reinsurer: 'שליחה למבטח משנה',
+  };
+  closePopup('approval-popup');
+  if (action === 'missing') { openApprovalMissingEmail(); return; }
+  alert('בוצע: ' + labels[action]);
+}
+
+// =====================================================================
+// SECTION FEEDBACK (like / dislike + rating popup)
+// =====================================================================
+const feedbackSections = {
+  'health':    { wrapId: 'fb-health',    label: 'הצהרת בריאות' },
+  'lifestyle': { wrapId: 'fb-lifestyle', label: 'עיסוק ותחביבים' },
+  'diagnoses': { wrapId: 'fb-diagnoses', label: 'אבחנות רפואיות' },
+  'docs':      { wrapId: 'fb-docs',      label: 'מסמכים' },
+  'summary':   { wrapId: 'fb-summary',   label: 'סיכום תוספות' },
+};
+
+function renderAllFeedback() {
+  Object.keys(feedbackSections).forEach(renderFeedbackBtns);
+}
+
+function renderFeedbackBtns(key) {
+  const wrap = document.getElementById(feedbackSections[key].wrapId);
+  if (!wrap) return;
+  const fb = feedbackState[key];
+  const likeActive = fb && fb.vote === 'like' ? 'active' : '';
+  const dislikeActive = fb && fb.vote === 'dislike' ? 'active' : '';
+  const title = fb ? ` title="נשלח פידבק לסקשן זה"` : '';
+  wrap.innerHTML = `
+    <button class="fb-btn like ${likeActive}" onclick="openFeedback('${key}','like')"${title}>👍</button>
+    <button class="fb-btn dislike ${dislikeActive}" onclick="openFeedback('${key}','dislike')"${title}>👎</button>`;
+}
+
+function openFeedback(key, vote) {
+  fbContext = { key, vote };
+  document.getElementById('feedback-popup-meta').textContent =
+    'סקשן: ' + feedbackSections[key].label + (vote === 'like' ? ' · 👍' : ' · 👎');
+  document.getElementById('fb-text').value = (feedbackState[key] && feedbackState[key].text) || '';
+  document.getElementById('feedback-popup').classList.add('open');
+}
+
+function submitFeedback() {
+  const key = fbContext.key;
+  if (!key) return;
+  feedbackState[key] = {
+    vote: fbContext.vote,
+    text: document.getElementById('fb-text').value.trim(),
+  };
+  renderFeedbackBtns(key);
+  closePopup('feedback-popup');
+  alert(`הפידבק נשמר — ${feedbackSections[key].label}`);
+}
+
+// =====================================================================
+// HEALTH DECLARATION — ORIGINAL CHECKLIST VIEW
+// =====================================================================
+function hdBox(answer, kind) {
+  // kind: 'yes' or 'no'; answer is 'yes'/'no'/null
+  const checked = answer === kind;
+  const cls = checked ? (kind === 'yes' ? 'checked-yes' : 'checked-no') : '';
+  const mark = checked ? (kind === 'yes' ? '✓' : '✕') : '';
+  const labelTxt = kind === 'yes' ? 'כן' : 'לא';
+  return `<span class="hd-checkbox"><span class="hd-box ${cls}">${mark}</span>${labelTxt}</span>`;
+}
+
+function hdAnswerGroup(insureds, answersPerInsured) {
+  return insureds.map((ins, i) => {
+    const a = answersPerInsured ? answersPerInsured[i] : null;
+    return `
+      <div class="hd-ans-group">
+        <span class="hd-ans-name">${ins.first}</span>
+        <div class="hd-ans-boxes">${hdBox(a, 'yes')}${hdBox(a, 'no')}</div>
+      </div>`;
+  }).join('');
+}
+
+function openHealthForm(idx) {
+  const form = healthForms[idx];
+  if (!form) return;
+  const p = patientsState[idx];
+  document.getElementById('hdform-popup-title').textContent = 'הצהרת בריאות מקורית — ' + p.name;
+  document.getElementById('hdform-popup-meta').textContent =
+    `טופס חתום · ${form.sign} · ${form.date} · ${form.insureds.length} מבוטחים`;
+
+  const ins = form.insureds;
+
+  // --- Header: insured details table ---
+  const insuredRows = ins.map((m, i) => `
+    <tr>
+      <td>${i === 0 ? 'מבוטח ראשון' : 'מבוטח שני'}</td>
+      <td style="direction:ltr;">${m.id}</td>
+      <td>${m.last}</td>
+      <td>${m.first}</td>
+      <td>${m.gender}</td>
+      <td>${m.height}</td>
+      <td>${m.weight}</td>
+    </tr>`).join('');
+
+  const headerTable = `
+    <div class="hd-form-section">
+      <div class="hd-form-section-title">פרטי המבוטחים</div>
+      <table class="hd-insured-table">
+        <thead><tr>
+          <th></th><th>מספר זהות</th><th>שם משפחה</th><th>שם פרטי</th>
+          <th>מין</th><th>גובה (ס״מ)</th><th>משקל (ק״ג)</th>
+        </tr></thead>
+        <tbody>${insuredRows}</tbody>
+      </table>
+    </div>`;
+
+  // --- Body: 7 questions ---
+  const questionsHtml = hdQuestions.map(q => {
+    if (q.smoking) {
+      const sm = form.answers[2];
+      const countRow = ins.map((m, i) =>
+        `${m.first}: <strong>${sm.count[i]}</strong> סיגריות/פעמים ביום`).join(' · ');
+      const quitRow = `<div class="hd-subq">
+          <span class="hd-subq-text">שאלת המשך: האם הפסיק/ה לעשן בשנתיים האחרונות?</span>
+          <div class="hd-q-answers">${hdAnswerGroup(ins, sm.quit2yrs)}</div>
+        </div>`;
+      return `
+        <div class="hd-q">
+          <div class="hd-q-head">
+            <span class="hd-q-num">${q.num}.</span>
+            <span class="hd-q-text">${q.text} — האם מעשן/ת?</span>
+            <div class="hd-q-answers">${hdAnswerGroup(ins, sm.smokes)}</div>
+          </div>
+          <div class="hd-q-extra">אם כן — כמות: ${countRow}</div>
+          ${quitRow}
+        </div>`;
+    }
+    if (q.subs) {
+      const subsHtml = q.subs.map((s, si) => `
+        <div class="hd-subq">
+          <span class="hd-subq-text">${s}</span>
+          <div class="hd-q-answers">${hdAnswerGroup(ins, form.answers[3][si])}</div>
+        </div>`).join('');
+      const extra = form.extra[q.num] ? `<div class="hd-q-extra">${form.extra[q.num]}</div>` : '';
+      return `
+        <div class="hd-q">
+          <div class="hd-q-head">
+            <span class="hd-q-num">${q.num}.</span>
+            <span class="hd-q-text">${q.text}</span>
+          </div>
+          ${subsHtml}
+          ${extra}
+        </div>`;
+    }
+    const extra = form.extra[q.num] ? `<div class="hd-q-extra">${form.extra[q.num]}</div>` : '';
+    return `
+      <div class="hd-q">
+        <div class="hd-q-head">
+          <span class="hd-q-num">${q.num}.</span>
+          <span class="hd-q-text">${q.text}</span>
+          <div class="hd-q-answers">${hdAnswerGroup(ins, form.answers[q.num])}</div>
+        </div>
+        ${extra}
+      </div>`;
+  }).join('');
+
+  const bodySection = `
+    <div class="hd-form-section">
+      <div class="hd-form-section-title">גוף ההצהרה — שאלות בריאות</div>
+      ${questionsHtml}
+    </div>`;
+
+  // --- Footer ---
+  const signBoxes = ins.map(m => `
+    <div class="hd-sign-box">
+      <div class="hd-sign-label">חתימת ${m.first} ${m.last}</div>
+      <div class="hd-sign-line"></div>
+      <div class="hd-sign-caption">תאריך: ${form.date}</div>
+    </div>`).join('');
+
+  const footerSection = `
+    <div class="hd-form-section">
+      <div class="hd-form-section-title">אישור וחתימה</div>
+      <div class="hd-note-box">
+        <strong>לתשומת ליבך:</strong> עבור מבוטחים מעל גיל 65 — נדרשת התייחסות מורחבת ובדיקות משלימות בהתאם למדיניות החיתום.
+      </div>
+      <div class="hd-declare-text">
+        אני הח״מ מצהיר/ה ומאשר/ת כדלקמן:
+        <ol>
+          <li>כל התשובות שמסרתי בהצהרה זו מלאות, נכונות וכנות, ולא העלמתי כל מידע רפואי מהותי.</li>
+          <li>ידוע לי כי הצהרה זו מהווה בסיס לקבלה לביטוח, וכי אני מוותר/ת בזאת על סודיות רפואית כלפי המבטח לצורך בדיקת הבקשה.</li>
+        </ol>
+      </div>
+      <div class="hd-sign-row">${signBoxes}</div>
+    </div>`;
+
+  document.getElementById('hdform-popup-body').innerHTML = `
+    <div class="hd-readonly-note">תצוגה לקריאה בלבד — הסימונים משקפים את הערכים מהטופס המקורי החתום.</div>
+    ${headerTable}${bodySection}${footerSection}`;
+  document.getElementById('hdform-popup').classList.add('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.popup-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closePopup(el.id); });
+});
+
+// =====================================================================
+// API TABS
+// =====================================================================
+let mainTab = 'calc';
+let calcTab = 'cmc';
+const calcList = ['cmc', 'ckd', 'cad', 'lvmc', 'jvc', 'cc'];
+const calcMeta = {
+  cmc:  'מחשבון קרדיומטאבולי',
+  ckd:  'מחשבון מחלת כליות כרונית (CKD)',
+  cad:  'מחשבון מחלת לב כלילית (CAD)',
+  lvmc: 'מחשבון מסת חדר שמאל (LVMC)',
+  jvc:  'מחשבון ורידי הצוואר (JVC)',
+  cc:   'מחשבון קליני כללי (CC)',
+};
+
+function buildGenericCalcs() {
+  const host = document.getElementById('generic-calcs');
+  host.innerHTML = ['ckd', 'cad', 'lvmc', 'jvc', 'cc'].map(k => `
+    <div class="api-panel" id="panel-${k}">
+      <div class="section-title" style="margin-bottom:10px;">${calcMeta[k]}</div>
+      <div class="cmc-form">
+        <div class="calc-placeholder">מבנה זהה ל-CMC — אזור שדות קלט (placeholder). השדות הספציפיים ל-${k.toUpperCase()} יתווספו בהמשך.</div>
+        <div class="form-grid">
+          <div class="form-field"><label class="form-label">פרמטר 1</label><input class="form-input" disabled placeholder="—"></div>
+          <div class="form-field"><label class="form-label">פרמטר 2</label><input class="form-input" disabled placeholder="—"></div>
+          <div class="form-field"><label class="form-label">פרמטר 3</label><input class="form-input" disabled placeholder="—"></div>
+          <div class="form-field"><label class="form-label">פרמטר 4</label><input class="form-input" disabled placeholder="—"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="submit-btn" disabled>חשב תוספת</button>
+          <button class="btn-secondary" disabled>נקה</button>
+        </div>
+        <div class="cmc-result show">
+          <div class="cmc-result-label">תוצאת מחשבון ${k.toUpperCase()}</div>
+          <div class="cmc-result-value">—%</div>
+          <div class="cmc-result-note">מבנה ה-UI מוכן לאכלוס. לוגיקת החישוב והשדות הייעודיים יתווספו בהמשך.</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function switchMainTab(tab) {
+  mainTab = tab;
+  document.getElementById('main-tab-scout').classList.toggle('active', tab === 'scout');
+  document.getElementById('main-tab-calc').classList.toggle('active', tab === 'calc');
+  document.getElementById('calc-subtabs').style.display = tab === 'calc' ? 'flex' : 'none';
+  renderApiPanels();
+}
+
+function switchCalc(c) {
+  calcTab = c;
+  calcList.forEach(k => document.getElementById('calc-subtab-' + k).classList.toggle('active', k === c));
+  renderApiPanels();
+}
+
+function renderApiPanels() {
+  document.getElementById('panel-scout').classList.remove('active');
+  calcList.forEach(k => document.getElementById('panel-' + k).classList.remove('active'));
+  if (mainTab === 'scout') {
+    document.getElementById('panel-scout').classList.add('active');
+  } else {
+    document.getElementById('panel-' + calcTab).classList.add('active');
+  }
+}
+
+// =====================================================================
+// CMC
+// =====================================================================
+const cmcFields = ['cmc-age','cmc-gender','cmc-bmi','cmc-bp','cmc-chol','cmc-hdl','cmc-hba1c','cmc-smoke','cmc-diabetes','cmc-meds'];
+
+function submitCMC() {
+  let err = false;
+  cmcFields.forEach(id => {
+    const el = document.getElementById(id);
+    const empty = !el.value;
+    el.classList.toggle('error', empty);
+    if (empty) err = true;
+  });
+  document.getElementById('cmc-error').classList.toggle('show', err);
+  if (err) return;
+
+  const hba1c = parseFloat(document.getElementById('cmc-hba1c').value);
+  const bmi = parseFloat(document.getElementById('cmc-bmi').value);
+  const bp = parseInt(document.getElementById('cmc-bp').value);
+  const smoke = document.getElementById('cmc-smoke').value;
+  const diabetes = document.getElementById('cmc-diabetes').value;
+  const meds = document.getElementById('cmc-meds').value;
+
+  let loading = 0;
+  const notes = [];
+
+  if (diabetes === 'type2' || diabetes === 'type1') {
+    if (hba1c < 6.5) { loading += 0; }
+    else if (hba1c <= 7.0) { loading += 50; notes.push(`HbA1c ${hba1c}% — סוכרת מבוקרת`); }
+    else if (hba1c <= 8.0) { loading += 75; notes.push(`HbA1c ${hba1c}% — שליטה חלקית`); }
+    else { loading += 150; notes.push(`HbA1c ${hba1c}% — שליטה לקויה`); }
+  } else if (diabetes === 'pre') {
+    loading += 0;
+    notes.push('Pre-diabetes — ללא תוספת עצמאית');
+  }
+
+  if (bmi >= 35) { loading += 50; notes.push(`BMI ${bmi} — השמנה מדרגה 2+`); }
+  else if (bmi >= 30) { loading += 25; notes.push(`BMI ${bmi} — השמנה מדרגה 1`); }
+
+  if (bp >= 160) { loading += 50; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם חמור`); }
+  else if (bp >= 140) { loading += 25; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם`); }
+
+  if (smoke === 'current') { loading += 50; notes.push('עישון פעיל'); }
+  else if (smoke === 'past') { loading += 25; notes.push('עישון בעבר'); }
+
+  loading = Math.round(loading / 25) * 25;
+
+  document.getElementById('cmc-result-value').textContent = loading + '%';
+  document.getElementById('cmc-result-note').innerHTML = notes.length
+    ? '<strong>גורמי סיכון שנמצאו:</strong><br>' + notes.map(n => '• ' + n).join('<br>')
+    : '✓ לא נמצאו גורמי סיכון משמעותיים מעבר לאבחנות';
+  document.getElementById('cmc-result').classList.add('show');
+}
+
+function clearCMC() {
+  cmcFields.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('error');
+  });
+  document.getElementById('cmc-error').classList.remove('show');
+  document.getElementById('cmc-result').classList.remove('show');
+}
+
+// =====================================================================
+// SCOUT
+// =====================================================================
+function fillSuggestion(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  document.getElementById('chat-input').focus();
+}
+
+function sendScout() {
+  const inp = document.getElementById('chat-input');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+
+  document.getElementById('chat-empty') && document.getElementById('chat-empty').remove();
+  addBubble('user', 'שאלה', escHtml(q));
+
+  document.getElementById('chat-typing').classList.add('show');
+
+  setTimeout(() => {
+    document.getElementById('chat-typing').classList.remove('show');
+
+    const ql = q.toLowerCase();
+    let resp;
+    if (ql.includes('עיש') || ql.includes('smok') || ql.includes('סיגר') || ql.includes('ניקוט')) resp = scoutResponses.smoking;
+    else if (ql.includes('שומה') || ql.includes('nevus') || ql.includes('עור') || ql.includes('נגע') || ql.includes('פתולוג')) resp = scoutResponses.nevus;
+    else if (ql.includes('אסטמ') || ql.includes('asthma') || ql.includes('ברונכ') || ql.includes('ריא')) resp = scoutResponses.asthma;
+    else if (ql.includes('לב') || ql.includes('חזה') || ql.includes('cardiac') || ql.includes('spect') || ql.includes('כליל') || ql.includes('איסכ') || ql.includes('כולסטרול')) resp = scoutResponses.cardiac;
+    else resp = scoutResponses.default;
+
+    const t = loadingTables[resp.tableKey];
+    const colH = t.cols.map(c => `<th>${c}</th>`).join('');
+    const rowsH = t.rows.map((row, ri) => {
+      const isActive = row.active;
+      const cells = row.vals.map(v => `<td class="${isActive ? 'hl' : ''}">${v}</td>`).join('');
+      return `<tr><td>${row.label}</td>${cells}</tr>`;
+    }).join('');
+
+    const content = `${resp.intro}
+      <table class="chat-table">
+        <thead><tr>${colH}</tr></thead>
+        <tbody>${rowsH}</tbody>
+      </table>
+      <br>${resp.conclusion}`;
+
+    addBubble('ai', 'Scout AI', content, true);
+  }, 1100 + Math.random() * 400);
+}
+
+function addBubble(role, label, content, isHtml = false) {
+  const h = document.getElementById('chat-history');
+  const div = document.createElement('div');
+  div.className = 'chat-bubble ' + role;
+  div.innerHTML = `<div class="chat-bubble-label">${label}</div><div class="chat-bubble-content">${isHtml ? content : content}</div>`;
+  h.appendChild(div);
+  h.scrollTop = h.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendScout(); }
+});
+
+// =====================================================================
+// INIT
+// =====================================================================
+// =====================================================================
+// LANDING PAGE — POLICY SEARCH
+// =====================================================================
+function submitLogin() {
+  const user = (document.getElementById('login-user').value || '').trim();
+  const pass = (document.getElementById('login-pass').value || '').trim();
+  const err = document.getElementById('login-error');
+  if (!user || !pass) {
+    err.textContent = 'יש להזין שם משתמש וסיסמה';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+  document.getElementById('login').classList.add('hidden');
+  const li = document.getElementById('landing-input');
+  if (li) li.focus();
+}
+
+function submitPolicySearch() {
+  const val = (document.getElementById('landing-input').value || '').trim();
+  const err = document.getElementById('landing-error');
+  if (val === '111') {
+    err.classList.remove('show');
+    document.getElementById('landing').classList.add('hidden');
+  } else {
+    err.textContent = 'הפוליסה לא נמצאה. נסה להזין 111';
+    err.classList.add('show');
+  }
+}
+
+(function init() {
+  buildGenericCalcs();
+  renderApiPanels();
+  renderHeader();
+  renderHealthBar();
+  renderHealthDeclActions();
+  renderPrevDeclarations();
+  renderLifestyle();
+  renderDiagnoses();
+  renderDocsStatus();
+  renderAllFeedback();
+  updateAgg();
+})();
+</script>
+</body>
+</html>
