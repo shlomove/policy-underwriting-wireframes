@@ -1960,6 +1960,79 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+  /* ===== v2 cross-cutting additions ===== */
+  /* Header action buttons (enrollment form / agent agreement) */
+  .header-actions { display:flex; gap:6px; align-items:center; margin-right:12px; }
+  .header-doc-btn {
+    font-size:11px; font-weight:600; color:var(--text-muted);
+    background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+    padding:5px 10px; cursor:pointer; white-space:nowrap; transition:.12s;
+  }
+  .header-doc-btn:hover { background:var(--bg-hover); border-color:#bbb; color:var(--text); }
+
+  /* Emphasised timeline dates for medical events */
+  .tl-date {
+    font-weight:700; color:var(--text-muted);
+    background:var(--bg-hover); border:1px solid var(--border-light);
+    border-radius:5px; padding:2px 5px; width:auto; min-width:46px; text-align:center;
+  }
+  .tl-info-btn { cursor:pointer; }
+
+  /* Document failure indication badges */
+  .doc-flag-badge {
+    display:inline-block; font-size:9.5px; font-weight:700; border-radius:4px;
+    padding:1px 5px; margin-left:4px; vertical-align:middle;
+  }
+  .doc-flag-dup { background:#fff3e0; color:#b26a00; border:1px solid #f0d2a0; }
+  .doc-flag-wrongid { background:#fdeaea; color:#b3261e; border:1px solid #f2c4c0; }
+
+  /* Financial underwriting section */
+  .fin-card { border:1px solid var(--border); border-radius:var(--radius); background:#fff; margin-bottom:8px; overflow:hidden; }
+  .fin-top { display:flex; align-items:center; gap:10px; padding:10px 12px; flex-wrap:wrap; }
+  .fin-controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .fin-controls label { font-size:11px; color:var(--text-light); }
+  .fin-controls select, .fin-controls input {
+    font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:var(--radius);
+    font-family:inherit; background:#fff;
+  }
+  .fin-verdict { margin-right:auto; display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; }
+  .fin-pill { font-size:11px; font-weight:700; border-radius:999px; padding:3px 11px; }
+  .fin-pill-no { background:#e7f6ec; color:#1a7f43; }
+  .fin-pill-yes { background:#fff3e0; color:#b26a00; }
+  .fin-body { padding:0 12px 12px; }
+  .fin-bracket { font-size:12px; color:var(--text); background:var(--bg-hover); border-radius:var(--radius); padding:8px 10px; margin-bottom:8px; line-height:1.6; }
+  .fin-reqs { list-style:none; margin:0; padding:0; }
+  .fin-reqs li { font-size:11.5px; color:var(--text-muted); padding:3px 0 3px 0; display:flex; gap:6px; }
+  .fin-reqs li::before { content:'•'; color:var(--accent,#3a6); }
+  .fin-rules-toggle { font-size:11px; color:var(--accent,#2a6); cursor:pointer; background:none; border:none; padding:4px 0; text-decoration:underline; }
+  .fin-rules { display:none; margin-top:6px; }
+  .fin-rules.open { display:block; }
+  .fin-rules table { width:100%; border-collapse:collapse; font-size:11px; }
+  .fin-rules th, .fin-rules td { border:1px solid var(--border-light); padding:5px 7px; text-align:right; vertical-align:top; }
+  .fin-rules th { background:var(--bg-hover); font-weight:700; }
+
+  /* Underwriting note (per-diagnosis free text) */
+  .uw-note-wrap { margin-top:10px; border-top:1px dashed var(--border-light); padding-top:8px; }
+  .uw-note-label { font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px; display:block; }
+  .uw-note-input {
+    width:100%; min-height:46px; font-family:inherit; font-size:12px; line-height:1.5;
+    border:1px solid var(--border); border-radius:var(--radius); padding:7px 9px; resize:vertical; background:#fffdf7;
+  }
+  .uw-note-input:focus { outline:none; border-color:#bbb; }
+
+  /* Consolidated underwriting notes section */
+  .uw-summary-card { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:12px; }
+  .uw-summary-item { font-size:12px; padding:7px 0; border-bottom:1px dashed var(--border-light); line-height:1.55; }
+  .uw-summary-item:last-child { border-bottom:none; }
+  .uw-summary-code { font-weight:700; color:var(--text); margin-left:6px; }
+  .uw-summary-empty { font-size:12px; color:var(--text-light); font-style:italic; }
+  .uw-general-label { font-size:11px; font-weight:700; color:var(--text-muted); margin:10px 0 4px; display:block; }
+
+  /* Event info popup rows */
+  .ev-info-grid { display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:13px; }
+  .ev-info-grid .lbl { color:var(--text-light); font-weight:600; }
+  .ev-info-grid .val { color:var(--text); }
 </style>
 </head>
 <body>
@@ -2013,6 +2086,10 @@
       <div class="id-no-results" id="id-no-results" style="display:none;">לא נמצאו מבוטחים תואמים</div>
     </div>
     <div class="policy-badge" style="margin-right:auto;">מספר פוליסה <span>POL-2026-00111</span></div>
+    <div class="header-actions">
+      <button class="header-doc-btn" onclick="openEnrollmentForm()">📋 טופס הצטרפות</button>
+      <button class="header-doc-btn" onclick="openAgentAgreement()">🤝 הסכם סוכן</button>
+    </div>
   </div>
   <div class="header-data-row" id="header-data"></div>
 </div>
@@ -2045,6 +2122,14 @@
 
     <div>
       <div class="section-head">
+        <div class="section-title">חיתום פיננסי</div>
+        <div class="feedback-btns" id="fb-financial"></div>
+      </div>
+      <div id="financial-list"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
         <div class="section-title">אבחנות רפואיות</div>
         <div class="feedback-btns" id="fb-diagnoses"></div>
       </div>
@@ -2060,6 +2145,14 @@
         <div class="feedback-btns" id="fb-docs"></div>
       </div>
       <div id="docs-status"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">הערות חיתום</div>
+        <div class="feedback-btns" id="fb-uwnotes"></div>
+      </div>
+      <div id="uw-summary"></div>
     </div>
 
     <div>
@@ -2233,6 +2326,48 @@
 <input type="file" id="source-file-input" accept="application/pdf,image/*" style="display:none" onchange="_onSourceFileChosen(this)">
 
 <!-- ===== DOC POPUP ===== -->
+<!-- ===== EVENT INFO POPUP ===== -->
+<div class="popup-overlay" id="evinfo-popup">
+  <div class="popup-box" style="max-width:520px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">אינדיקציית אירוע רפואי</div>
+        <div class="popup-meta" id="evinfo-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('evinfo-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="evinfo-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== ENROLLMENT FORM POPUP ===== -->
+<div class="popup-overlay" id="enrollment-popup">
+  <div class="popup-box" style="max-width:780px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">טופס הצטרפות</div>
+        <div class="popup-meta" id="enrollment-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('enrollment-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="enrollment-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== AGENT AGREEMENT POPUP ===== -->
+<div class="popup-overlay" id="agent-popup">
+  <div class="popup-box" style="max-width:720px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הסכם סוכן</div>
+        <div class="popup-meta" id="agent-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('agent-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="agent-popup-body"></div>
+  </div>
+</div>
+
 <div class="popup-overlay" id="doc-popup">
   <div class="popup-box">
     <div class="popup-header">
@@ -2451,8 +2586,10 @@
 const patients = [
   {
     id: '69201432', policy: 'POL-2026-00112', name: 'ליאור אריאל', age: 65, weight: '—', height: '—', bmi: '—',
-    policyType: 'ביטוח חיים — ריסק', sumRequested: '—', sumExisting: '—',
-    reasons: ['בחינת תיק רפואי', 'חיתום רפואי — לב'],
+    birthDate: '07/06/1961', gender: 'זכר', smokingStatus: '—',
+    policyType: 'ביטוח חיים — ריסק', sumRequested: '2,500,000 ₪', sumExisting: '800,000 ₪',
+    financial: { purpose: 'private', amount: 2500000 },
+    reasons: ['תביעה קודמת', 'שאלון רפואי'],
     email: 'lior.ariel@example.com',
     healthStatus: 'declared',
     healthDetail: 'זוהו 2 אבחנות לבביות: מחלת עורקים כליליים בכלי אחד (One Vessel CAD) ואוטם שריר הלב חריף בדופן קדמית-צידית (2009, לאחר צנתור ו-PCI)',
@@ -2680,8 +2817,10 @@ function switchId(idx) {
   renderHealthDeclActions();
   renderPrevDeclarations();
   renderLifestyle();
+  renderFinancial();
   renderDiagnoses();
   renderDocsStatus();
+  renderUwSummary();
   renderAllFeedback();
   updateAgg();
 }
@@ -2710,7 +2849,13 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">ת״ז</div><div class="hd-value ltr">${p.id}</div></div>
     <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">תאריך לידה</div><div class="hd-value ltr">${p.birthDate || '—'}</div></div>
+    <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">גיל</div><div class="hd-value">${p.age}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">מין</div><div class="hd-value">${p.gender || '—'}</div></div>
+    <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סטטוס עישון</div><div class="hd-value" style="font-size:12px;">${p.smokingStatus || '—'}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">משקל / גובה</div><div class="hd-value ltr">${p.weight==='—'?'—':p.weight+'kg'} / ${p.height==='—'?'—':p.height+'cm'}</div></div>
     <div class="divider-v"></div>
@@ -2751,7 +2896,6 @@ function renderHealthDeclActions() {
   if (p.uploadedDeclaration) {
     btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="openUploadedSource('${p.uploadedDeclaration}')">📄 פתח קובץ שהועלה</button>`;
   }
-  btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="uploadDeclarationSource()">📎 העלה קובץ מקור</button>`;
   wrap.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;">${btns}</div>`;
 }
 
@@ -2819,9 +2963,15 @@ function openDocsList() {
     else if (d.status === 'unknown') badge = '<span class="doc-status-badge unknown">● סוג לא מזוהה</span>';
     else badge = '<span class="doc-status-badge failed">● נכשל בקריאה</span>';
 
+    const fr = d.failReason || '';
+    const isDup = d.duplicate || /כפול|עותק כפול|חופף/.test(fr);
+    const isWrongId = d.wrongId || /אינו שייך|לא שייך|אינה שייכת|מתייחס ל|מתייחסת ל|מבוטח אחר|ת״ז של מבוטח/.test(fr);
+    const flagBadges =
+      (isDup ? '<span class="doc-flag-badge doc-flag-dup" title="מסמך כפול">⧉ כפול</span>' : '') +
+      (isWrongId ? '<span class="doc-flag-badge doc-flag-wrongid" title="המסמך על ת״ז של מבוטח אחר">⚠ ת״ז של מבוטח אחר</span>' : '');
     const reasonCell = failedRow
-      ? `<div class="doc-fail-reason"><span class="reason-label">סיבת הכשל:</span> ${d.failReason || 'לא ידוע'}</div>`
-      : `<span style="color:var(--text-light);font-size:11px;">—</span>`;
+      ? `<div class="doc-fail-reason"><span class="reason-label">סיבת הכשל:</span> ${fr || 'לא ידוע'}${flagBadges ? '<div style="margin-top:4px;">' + flagBadges + '</div>' : ''}</div>`
+      : (flagBadges ? `<div>${flagBadges}</div>` : `<span style="color:var(--text-light);font-size:11px;">—</span>`);
 
     const okManual = d.status === 'ok' && d.manualRead;
     if (okManual) badge = '<span class="doc-status-badge ok">● נקרא (עודכן ידנית)</span>';
@@ -3016,6 +3166,7 @@ function buildCard(dx, idx) {
       <div class="tl-dot"></div>
       <div class="tl-text" ${item.doc ? `onclick="openDoc('${item.doc}')"` : 'style="text-decoration:none;cursor:default;"'}>${item.text}</div>
       <div class="tl-actions">
+        <button class="tl-mini-btn tl-info-btn" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" title="אינדיקציית אירוע — גיל, תאריך סיום, מס׳ תיק תביעה">ⓘ</button>
         ${item.uploadedDoc ? `<button class="tl-mini-btn" onclick="event.stopPropagation();openUploadedSource('${item.uploadedDoc}')" title="פתח מסמך מקור שהועלה">📄</button>` : ''}
         <button class="tl-mini-btn" onclick="event.stopPropagation();uploadEventSource(${idx}, ${ei})" title="העלה קובץ מקור">📎</button>
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
@@ -3081,9 +3232,18 @@ function buildCard(dx, idx) {
         <button class="tl-add-btn" onclick="event.stopPropagation();addEvent(${idx})">
           <span style="font-size:13px;line-height:1;">＋</span> הוסף אירוע רפואי
         </button>
+        <div class="uw-note-wrap" onclick="event.stopPropagation()">
+          <label class="uw-note-label">הערת חיתום / הסבר להחלטה (החרגה, תוספת וכו׳)</label>
+          <textarea class="uw-note-input" placeholder="תיעוד חופשי — יישמר עם האבחנה ויופיע בריכוז הערות החיתום" onchange="onUwNoteChange(${idx}, this.value)">${dx.uwNote || ''}</textarea>
+        </div>
       </div>
     </div>
   `;
+}
+
+function onUwNoteChange(idx, val) {
+  patientsState[currentIdx].diagnoses[idx].uwNote = (val || '').trim();
+  renderUwSummary();
 }
 
 function toggleTl(idx) {
@@ -3247,6 +3407,31 @@ function deleteEvent(dxIdx, evIdx) {
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
 }
 
+function _evYear(s) { const m = ('' + (s || '')).match(/(\d{4})/); return m ? parseInt(m[1]) : null; }
+
+function openEventInfo(dxIdx, evIdx) {
+  const p = patientsState[currentIdx];
+  const dx = p.diagnoses[dxIdx];
+  const ev = dx.timeline[evIdx];
+  if (!ev) return;
+  let age = ev.age;
+  if (age == null) {
+    const by = _evYear(p.birthDate), ey = _evYear(ev.date);
+    if (by && ey) age = ey - by;
+  }
+  document.getElementById('evinfo-popup-meta').textContent = dx.code + ' · ' + (ev.date || '—');
+  const rows = [
+    ['אירוע', ev.text || '—'],
+    ['תאריך האירוע', ev.date || '—'],
+    ['גיל הלקוח בזמן האירוע', (age != null && age !== '') ? age : '—'],
+    ['תאריך סיום אירוע / טיפול', ev.endDate || '—'],
+    ['מספר תיק תביעה', ev.claimId ? ev.claimId : 'אין מזהה תביעה'],
+  ];
+  document.getElementById('evinfo-popup-body').innerHTML =
+    `<div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>`;
+  document.getElementById('evinfo-popup').classList.add('open');
+}
+
 // =====================================================================
 // MISSING DOCUMENTS + CLIENT EMAIL REQUEST
 // =====================================================================
@@ -3407,14 +3592,13 @@ function renderLifestyle() {
           <span class="dx-loading-pct">‰</span>
         </div>
         <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
+        ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
       </div>
       <div class="timeline-container" id="ls-tl-${r.key}">
         <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
         <div class="ls-source-row">
           <span class="ls-mini-label">מקור:</span>
-          <select class="ls-source-select" onchange="onLsSourceChange('${r.key}', this.value)">
-            ${lsSourceOptions(r.data.source)}
-          </select>
+          <span class="ls-source-name" style="font-size:12px;color:var(--text);font-weight:600;">${r.data.source && docs[r.data.source] ? docs[r.data.source].title : 'לא צורף מקור'}</span>
           <button class="dx-table-btn" onclick="openLsSource('${r.key}')" ${r.data.source ? '' : 'disabled'}>פתח מקור ▸</button>
         </div>
       </div>
@@ -3455,6 +3639,195 @@ function editLifestyle(key) {
   const nv = prompt('תיאור ' + lifestyleLabels[key] + ':', item.value);
   if (nv !== null) item.value = nv.trim() || '—';
   renderLifestyle();
+}
+
+function addHobby() {
+  const item = patientsState[currentIdx].lifestyle.profession;
+  const nh = prompt('הוסף תחביב חדש:');
+  if (nh === null || !nh.trim()) return;
+  const cur = (item.value && item.value !== '—' && !/לא נמצא/.test(item.value)) ? item.value : '';
+  item.value = cur ? (cur + '; ' + nh.trim()) : nh.trim();
+  renderLifestyle();
+  const tl = document.getElementById('ls-tl-profession');
+  if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-profession').textContent = '▼'; }
+}
+
+// =====================================================================
+// HEADER DOCUMENTS (enrollment form / agent agreement)
+// =====================================================================
+function openEnrollmentForm() {
+  const p = patientsState[currentIdx];
+  document.getElementById('enrollment-popup-meta').textContent =
+    `${p.name} · ת״ז ${p.id}${p.policy ? ' · פוליסה ' + p.policy : ''}`;
+  const row = (l, v) => `<div class="doc-meta-item">${l}: <span>${v || '—'}</span></div>`;
+  document.getElementById('enrollment-popup-body').innerHTML = `
+    <div class="doc-placeholder">
+      <div class="doc-placeholder-label">טופס הצטרפות לביטוח — APEX</div>
+      <div class="doc-meta-row" style="flex-wrap:wrap;gap:8px 18px;">
+        ${row('שם מלא', p.name)}${row('ת״ז', p.id)}${row('תאריך לידה', p.birthDate)}${row('מין', p.gender)}
+        ${row('סוג פוליסה', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
+      </div>
+    </div>
+    <div class="doc-placeholder" style="margin-top:10px;">
+      <div class="doc-placeholder-label">פרטי המוצר וההצהרות</div>
+      <div class="doc-excerpt" style="line-height:1.7;">
+        • מסלול: ${p.policyType}.<br>
+        • הצהרת בריאות: מצורפת וחתומה דיגיטלית על ידי המבוטח.<br>
+        • הסכמת המבוטח לאיסוף ועיבוד מידע רפואי לצורך חיתום — נחתמה.<br>
+        • ייפוי כוח לקבלת מידע רפואי מגופים מטפלים — נחתם.<br>
+        • אמצעי תשלום והוראת קבע — מולאו בטופס המקורי.
+      </div>
+    </div>
+    <div class="doc-scan-placeholder">[ תמונה מוקטנת של טופס ההצטרפות הסרוק / PDF מקור ]</div>
+    <div class="doc-actions">
+      <button class="doc-action-btn">הורד PDF</button>
+      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
+    </div>`;
+  document.getElementById('enrollment-popup').classList.add('open');
+}
+
+function openAgentAgreement() {
+  const p = patientsState[currentIdx];
+  document.getElementById('agent-popup-meta').textContent =
+    `תנאי ההתקשרות מול הסוכן · ${p.policy || 'פוליסה'}`;
+  const point = (t, d) => `<li style="margin-bottom:8px;"><strong>${t}</strong> — ${d}</li>`;
+  document.getElementById('agent-popup-body').innerHTML = `
+    <div class="doc-placeholder">
+      <div class="doc-placeholder-label">עיקרי ההסכם עם הסוכן</div>
+      <ul style="margin:6px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6;color:var(--text);">
+        ${point('הצהרת בריאות מקוצרת', 'הסוכן רשאי להחתים את המבוטח על הצהרת בריאות מקוצרת בעסקאות העומדות בתנאי הסף שנקבעו במסגרת ההסכם.')}
+        ${point('הטבות', 'הנחות ותנאים מועדפים מוסכמים לתיק זה (לרבות הטבת פרמיה והרחבות כיסוי) בהתאם לנספח ההטבות.')}
+        ${point('החרגות', 'רשימת ההחרגות והסייגים המוסכמים מראש שניתן להחילם ללא אישור פרטני נוסף.')}
+        ${point('סמכויות חיתום', 'גבולות הסמכות של הסוכן לאישור עסקאות (סכומי כיסוי, גילאים וסוגי מוצר) ללא הפניה לחיתום מרכזי.')}
+        ${point('עמלות ותגמול', 'מבנה העמלות, מקדמי התגמול ותנאי ההתחשבנות מול הסוכן.')}
+        ${point('חובות גילוי ונאותות', 'התחייבות הסוכן למסירת מידע מלא ומדויק ולקיום הליך מכירה נאות מול המבוטח.')}
+      </ul>
+    </div>
+    <div class="doc-scan-placeholder">[ העתק הסכם הסוכן החתום — PDF מקור ]</div>
+    <div class="doc-actions">
+      <button class="doc-action-btn">הורד PDF</button>
+      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
+    </div>`;
+  document.getElementById('agent-popup').classList.add('open');
+}
+
+// =====================================================================
+// FINANCIAL UNDERWRITING (binary, math-based — no exclusions)
+// =====================================================================
+const M = 1000000;
+function fmtMoney(n) { return new Intl.NumberFormat('he-IL').format(Math.round(n)) + ' ₪'; }
+
+const financialPurposes = {
+  mortgage: 'ביטוח חיים לרכישת נכס / בלמ״ש (מגוף מוסדי מוכר)',
+  private:  'ביטוח חיים פרטי',
+};
+
+function financialEval(purpose, amount) {
+  if (purpose === 'mortgage') {
+    if (amount <= 4 * M) return { required: false, bracket: 'עד 4 מיליון ₪',
+      reqs: ['ללא חיתום פיננסי', 'יש לוודא שהמוטב הינו הבנק בלבד'] };
+    if (amount <= 7 * M) return { required: true, bracket: '4–7 מיליון ₪',
+      reqs: ['שאלון פיננסי (סעיפים א, ב, ד)', 'הסכם הלוואה מלא מהבנק עבור מלוא הסכום הנדרש (אישור עקרוני לא מאושר)'] };
+    return { required: true, bracket: 'מעל 7 מיליון ₪',
+      reqs: ['שאלון פיננסי (סעיפים א, ב, ד)', 'הסכם הלוואה מלא (אישור עקרוני לא מאושר)', 'אישורים פיננסיים על הכנסות מכל המקורות (כמפורט בביטוח חיים פרטי מעל 5 מיליון ₪)'] };
+  }
+  // private
+  if (amount <= 4 * M) return { required: false, bracket: 'עד 4 מיליון ₪',
+    reqs: ['ללא חיתום פיננסי'] };
+  if (amount <= 5 * M) return { required: true, bracket: '4–5 מיליון ₪',
+    reqs: ['שאלון פיננסי (סעיפים א, ב, ו) — או הצהרה על שכר וסכומים קיימים בחברות ביטוח אחרות', 'חריגים (עקרת בית / סטודנט / מובטל / אברך): סכום כיסוי מקסימלי 3 מיליון ₪'] };
+  return { required: true, bracket: 'מעל 5 מיליון ₪',
+    reqs: ['שאלון פיננסי (סעיפים א, ב, ו)', 'אישור פורמלי על הכנסות מעבודה — שכיר: 3 תלושי שכר אחרונים / טופס 106', 'עצמאי: 3 תלושי שכר / טופס 106 / דו״ח אישי למס הכנסה / אישור רו״ח על הכנסה מעבודה (לא מחזור), + אישור רו״ח על דיבידנדים שחולקו בשנתיים האחרונות + רווח נקי של החברה'] };
+}
+
+function getFinancial() {
+  const p = patientsState[currentIdx];
+  if (!p.financial) {
+    const fromHeader = parseInt(('' + (p.sumRequested || '')).replace(/[^\d]/g, '')) || 0;
+    p.financial = { purpose: 'private', amount: fromHeader };
+  }
+  return p.financial;
+}
+
+function renderFinancial() {
+  const wrap = document.getElementById('financial-list');
+  if (!wrap) return;
+  const fin = getFinancial();
+  const res = financialEval(fin.purpose, fin.amount);
+  const pill = res.required
+    ? '<span class="fin-pill fin-pill-yes">נדרש חיתום פיננסי</span>'
+    : '<span class="fin-pill fin-pill-no">לא נדרש חיתום פיננסי</span>';
+  const reqs = res.reqs.map(r => `<li>${r}</li>`).join('');
+  const purposeOpts = Object.keys(financialPurposes).map(k =>
+    `<option value="${k}" ${fin.purpose === k ? 'selected' : ''}>${financialPurposes[k]}</option>`).join('');
+  wrap.innerHTML = `
+    <div class="fin-card">
+      <div class="fin-top">
+        <div class="fin-controls">
+          <label>מטרת הביטוח:
+            <select onchange="onFinChange('purpose', this.value)">${purposeOpts}</select>
+          </label>
+          <label>סכום מבוקש (₪):
+            <input type="number" min="0" step="100000" value="${fin.amount}" onchange="onFinChange('amount', this.value)" style="width:130px;">
+          </label>
+        </div>
+        <div class="fin-verdict">${pill}</div>
+      </div>
+      <div class="fin-body">
+        <div class="fin-bracket"><strong>סכום מבוקש:</strong> ${fmtMoney(fin.amount)} · <strong>מדרגה:</strong> ${res.bracket} — תהליך בינארי (כן/לא), ללא החרגות, מבוסס חישוב.</div>
+        <ul class="fin-reqs">${reqs}</ul>
+        <button class="fin-rules-toggle" onclick="toggleFinRules()">הצג/הסתר טבלת כללי החיתום הפיננסי המלאה ▸</button>
+        <div class="fin-rules" id="fin-rules">
+          <table>
+            <thead><tr><th>מטרת ביטוח</th><th>מדרגת סכום</th><th>דרישה</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="3">ביטוח חיים לרכישת נכס / בלמ״ש</td><td>עד 4 מ׳ ₪</td><td>ללא חיתום פיננסי (המוטב — הבנק בלבד)</td></tr>
+              <tr><td>4–7 מ׳ ₪</td><td>שאלון פיננסי (א, ב, ד) + הסכם הלוואה מלא מהבנק (אישור עקרוני לא מאושר)</td></tr>
+              <tr><td>מעל 7 מ׳ ₪</td><td>שאלון פיננסי (א, ב, ד) + הסכם הלוואה מלא + אישורים על הכנסות מכל המקורות</td></tr>
+              <tr><td rowspan="3">ביטוח חיים פרטי</td><td>עד 4 מ׳ ₪</td><td>ללא חיתום פיננסי</td></tr>
+              <tr><td>4–5 מ׳ ₪</td><td>שאלון פיננסי (א, ב, ו) או הצהרה על שכר וסכומים קיימים · חריגים — מקס׳ 3 מ׳ ₪</td></tr>
+              <tr><td>מעל 5 מ׳ ₪</td><td>שאלון פיננסי (א, ב, ו) + אישור פורמלי על הכנסות מעבודה (שכיר/עצמאי)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+function onFinChange(field, val) {
+  const fin = getFinancial();
+  fin[field] = field === 'amount' ? (parseInt(val) || 0) : val;
+  renderFinancial();
+}
+
+function toggleFinRules() {
+  document.getElementById('fin-rules').classList.toggle('open');
+}
+
+// =====================================================================
+// CONSOLIDATED UNDERWRITING NOTES
+// =====================================================================
+function renderUwSummary() {
+  const wrap = document.getElementById('uw-summary');
+  if (!wrap) return;
+  const p = patientsState[currentIdx];
+  const items = (p.diagnoses || [])
+    .filter(dx => dx.uwNote && dx.uwNote.trim())
+    .map(dx => {
+      const load = dx.loading ? ` · תוספת ${dx.loading}%` : '';
+      return `<div class="uw-summary-item"><span class="uw-summary-code">${dx.code}</span>${load}<div>${dx.uwNote}</div></div>`;
+    }).join('');
+  const body = items || '<div class="uw-summary-empty">אין עדיין הערות חיתום לאבחנות — ניתן להוסיף הערה והסבר להחלטה בתוך כל אבחנה.</div>';
+  wrap.innerHTML = `
+    <div class="uw-summary-card">
+      ${body}
+      <label class="uw-general-label">הערת חיתום כללית לתיק (הסבר מרוכז להחלטות — החרגות, תוספות, נימוקים)</label>
+      <textarea class="uw-note-input" placeholder="כתוב/י כאן סיכום והסבר כולל להחלטות החיתום בתיק זה" onchange="onGeneralUwNoteChange(this.value)">${p.generalUwNote || ''}</textarea>
+    </div>`;
+}
+
+function onGeneralUwNoteChange(val) {
+  patientsState[currentIdx].generalUwNote = (val || '').trim();
 }
 
 // =====================================================================
@@ -3539,8 +3912,10 @@ function runApproval(action) {
 const feedbackSections = {
   'health':    { wrapId: 'fb-health',    label: 'הצהרת בריאות' },
   'lifestyle': { wrapId: 'fb-lifestyle', label: 'עיסוק ותחביבים' },
+  'financial': { wrapId: 'fb-financial', label: 'חיתום פיננסי' },
   'diagnoses': { wrapId: 'fb-diagnoses', label: 'אבחנות רפואיות' },
   'docs':      { wrapId: 'fb-docs',      label: 'מסמכים' },
+  'uwnotes':   { wrapId: 'fb-uwnotes',   label: 'הערות חיתום' },
   'summary':   { wrapId: 'fb-summary',   label: 'סיכום תוספות' },
 };
 
@@ -3956,14 +4331,16 @@ function submitPolicySearch() {
 
 (function init() {
   buildGenericCalcs();
-  renderApiPanels();
+  switchMainTab('scout');
   renderHeader();
   renderHealthBar();
   renderHealthDeclActions();
   renderPrevDeclarations();
   renderLifestyle();
+  renderFinancial();
   renderDiagnoses();
   renderDocsStatus();
+  renderUwSummary();
   renderAllFeedback();
   updateAgg();
 })();
