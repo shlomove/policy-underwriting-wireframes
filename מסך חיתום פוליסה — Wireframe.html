@@ -2027,6 +2027,19 @@
   .ev-info-grid { display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:13px; }
   .ev-info-grid .lbl { color:var(--text-light); font-weight:600; }
   .ev-info-grid .val { color:var(--text); }
+
+  /* Underwriting explainability inside the source-table popup */
+  .uw-explain-block { margin-top:16px; border-top:1px solid var(--border); padding-top:12px; }
+  .uw-explain-head { font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .uw-explain-result { font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:999px; padding:2px 10px; color:var(--text-muted); background:var(--bg-hover); }
+
+  /* ===== lo-fi grayscale — no colors (green / orange / red removed) ===== */
+  :root {
+    --green:#555; --orange:#555; --red:#444;
+    --dot-green:#9a9a9a; --dot-orange:#777; --dot-red:#555;
+    --accent:#555;
+  }
+  html { filter: grayscale(1); }
 </style>
 <!-- ===== ANNOTATION LAYER (annotations.css) ===== -->
 <link rel="stylesheet" href="annotations.css">
@@ -2066,8 +2079,8 @@
     </div>
     <div class="policy-badge" style="margin-right:auto;">מספר פוליסה <span>POL-2024-00847</span></div>
     <div class="header-actions">
-      <button class="header-doc-btn" onclick="openEnrollmentForm()">📋 טופס הצטרפות</button>
-      <button class="header-doc-btn" onclick="openAgentAgreement()">🤝 הסכם סוכן</button>
+      <button class="header-doc-btn" onclick="openEnrollmentForm()">טופס הצטרפות</button>
+      <button class="header-doc-btn" onclick="openAgentAgreement()">הסכם סוכן</button>
     </div>
   </div>
   <div class="header-data-row" id="header-data"></div>
@@ -3040,10 +3053,10 @@ function renderHealthDeclActions() {
   const decl = healthDeclarations[currentIdx];
   if (decl && decl.docKey && healthForms[currentIdx]) {
     wrap.innerHTML = `<button class="health-decl-btn" onclick="openHealthForm(${currentIdx})">
-      📄 צפה בהצהרה המקורית <span style="color:var(--text-light);">(${decl.date})</span>
+      צפה בהצהרה המקורית <span style="color:var(--text-light);">(${decl.date})</span>
     </button>`;
   } else {
-    wrap.innerHTML = `<button class="health-decl-btn" disabled title="לא נמצאה הצהרת בריאות חתומה">📄 אין הצהרה מקורית בתיק</button>`;
+    wrap.innerHTML = `<button class="health-decl-btn" disabled title="לא נמצאה הצהרת בריאות חתומה">אין הצהרה מקורית בתיק</button>`;
   }
 }
 
@@ -3235,7 +3248,7 @@ function buildCard(dx, idx) {
   `).join('');
 
   const tableBtn = dx.loadingTableKey
-    ? `<button class="dx-table-btn" onclick="event.stopPropagation();openLoadingTable('${dx.loadingTableKey}')">טבלה ▸</button>`
+    ? `<button class="dx-table-btn" onclick="event.stopPropagation();openLoadingTable('${dx.loadingTableKey}', ${idx})">טבלה ▸</button>`
     : '';
 
   // ----- status tags: anomaly / pending / missing -----
@@ -3293,15 +3306,20 @@ function buildCard(dx, idx) {
         </button>
         <div class="uw-note-wrap" onclick="event.stopPropagation()">
           <label class="uw-note-label">הערת חיתום / הסבר להחלטה (החרגה, תוספת וכו׳)</label>
-          <textarea class="uw-note-input" placeholder="תיעוד חופשי — יישמר עם האבחנה ויופיע בריכוז הערות החיתום" onchange="onUwNoteChange(${idx}, this.value)">${dx.uwNote || ''}</textarea>
+          <textarea id="uwnote-card-${idx}" class="uw-note-input" placeholder="תיעוד חופשי — יישמר עם האבחנה ויופיע בריכוז הערות החיתום ובפופ-אפ טבלת המקור" onchange="setUwNote(${idx}, this.value)">${dx.uwNote || ''}</textarea>
         </div>
       </div>
     </div>
   `;
 }
 
-function onUwNoteChange(idx, val) {
-  patientsState[currentIdx].diagnoses[idx].uwNote = (val || '').trim();
+function setUwNote(idx, val) {
+  const v = (val || '').trim();
+  patientsState[currentIdx].diagnoses[idx].uwNote = v;
+  const card = document.getElementById('uwnote-card-' + idx);
+  const pop = document.getElementById('uwnote-popup-' + idx);
+  if (card && card.value !== v) card.value = v;
+  if (pop && pop.value !== v) pop.value = v;
   renderUwSummary();
 }
 
@@ -3919,7 +3937,7 @@ function openDoc(key) {
   document.getElementById('doc-popup').classList.add('open');
 }
 
-function openLoadingTable(key) {
+function openLoadingTable(key, idx) {
   const t = loadingTables[key];
   if (!t) return;
   document.getElementById('loading-popup-title').textContent = t.title;
@@ -3932,6 +3950,22 @@ function openLoadingTable(key) {
     return `<tr><td class="${isActive ? 'row-active-label' : ''}">${row.label}</td>${cells}</tr>`;
   }).join('');
 
+  // Underwriting result + explainability for this diagnosis (notes synced with the card + consolidated section)
+  let uwBlock = '';
+  if (idx != null && patientsState[currentIdx].diagnoses[idx]) {
+    const dx = patientsState[currentIdx].diagnoses[idx];
+    const hasLoad = (dx.loading || 0) > 0 || (dx.loadingPermille || 0) > 0;
+    const resultTxt = hasLoad
+      ? `תוספת ${dx.loading || 0}%${dx.loadingPermille ? ' · ' + dx.loadingPermille + '‰' : ''}`
+      : 'ללא תוספת';
+    uwBlock = `
+      <div class="uw-explain-block">
+        <div class="uw-explain-head">תוצאת חיתום — ${dx.code} <span class="uw-explain-result">${resultTxt}</span></div>
+        <label class="uw-note-label">הסבר / נימוק להחלטת החיתום (explainability)${hasLoad ? ' — נדרש כאשר קיימת תוספת או פרומיל' : ''}</label>
+        <textarea id="uwnote-popup-${idx}" class="uw-note-input" placeholder="כתוב/י כאן את הנימוק לתוצאת החיתום — מדוע נקבעה התוספת / הפרומיל (החרגה, חומרה, איזון וכו׳)" onchange="setUwNote(${idx}, this.value)">${dx.uwNote || ''}</textarea>
+      </div>`;
+  }
+
   document.getElementById('loading-popup-body').innerHTML = `
     <div class="loading-table-wrap">
       <table class="loading-table">
@@ -3940,6 +3974,7 @@ function openLoadingTable(key) {
       </table>
     </div>
     <div class="table-note">${t.note}</div>
+    ${uwBlock}
   `;
   document.getElementById('loading-popup').classList.add('open');
 }
