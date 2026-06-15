@@ -2088,11 +2088,6 @@
 
     <div class="calc-subtabs" id="calc-subtabs">
       <button class="calc-subtab active" onclick="switchCalc('cmc')"  id="calc-subtab-cmc">CMC</button>
-      <button class="calc-subtab"        onclick="switchCalc('ckd')"  id="calc-subtab-ckd">CKD</button>
-      <button class="calc-subtab"        onclick="switchCalc('cad')"  id="calc-subtab-cad">CAD</button>
-      <button class="calc-subtab"        onclick="switchCalc('lvmc')" id="calc-subtab-lvmc">LVMC</button>
-      <button class="calc-subtab"        onclick="switchCalc('jvc')"  id="calc-subtab-jvc">JVC</button>
-      <button class="calc-subtab"        onclick="switchCalc('cc')"   id="calc-subtab-cc">CC</button>
     </div>
 
     <!-- CMC -->
@@ -3777,7 +3772,7 @@ document.querySelectorAll('.popup-overlay').forEach(el => {
 // =====================================================================
 let mainTab = 'calc';
 let calcTab = 'cmc';
-const calcList = ['cmc', 'ckd', 'cad', 'lvmc', 'jvc', 'cc'];
+const calcList = ['cmc'];
 const calcMeta = {
   cmc:  'מחשבון קרדיומטאבולי',
   ckd:  'מחשבון מחלת כליות כרונית (CKD)',
@@ -3789,7 +3784,7 @@ const calcMeta = {
 
 function buildGenericCalcs() {
   const host = document.getElementById('generic-calcs');
-  host.innerHTML = ['ckd', 'cad', 'lvmc', 'jvc', 'cc'].map(k => `
+  host.innerHTML = [].map(k => `
     <div class="api-panel" id="panel-${k}">
       <div class="section-title" style="margin-bottom:10px;">${calcMeta[k]}</div>
       <div class="cmc-form">
