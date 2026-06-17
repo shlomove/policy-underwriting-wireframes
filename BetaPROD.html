@@ -3822,7 +3822,6 @@ function renderLifestyle() {
           <span class="dx-loading-pct">‰</span>
         </div>
         <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
-        ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
       </div>
       <div class="timeline-container" id="ls-tl-${r.key}">
         <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
@@ -3830,6 +3829,11 @@ function renderLifestyle() {
           <span class="ls-mini-label">מקור:</span>
           <span class="ls-source-name" style="font-size:12px;color:var(--text);font-weight:600;">${r.data.source && docs[r.data.source] ? docs[r.data.source].title : 'לא צורף מקור'}</span>
           <button class="dx-table-btn" onclick="openLsSource('${r.key}')" ${r.data.source ? '' : 'disabled'}>פתח מקור ▸</button>
+        </div>
+        <div class="ls-source-row" style="margin-top:8px;">
+          <span class="ls-mini-label">רישום עצמי:</span>
+          <input type="text" id="ls-self-${r.key}" placeholder="הוסף/י ${r.kind} ידנית…" style="flex:1;min-width:0;font-size:12px;padding:5px 9px;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;background:#fff;" onkeydown="if(event.key==='Enter'){event.preventDefault();addLifestyleEntry('${r.key}');}">
+          <button class="dx-table-btn" onclick="addLifestyleEntry('${r.key}')">הוסף ▸</button>
         </div>
       </div>
     </div>
@@ -3871,15 +3875,18 @@ function editLifestyle(key) {
   renderLifestyle();
 }
 
-function addHobby() {
-  const item = patientsState[currentIdx].lifestyle.profession;
-  const nh = prompt('הוסף תחביב חדש:');
-  if (nh === null || !nh.trim()) return;
+// Self-entry of a hobby / occupation from the empty inline field
+function addLifestyleEntry(key) {
+  const el = document.getElementById('ls-self-' + key);
+  if (!el) return;
+  const v = (el.value || '').trim();
+  if (!v) return;
+  const item = patientsState[currentIdx].lifestyle[key];
   const cur = (item.value && item.value !== '—' && !/לא נמצא/.test(item.value)) ? item.value : '';
-  item.value = cur ? (cur + '; ' + nh.trim()) : nh.trim();
+  item.value = cur ? (cur + '; ' + v) : v;
   renderLifestyle();
-  const tl = document.getElementById('ls-tl-profession');
-  if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-profession').textContent = '▼'; }
+  const tl = document.getElementById('ls-tl-' + key);
+  if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-' + key).textContent = '▼'; }
 }
 
 // =====================================================================
