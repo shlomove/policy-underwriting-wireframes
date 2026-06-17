@@ -2460,8 +2460,8 @@
     <span class="footer-status" id="footer-name">כהן יעל</span>
   </div>
   <div class="footer-actions">
-    <button class="footer-save-btn">שמור טיוטה</button>
-    <button class="footer-submit-btn" onclick="openApprovalPopup()">שלח לאישור ▸</button>
+    <button class="footer-save-btn" onclick="saveDraft()">שמור כטיוטה</button>
+    <button class="footer-submit-btn" onclick="openApprovalFeedback()">אישור ▸</button>
   </div>
 </div>
 
@@ -2620,6 +2620,35 @@
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="submitFeedback()">שלח פידבק</button>
         <button class="btn-secondary" onclick="closePopup('feedback-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPROVAL → FEEDBACK SCREEN ===== -->
+<div class="popup-overlay" id="appfb-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">פידבק על המסך</div>
+        <div class="popup-meta">שלב הבטא — נשמח לשמוע מהחתמות</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('appfb-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">דירוג כללי של המסך</span>
+      <div class="fb-stars" id="appfb-stars">
+        <span class="fb-star" onclick="setAppfbStars(1)">★</span>
+        <span class="fb-star" onclick="setAppfbStars(2)">★</span>
+        <span class="fb-star" onclick="setAppfbStars(3)">★</span>
+        <span class="fb-star" onclick="setAppfbStars(4)">★</span>
+        <span class="fb-star" onclick="setAppfbStars(5)">★</span>
+      </div>
+      <span class="fb-field-label">מה עבד, מה חסר, ומה לשפר?</span>
+      <textarea class="fb-textarea" id="appfb-text" placeholder="כתוב/י כאן את הפידבק שלך על המסך..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="submitApprovalFeedback()">שלח פידבק</button>
+        <button class="btn-secondary" onclick="closePopup('appfb-popup')">ביטול</button>
       </div>
     </div>
   </div>
@@ -4187,6 +4216,28 @@ function submitFeedback() {
   renderFeedbackBtns(key);
   closePopup('feedback-popup');
   alert(`הפידבק נשמר — ${feedbackSections[key].label}`);
+}
+
+// ===== FOOTER: save draft + approval feedback screen =====
+function saveDraft() {
+  alert('התיק נשמר כטיוטה.');
+}
+
+let appfbRating = 0;
+function openApprovalFeedback() {
+  appfbRating = 0;
+  document.querySelectorAll('#appfb-stars .fb-star').forEach(s => s.classList.remove('on'));
+  const t = document.getElementById('appfb-text');
+  if (t) t.value = '';
+  document.getElementById('appfb-popup').classList.add('open');
+}
+function setAppfbStars(n) {
+  appfbRating = n;
+  document.querySelectorAll('#appfb-stars .fb-star').forEach((s, i) => s.classList.toggle('on', i < n));
+}
+function submitApprovalFeedback() {
+  closePopup('appfb-popup');
+  alert('תודה! הפידבק נשלח' + (appfbRating ? ` · דירוג: ${appfbRating}/5` : ''));
 }
 
 // =====================================================================
