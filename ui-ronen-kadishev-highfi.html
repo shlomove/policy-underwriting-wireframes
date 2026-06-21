@@ -2226,7 +2226,7 @@
   <div class="header-top">
     <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span></div>
     <div class="id-search-wrap">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי פוליסה או שם..."
+      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי פוליסה או ת״ז"
         oninput="filterIds(this.value)" autocomplete="off">
       <span class="id-search-icon">⌕</span>
     </div>
@@ -2324,9 +2324,13 @@
           <input type="text" class="agg-extra-input" id="agg-max" readonly title="שווה לסך התוספת המצטברת">
         </div>
         <div class="agg-extra-field">
-          <span class="agg-extra-label">תוספת מתבטלת <span style="font-weight:400;color:var(--text-light);">(מקסימלית − 50)</span></span>
-          <input type="text" class="agg-extra-input" id="agg-cancelling" readonly title="מחושב אוטומטית — התוספת המקסימלית פחות 50">
+          <span class="agg-extra-label">תוספת מתבטלת</span>
+          <input type="text" class="agg-extra-input" id="agg-cancelling" placeholder="הזן/י סכום" title="ניתן להזין כל מספר שתרצה">
         </div>
+      </div>
+      <div class="agg-extra-field" style="margin-top:10px;">
+        <span class="agg-extra-label">הסבר לביטול תוספת</span>
+        <textarea class="uw-note-input" id="agg-cancel-note" placeholder="כתוב/י כאן את ההסבר לביטול התוספת"></textarea>
       </div>
     </div>
 
@@ -3059,7 +3063,7 @@ function filterIds(query) {
   patients.forEach((p, i) => {
     const tab = document.getElementById('id-tab-' + i);
     if (!tab) return;
-    const haystack = ((p.policy || '') + ' ' + p.name).toLowerCase();
+    const haystack = ((p.policy || '') + ' ' + (p.id || '')).toLowerCase();
     const match = !q || haystack.includes(q);
     tab.classList.toggle('hidden-tab', !match);
     if (match) visibleCount++;
@@ -3088,7 +3092,7 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סוג פוליסה</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
+    <div class="hd-field"><div class="hd-label">סוג מוצר</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
     <div class="divider-v"></div>
@@ -3402,9 +3406,7 @@ function buildCard(dx, idx) {
     </div>
   `).join('');
 
-  const tableBtn = dx.loadingTableKey
-    ? `<button class="dx-table-btn" onclick="event.stopPropagation();openLoadingTable('${dx.loadingTableKey}', ${idx})">טבלת מקור ▸</button>`
-    : '';
+  const tableBtn = `<button class="dx-table-btn" onclick="event.stopPropagation();openDxSummary(${idx})">סיכום אבחנה ▸</button>`;
 
   // ----- status tags: anomaly / pending / missing -----
   const missingCount = (dx.requiredDocs || []).filter(d => !d.received).length;
@@ -3515,12 +3517,11 @@ function updateAgg() {
   const p = patientsState[currentIdx];
   const diags = p.diagnoses;
   const maxEl = document.getElementById('agg-max');
-  const cancelEl = document.getElementById('agg-cancelling');
 
-  // maximum addition ALWAYS equals the cumulative total; cancelling = total - 50
+  // maximum addition ALWAYS equals the cumulative total.
+  // "תוספת מתבטלת" is now a free field the underwriter fills in — do not auto-overwrite it.
   const total = diags.reduce((s, d) => s + d.loading, 0);
   if (maxEl) maxEl.value = fmtPct(total);
-  if (cancelEl) cancelEl.value = fmtPct(Math.max(0, total - 50));
 
   if (!diags.length) {
     document.getElementById('agg-total').textContent = '0%';
@@ -3897,7 +3898,7 @@ function openEnrollmentForm() {
       <div class="doc-placeholder-label">טופס הצטרפות לביטוח — APEX</div>
       <div class="doc-meta-row" style="flex-wrap:wrap;gap:8px 18px;">
         ${row('שם מלא', p.name)}${row('ת״ז', p.id)}${row('תאריך לידה', p.birthDate)}${row('מין', p.gender)}
-        ${row('סוג פוליסה', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
+        ${row('סוג מוצר', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
       </div>
     </div>
     <div class="doc-placeholder" style="margin-top:10px;">
@@ -4127,6 +4128,22 @@ function openLoadingTable(key, idx) {
     ${uwBlock}
   `;
   document.getElementById('loading-popup').classList.add('open');
+}
+
+// ===== DIAGNOSIS SUMMARY (free text — paste Scout answers / write freely) =====
+function openDxSummary(idx) {
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  if (!dx) return;
+  document.getElementById('loading-popup-title').textContent = 'סיכום אבחנה — ' + dx.code;
+  document.getElementById('loading-popup-meta').textContent = dx.fullName || '';
+  document.getElementById('loading-popup-body').innerHTML = `
+    <label class="uw-note-label">סיכום אבחנה — ניתן להדביק תשובות מ-Scout ולכתוב במלל חופשי</label>
+    <textarea id="dxsummary-${idx}" class="uw-note-input" style="min-height:240px;" placeholder="הדבק/י כאן תשובות מ-Scout או כתוב/י סיכום אבחנה במלל חופשי…" onchange="setDxSummary(${idx}, this.value)">${dx.summaryNote || ''}</textarea>`;
+  document.getElementById('loading-popup').classList.add('open');
+}
+
+function setDxSummary(idx, val) {
+  patientsState[currentIdx].diagnoses[idx].summaryNote = val || '';
 }
 
 function closePopup(id) {
