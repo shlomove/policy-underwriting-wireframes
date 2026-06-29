@@ -2472,6 +2472,7 @@
     <span class="footer-status" id="footer-name">כהן יעל</span>
   </div>
   <div class="footer-actions">
+    <button class="footer-save-btn" onclick="openNoUnderwriting()">לא נדרש חיתום</button>
     <button class="footer-save-btn">שמור טיוטה</button>
     <button class="footer-submit-btn" onclick="openApprovalPopup()">שלח לאישור ▸</button>
   </div>
@@ -2728,6 +2729,27 @@
           <button class="btn-secondary" onclick="closePopup('temp-popup')">ביטול</button>
           <button class="btn-secondary" id="temp-clear-btn" onclick="clearTempLoading()" style="margin-right:auto;">הסר תוספת זמנית</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NO-UNDERWRITING POPUP ===== -->
+<div class="popup-overlay" id="nouw-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">לא נדרש חיתום ריסק</div>
+        <div class="popup-meta">פירוט הסיבות בגינן הפוליסה אינה דורשת חיתום ריסק</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('nouw-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">סיבות לאי-דרישת חיתום ריסק</span>
+      <textarea class="fb-textarea" id="nouw-text" placeholder="פרט/י כאן את הסיבות בגינן הפוליסה אינה דורשת חיתום ריסק..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveNoUnderwriting()">שמירה</button>
+        <button class="btn-secondary" onclick="closePopup('nouw-popup')">ביטול</button>
       </div>
     </div>
   </div>
@@ -4148,6 +4170,18 @@ function setDxSummary(idx, val) {
 
 function closePopup(id) {
   document.getElementById(id).classList.remove('open');
+}
+
+// ===== NO-UNDERWRITING (לא נדרש חיתום ריסק) =====
+function openNoUnderwriting() {
+  const p = patientsState[currentIdx];
+  document.getElementById('nouw-text').value = (p && p.noUwReason) || '';
+  document.getElementById('nouw-popup').classList.add('open');
+}
+function saveNoUnderwriting() {
+  patientsState[currentIdx].noUwReason = document.getElementById('nouw-text').value.trim();
+  closePopup('nouw-popup');
+  alert('הסיבות לאי-דרישת חיתום ריסק נשמרו.');
 }
 
 // ===== APPROVAL POPUP =====
