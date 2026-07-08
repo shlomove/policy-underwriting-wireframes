@@ -3131,7 +3131,7 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סוג פוליסה</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
+    <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
     <div class="divider-v"></div>
@@ -3924,7 +3924,7 @@ function openEnrollmentForm() {
       <div class="doc-placeholder-label">טופס הצטרפות לביטוח — APEX</div>
       <div class="doc-meta-row" style="flex-wrap:wrap;gap:8px 18px;">
         ${row('שם מלא', p.name)}${row('ת״ז', p.id)}${row('תאריך לידה', p.birthDate)}${row('מין', p.gender)}
-        ${row('סוג פוליסה', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
+        ${row('קבוצות סיכון', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
       </div>
     </div>
     <div class="doc-placeholder" style="margin-top:10px;">
