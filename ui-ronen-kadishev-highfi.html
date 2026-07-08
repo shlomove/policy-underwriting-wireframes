@@ -2287,14 +2287,14 @@
 <div id="landing">
   <div class="landing-card">
     <div class="landing-logo">APEX</div>
-    <div class="landing-title">חיפוש לפי ת״ז</div>
-    <div class="landing-sub">הזן/י ת״ז לצפייה במזהי התהליך הפתוחים הממתינים לחיתום</div>
+    <div class="landing-title">כניסה לחיתום</div>
+    <div class="landing-sub">הזן/י מספר מזהה תהליך (לדוגמה: 1) לפתיחת מסך החיתום, או ת״ז לרשימת מזהי התהליך הפתוחים</div>
     <div class="landing-search-wrap">
-      <input type="text" id="landing-input" class="landing-input" placeholder="ת״ז מבוטח (לדוגמה: 046262002)"
+      <input type="text" id="landing-input" class="landing-input" placeholder="מספר מזהה תהליך (לדוגמה: 1) או ת״ז"
         autocomplete="off" onkeydown="if(event.key==='Enter')submitPolicySearch()">
       <span class="landing-search-icon">⌕</span>
     </div>
-    <button class="landing-btn" onclick="submitPolicySearch()">חפש מזהי תהליך ▸</button>
+    <button class="landing-btn" onclick="submitPolicySearch()">כניסה למסך החיתום ▸</button>
     <div class="landing-error" id="landing-error"></div>
   </div>
 </div>
@@ -5197,19 +5197,28 @@ function processListFor(p) {
   ];
 }
 
+function openUwScreen() {
+  closePopup('proc-popup');
+  const lg = document.getElementById('login'); if (lg) lg.classList.add('hidden');
+  document.getElementById('landing').classList.add('hidden');
+}
+
 function submitPolicySearch() {
   const val = (document.getElementById('landing-input').value || '').trim();
   const err = document.getElementById('landing-error');
   const p = patients[0];
-  const ok = val === '111' || val === p.id || (p.policy && val === p.policy) ||
+  // quick demo shortcuts → straight to the underwriting screen
+  const direct = val === '1' || val === '111';
+  const ok = direct || val === p.id || (p.policy && val === p.policy) ||
     val.toLowerCase() === (p.processId || '').toLowerCase();
-  if (ok) {
-    err.classList.remove('show');
-    openProcessList();
-  } else {
-    err.textContent = 'לא נמצאו מזהי תהליך לת״ז זו. נסה/י 046262002';
+  if (!ok) {
+    err.textContent = 'לא נמצא. נסה/י מזהה תהליך 1 או ת״ז 046262002';
     err.classList.add('show');
+    return;
   }
+  err.classList.remove('show');
+  if (direct) { openUwScreen(); return; }   // "1" → open Ronen's underwriting screen directly
+  openProcessList();                         // ת״ז → list of open process IDs
 }
 
 function openProcessList() {
@@ -5229,8 +5238,7 @@ function openProcessList() {
 }
 
 function chooseProcess(id) {
-  closePopup('proc-popup');
-  document.getElementById('landing').classList.add('hidden');
+  openUwScreen();
   // single-dataset demo — the underwriter screen (tabs per insured) is already rendered for patient 0
 }
 
