@@ -2183,6 +2183,19 @@
   .uwm-rg-total.reject { color:var(--text); font-weight:800; }
   .uwm-temp-btn { font-size:12px; font-weight:700; color:var(--text); background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:6px 10px; cursor:pointer; text-align:right; width:100%; }
   .uwm-temp-btn:hover { background:var(--bg-hover); }
+
+  /* compact one-row-per-coverage layout inside the underwriting modal */
+  .uwm-rows { display:flex; flex-direction:column; gap:8px; }
+  .uwm-row { display:flex; align-items:center; gap:10px 12px; flex-wrap:wrap; border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:10px 12px; }
+  .uwm-row.rejected { border-color:var(--text-muted); box-shadow:0 0 0 1px var(--text-muted) inset; }
+  .uwm-row-name { font-size:13px; font-weight:800; color:var(--text); min-width:118px; display:flex; align-items:center; gap:6px; }
+  .uwm-maslul { font-size:10px; font-weight:600; color:var(--text-light); }
+  .uwm-inp-wrap { display:flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+  .uwm-inp { width:60px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:4px 6px; text-align:center; }
+  .uwm-inp:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .uwm-row-total { margin-inline-start:auto; font-size:12px; font-weight:800; color:var(--text); white-space:nowrap; }
+  .uwm-row-total.reject { color:var(--text); }
+  .uwm-row-total.clean { color:var(--text-light); font-weight:700; }
   .uwm-policies { font-size:11px; color:var(--text-light); margin-bottom:8px; line-height:1.5; }
   .uwm-policies .ltr { direction:ltr; unicode-bidi:isolate; }
   .uwm-swiss { font-size:11.5px; background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:7px 9px; margin-bottom:9px; line-height:1.5; }
@@ -2868,6 +2881,20 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ===== DIAGNOSIS SUMMARY POPUP (Swiss table + underwriter notes, per coverage) ===== -->
+<div class="popup-overlay" id="dxsum-popup" style="z-index:600;">
+  <div class="popup-box" style="max-width:720px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="dxsum-title">סיכום אבחנה</div>
+        <div class="popup-meta" id="dxsum-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('dxsum-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="dxsum-body"></div>
   </div>
 </div>
 
@@ -3697,8 +3724,6 @@ function buildCard(dx, idx) {
     </div>
   `).join('');
 
-  const tableBtn = `<button class="dx-table-btn" onclick="event.stopPropagation();openDxSummary(${idx})">סיכום אבחנה ▸</button>`;
-
   // ----- status tags: anomaly / pending / missing -----
   const missingCount = (dx.requiredDocs || []).filter(d => !d.received).length;
   let tagHtml = '';
@@ -3721,10 +3746,8 @@ function buildCard(dx, idx) {
         <span class="dx-name">${dx.code}</span>
         ${tagHtml}
         <span class="dx-full-name">— ${dx.fullName}</span>
-        <div class="uw-chips" onclick="event.stopPropagation()" style="margin-right:auto;">${findingChips(dx)}</div>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;">
+        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;margin-right:auto;">
           ${uwBtn}
-          ${tableBtn}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editDx(${idx})" title="ערוך אבחנה">✏</button>
           <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
         </div>
@@ -3941,52 +3964,30 @@ function renderUnderwritingModal() {
       <button class="uw-do-btn" onclick="runSwissAll()" ${swissAvailable ? '' : 'disabled style="opacity:.5;cursor:default;"'}>⚡ הרץ חיתום Swiss — מלא את כל קבוצות הסיכון</button>
       <span class="uwm-hint">Swiss מחזיר טבלה עם עמודה לכל קבוצת סיכון; הערכים מוצעים לאישור. <b>AI מציע — החתם מחליט.</b></span>
     </div>`;
-  const cards = riskGroupsOf(p).map(rg => uwmCard(f, rg)).join('');
-  document.getElementById('uw-popup-body').innerHTML = toolbar + `<div class="uwm-grid">${cards}</div>`;
+  const rows = riskGroupsOf(p).map(rg => uwmRow(f, rg)).join('');
+  document.getElementById('uw-popup-body').innerHTML = toolbar + `<div class="uwm-rows">${rows}</div>`;
 }
 
-function uwmCard(f, rg) {
+// one compact row per coverage: addition % / permille / temporary-addition button / diagnosis-summary button
+function uwmRow(f, rg) {
   const code = rg.riskGroupCode;
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
-  const sw = f.swiss[code];
   const rejected = c.decision === 'REJECTION';
-
-  let policiesHtml = '';
-  if (rg.policies && rg.policies.length) {
-    const multi = rg.policies.length > 1;
-    policiesHtml = `<div class="uwm-policies">${rg.policies.map((pol, i) =>
-      `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}<span class="ltr">${pol.policyNumber}</span> · ${escapeHtml(pol.productType)}`).join('<br>')}</div>`;
-  }
-
-  let swissHtml = '';
-  if (swissHasContent(sw)) {
-    const tblBtn = f.loadingTableKey ? `<button class="uwm-mini-btn" onclick="openLoadingTable('${f.loadingTableKey}')">טבלת תוספות Swiss ▸</button>` : '';
-    swissHtml = `<div class="uwm-swiss">
-      <span class="uwm-swiss-lbl">המלצת Swiss:</span> ${escapeHtml(cellSummary(sw))}${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}
-      <div class="uwm-swiss-actions">
-        <button class="uwm-mini-btn accept" onclick="applySwissCell('${code}')">אמץ המלצה</button>${tblBtn}
-      </div></div>`;
-  }
-
+  const multi = rg.policies && rg.policies.length > 1;
+  const policiesTitle = (rg.policies || []).map((pol, i) =>
+    `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}${pol.policyNumber} · ${pol.productType}`).join('   |   ');
+  const summary = cellSummary(c);
+  const totalCls = rejected ? 'reject' : (summary === 'נקי' ? 'clean' : '');
   const num = (field, val, step) =>
-    `<input type="number" min="0" step="${step}" value="${val || 0}" onchange="onUwCellChange('${code}','${field}',this.value)">`;
-
+    `<input type="number" class="uwm-inp" min="0" step="${step}" value="${val || 0}" onchange="onUwCellChange('${code}','${field}',this.value)">`;
   return `
-  <div class="uwm-card ${rejected ? 'rejected' : ''}" id="uwm-card-${code}">
-    <div class="uwm-card-head">
-      <span class="uwm-rg-name">${escapeHtml(rg.riskGroupName)}</span>
-      <span class="uwm-rg-total ${rejected ? 'reject' : ''}" id="uwm-total-${code}">${escapeHtml(cellSummary(c))}</span>
-    </div>
-    ${policiesHtml}
-    ${swissHtml}
-    <div class="uwm-fields">
-      <div class="uwm-field"><label>תוספת אחוז (%)</label>${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)}</div>
-      <div class="uwm-field"><label>תוספת פרומיל (‰)</label>${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)}</div>
-      <div class="uwm-field full"><label>תוספת זמנית</label><button class="uwm-temp-btn" onclick="openUwTemp('${code}')">⏱ ${escapeHtml(tempLabel(c))}</button></div>
-      <div class="uwm-field full"><label>החרגה (exclusion)</label><input type="text" value="${escapeHtml(c.exclusionText)}" placeholder="טקסט החרגה — יופיע במכתב" onchange="onUwCellChange('${code}','exclusionText',this.value)"></div>
-      <div class="uwm-field full"><label>מלל חופשי לחתם</label><textarea rows="2" style="resize:vertical;" onchange="onUwCellChange('${code}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea></div>
-      <label class="uwm-reject-row"><input type="checkbox" ${rejected ? 'checked' : ''} onchange="onUwReject('${code}',this.checked)"> דחיית קבוצת הסיכון (בגין ${escapeHtml(findingCode(f))}) — תגרור דחיית מזהה התהליך</label>
-    </div>
+  <div class="uwm-row ${rejected ? 'rejected' : ''}" id="uwm-row-${code}" title="${escapeHtml(policiesTitle)}">
+    <span class="uwm-row-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
+    <label class="uwm-inp-wrap">תוספת ${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)} <span>%</span></label>
+    <label class="uwm-inp-wrap">פרומיל ${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)} <span>‰</span></label>
+    <button class="uwm-mini-btn" onclick="openUwTemp('${code}')">⏱ ${escapeHtml(tempLabel(c))}</button>
+    <button class="uwm-mini-btn" onclick="openDxSummaryRg('${code}')">סיכום אבחנה ▸</button>
+    <span class="uwm-row-total ${totalCls}" id="uwm-total-${code}">${escapeHtml(summary)}</span>
   </div>`;
 }
 
@@ -4007,12 +4008,17 @@ function onUwCellChange(code, field, val) {
     let n = parseFloat(val) || 0; if (n < 0) n = 0;
     if (/Percent$/.test(field)) n = Math.round(n / 25) * 25;
     c[field] = n;
-    const el = document.querySelector(`#uwm-card-${code} input[onchange*="'${field}'"]`);
+    const el = document.querySelector(`#uwm-row-${code} input[onchange*="'${field}'"]`);
     if (el) el.value = n;
   }
   recomputeDecision(c);
   const tEl = document.getElementById('uwm-total-' + code);
-  if (tEl) { tEl.textContent = cellSummary(c); tEl.classList.toggle('reject', c.decision === 'REJECTION'); }
+  if (tEl) {
+    const s = cellSummary(c);
+    tEl.textContent = s;
+    tEl.classList.toggle('reject', c.decision === 'REJECTION');
+    tEl.classList.toggle('clean', c.decision !== 'REJECTION' && s === 'נקי');
+  }
   refreshAfterUnderwriting();
 }
 
@@ -4088,6 +4094,52 @@ function clearUwTemp() {
   renderUnderwritingModal();
   refreshAfterUnderwriting();
 }
+
+// ----- "סיכום אבחנה" per coverage: relevant Swiss table + underwriter notes/exclusion/rejection -----
+let dxSumRg = null;
+function openDxSummaryRg(code) {
+  dxSumRg = code;
+  const f = uwFindingByRef(uwCtx); if (!f) return;
+  const c = f.uw[code];
+  const sw = f.swiss[code];
+  const rgName = riskGroupNames[code] || code;
+  document.getElementById('dxsum-title').textContent = 'סיכום אבחנה — ' + findingCode(f) + ' · ' + rgName;
+  document.getElementById('dxsum-meta').textContent = findingTitle(f);
+
+  // Swiss recommendation for this coverage
+  let swissRec = '';
+  if (swissHasContent(sw)) {
+    swissRec = `<div class="uwm-swiss">
+      <span class="uwm-swiss-lbl">המלצת Swiss ל${escapeHtml(rgName)}:</span> ${escapeHtml(cellSummary(sw))}${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}
+      <div class="uwm-swiss-actions"><button class="uwm-mini-btn accept" onclick="applySwissFromSummary('${code}')">אמץ המלצה</button></div>
+    </div>`;
+  }
+
+  // relevant Swiss source table for the diagnosis
+  let tableHtml = '<div class="uw-summary-empty">אין טבלת Swiss זמינה לאבחנה זו.</div>';
+  const t = loadingTables[f.loadingTableKey];
+  if (t) {
+    const colH = t.cols.map(col => `<th>${escapeHtml(col)}</th>`).join('');
+    const rowsH = t.rows.map(row => {
+      const act = row.active;
+      const cells = row.vals.map(v => `<td class="${act ? 'active-cell' : ''}">${escapeHtml(v)}</td>`).join('');
+      return `<tr><td class="${act ? 'row-active-label' : ''}">${escapeHtml(row.label)}</td>${cells}</tr>`;
+    }).join('');
+    tableHtml = `<div class="loading-table-wrap"><table class="loading-table"><thead><tr>${colH}</tr></thead><tbody>${rowsH}</tbody></table></div>${t.note ? `<div class="table-note">${escapeHtml(t.note)}</div>` : ''}`;
+  }
+
+  document.getElementById('dxsum-body').innerHTML = `
+    ${swissRec}
+    ${tableHtml}
+    <div class="uwm-field full" style="margin-top:14px;"><label>החרגה (exclusion)</label>
+      <input type="text" value="${escapeHtml(c.exclusionText)}" placeholder="טקסט החרגה — יופיע במכתב" onchange="onUwCellChange('${code}','exclusionText',this.value)"></div>
+    <div class="uwm-field full"><label>הערות חתם / נימוק להחלטה</label>
+      <textarea rows="3" style="resize:vertical;" onchange="onUwCellChange('${code}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea></div>
+    <label class="uwm-reject-row"><input type="checkbox" ${c.decision === 'REJECTION' ? 'checked' : ''} onchange="onUwReject('${code}',this.checked)"> דחיית קבוצת הסיכון (בגין ${escapeHtml(findingCode(f))}) — תגרור דחיית מזהה התהליך</label>
+  `;
+  document.getElementById('dxsum-popup').classList.add('open');
+}
+function applySwissFromSummary(code) { applySwissCell(code); openDxSummaryRg(code); }
 
 function updateAgg() {
   const p = patientsState[currentIdx];
@@ -4419,8 +4471,7 @@ function renderLifestyle() {
         <span class="dx-toggle" id="ls-toggle-${r.key}">▶</span>
         <span class="dx-name">${r.kind}</span>
         <span class="dx-full-name">— ${r.data.value || '—'}</span>
-        <div class="uw-chips" onclick="event.stopPropagation()" style="margin-right:auto;">${findingChips(r.data)}</div>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;">
+        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;margin-right:auto;">
           <button class="uw-do-btn ${Object.values(r.data.uw || {}).some(c => c.decision === 'REJECTION') ? 'rejected' : ''}" onclick="event.stopPropagation();openUnderwriting('ls','${r.key}')" title="חיתום ${r.kind} פר קבוצת סיכון">בצע חיתום ▸</button>
           <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
           ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
