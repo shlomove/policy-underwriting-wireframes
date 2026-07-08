@@ -5257,6 +5257,12 @@ function chooseProcess(id) {
   renderUwSummary();
   renderAllFeedback();
   updateAgg();
+
+  // --- TEMP: bypass the login/landing flow — open Ronen's underwriting screen directly.
+  //     The flow code is kept intact (submitLogin / submitPolicySearch / process list);
+  //     to restore it, remove these two lines. ---
+  const _lg = document.getElementById('login'); if (_lg) _lg.classList.add('hidden');
+  const _ld = document.getElementById('landing'); if (_ld) _ld.classList.add('hidden');
 })();
 </script>
 </body>
