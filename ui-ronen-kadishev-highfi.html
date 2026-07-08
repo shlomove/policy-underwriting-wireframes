@@ -2156,20 +2156,20 @@
 
   /* ===== Underwriting matrix (finding × risk group) ===== */
   .uw-do-btn {
-    font-size:12px; font-weight:700; color:#fff; background:var(--mig-blue); border:1px solid var(--mig-blue);
+    font-size:12px; font-weight:700; color:var(--text); background:#fff; border:1px solid var(--border);
     border-radius:var(--radius); padding:5px 12px; cursor:pointer; white-space:nowrap;
   }
-  .uw-do-btn:hover { filter:brightness(1.08); }
-  .uw-do-btn.rejected { background:var(--error); border-color:var(--error); }
+  .uw-do-btn:hover { background:var(--bg-hover); }
+  .uw-do-btn.rejected { border-color:var(--text-muted); font-weight:800; }
   .uw-chips { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
   .uw-chip {
     font-size:11px; font-weight:600; border:1px solid var(--border); border-radius:999px;
     padding:2px 9px; color:var(--text-muted); background:#fff; white-space:nowrap;
   }
   .uw-chip b { color:var(--text); font-weight:700; }
-  .uw-chip.load { background:#fff8ec; border-color:#e6cf9a; color:#8a6d1f; }
+  .uw-chip.load { }
   .uw-chip.clean { color:var(--text-light); }
-  .uw-chip.reject { background:#fdecec; border-color:#e3a8ab; color:var(--error); font-weight:700; }
+  .uw-chip.reject { font-weight:700; }
 
   .uwm-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-hover); }
   .uwm-toolbar .uwm-hint { font-size:12px; color:var(--text-muted); }
@@ -2179,8 +2179,10 @@
   .uwm-card.rejected { border-color:var(--error); box-shadow:0 0 0 2px #fdecec inset; }
   .uwm-card-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
   .uwm-rg-name { font-size:14px; font-weight:800; color:var(--text); }
-  .uwm-rg-total { font-size:12px; font-weight:700; color:var(--mig-blue); }
-  .uwm-rg-total.reject { color:var(--error); }
+  .uwm-rg-total { font-size:12px; font-weight:700; color:var(--text); }
+  .uwm-rg-total.reject { color:var(--text); font-weight:800; }
+  .uwm-temp-btn { font-size:12px; font-weight:700; color:var(--text); background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:6px 10px; cursor:pointer; text-align:right; width:100%; }
+  .uwm-temp-btn:hover { background:var(--bg-hover); }
   .uwm-policies { font-size:11px; color:var(--text-light); margin-bottom:8px; line-height:1.5; }
   .uwm-policies .ltr { direction:ltr; unicode-bidi:isolate; }
   .uwm-swiss { font-size:11.5px; background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:7px 9px; margin-bottom:9px; line-height:1.5; }
@@ -2188,24 +2190,24 @@
   .uwm-swiss-actions { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
   .uwm-mini-btn { font-size:11px; font-weight:700; border:1px solid var(--border); background:#fff; border-radius:var(--radius); padding:3px 9px; cursor:pointer; color:var(--text-muted); }
   .uwm-mini-btn:hover { background:var(--bg-hover); color:var(--text); }
-  .uwm-mini-btn.accept { border-color:var(--mig-blue); color:var(--mig-blue); }
+  .uwm-mini-btn.accept { border-color:var(--text-muted); color:var(--text); }
   .uwm-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .uwm-field { display:flex; flex-direction:column; gap:3px; }
   .uwm-field label { font-size:10.5px; font-weight:700; color:var(--text-muted); }
   .uwm-field input, .uwm-field textarea { font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 7px; background:#fff; }
   .uwm-field input:focus, .uwm-field textarea:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
   .uwm-field.full { grid-column:1 / -1; }
-  .uwm-reject-row { grid-column:1 / -1; display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:var(--error); margin-top:2px; }
-  .uwm-reject-row input { width:16px; height:16px; accent-color:var(--error); }
+  .uwm-reject-row { grid-column:1 / -1; display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:var(--text-muted); margin-top:2px; }
+  .uwm-reject-row input { width:16px; height:16px; accent-color:var(--text-muted); }
   .uwm-sub { font-size:10px; font-weight:800; color:var(--text-light); text-transform:uppercase; letter-spacing:.03em; grid-column:1 / -1; margin-top:4px; border-top:1px dashed var(--border-light); padding-top:6px; }
 
   /* ===== Per-risk-group summary ===== */
   .rgsum-row { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:9px 11px; margin-bottom:7px; }
-  .rgsum-row.reject { border-color:var(--error); background:#fdf4f4; }
+  .rgsum-row.reject { border-color:var(--text-muted); }
   .rgsum-top { display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; }
   .rgsum-name { font-size:13px; font-weight:800; color:var(--text); }
-  .rgsum-total { font-size:13px; font-weight:800; color:var(--mig-blue); }
-  .rgsum-total.reject { color:var(--error); }
+  .rgsum-total { font-size:13px; font-weight:800; color:var(--text); }
+  .rgsum-total.reject { color:var(--text); }
   .rgsum-total.clean { color:var(--text-light); }
   .rgsum-detail { font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.55; }
   .rgsum-detail .dxc { font-weight:700; color:var(--text); }
@@ -2216,7 +2218,7 @@
   }
   .footer-rg-chips { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
   .footer-rg-chip { font-size:11px; font-weight:700; border:1px solid var(--mig-line); border-radius:999px; padding:2px 9px; color:var(--text); background:#fff; white-space:nowrap; }
-  .footer-rg-chip.reject { background:var(--error); color:#fff; border-color:var(--error); }
+  .footer-rg-chip.reject { border-color:var(--text-muted); font-weight:800; }
   .footer-rg-chip.clean { color:var(--text-light); }
 
   /* ===== Cross-check flag (health declaration) ===== */
@@ -2833,6 +2835,42 @@
   </div>
 </div>
 
+<!-- ===== UW TEMPORARY-ADDITION POPUP (per risk-group cell) ===== -->
+<div class="popup-overlay" id="uwtemp-popup" style="z-index:600;">
+  <div class="popup-box" style="max-width:400px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">תוספת זמנית</div>
+        <div class="popup-meta" id="uwtemp-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('uwtemp-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <div class="cmc-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">תוספת אחוז (%)</label>
+            <input type="number" class="form-input" id="uwtemp-pct" min="0" step="25" placeholder="0">
+          </div>
+          <div class="form-field">
+            <label class="form-label">תוספת פרומיל (‰)</label>
+            <input type="number" class="form-input" id="uwtemp-permille" min="0" step="0.5" placeholder="0">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">עד תאריך (תוקף התוספת הזמנית)</label>
+          <input type="date" class="form-input" id="uwtemp-until">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="submit-btn" onclick="confirmUwTemp()">אישור</button>
+          <button class="btn-secondary" onclick="closePopup('uwtemp-popup')">ביטול</button>
+          <button class="btn-secondary" id="uwtemp-clear" onclick="clearUwTemp()" style="margin-right:auto;">הסר תוספת זמנית</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== NO-UNDERWRITING POPUP ===== -->
 <div class="popup-overlay" id="nouw-popup">
   <div class="popup-box" style="max-width:480px;">
@@ -3137,14 +3175,14 @@ const lifestyleData = [
       value: 'מפעיל ציוד כבד', source: 'doc-sarc-4', findingSource: 'OCCUPATION',
       swissResults: [
         _cell('RISK', 'CLEAN'),
-        _cell('ACC_DIS', 'LOADING', { occupationalAdditionPercent: 15, freeText: 'סיכון תעסוקתי — הפעלת ציוד כבד' }),
-        _cell('WORK_DIS', 'LOADING', { occupationalAdditionPermille: 2, freeText: 'סיכון תעסוקתי — הפעלת ציוד כבד' }),
+        _cell('ACC_DIS', 'LOADING', { medicalAdditionPercent: 15, freeText: 'סיכון תעסוקתי — הפעלת ציוד כבד' }),
+        _cell('WORK_DIS', 'LOADING', { medicalAdditionPermille: 2, freeText: 'סיכון תעסוקתי — הפעלת ציוד כבד' }),
         _cell('MORTGAGE', 'CLEAN'),
       ],
       underwritingResults: [
         _cell('RISK', 'CLEAN'),
-        _cell('ACC_DIS', 'LOADING', { occupationalAdditionPercent: 15 }),
-        _cell('WORK_DIS', 'LOADING', { occupationalAdditionPermille: 2 }),
+        _cell('ACC_DIS', 'LOADING', { medicalAdditionPercent: 15 }),
+        _cell('WORK_DIS', 'LOADING', { medicalAdditionPermille: 2 }),
         _cell('MORTGAGE', 'CLEAN'),
       ],
     },
@@ -3777,7 +3815,6 @@ function findingHasResult(f) {
   return Object.values(f.uw || {}).some(c =>
     c.decision === 'REJECTION' || c.decision === 'EXCLUSION' ||
     (+c.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) ||
-    (+c.occupationalAdditionPercent || 0) || (+c.occupationalAdditionPermille || 0) ||
     (+c.temporaryAdditionPercent || 0) || (+c.temporaryAdditionPermille || 0));
 }
 // human-readable summary of a single cell (for chips on the finding card)
@@ -3787,8 +3824,6 @@ function cellSummary(c) {
   const bits = [];
   if (+c.medicalAdditionPercent) bits.push('+' + fmtNum(+c.medicalAdditionPercent) + '%');
   if (+c.medicalAdditionPermille) bits.push('+' + fmtPermille(+c.medicalAdditionPermille));
-  if (+c.occupationalAdditionPercent) bits.push('+' + fmtNum(+c.occupationalAdditionPercent) + '% ע׳');
-  if (+c.occupationalAdditionPermille) bits.push('+' + fmtPermille(+c.occupationalAdditionPermille) + ' ע׳');
   if (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille) {
     const t = [];
     if (+c.temporaryAdditionPercent) t.push('+' + fmtNum(+c.temporaryAdditionPercent) + '%');
@@ -3806,7 +3841,7 @@ function computeRiskGroupTotals(p) {
   riskGroupsOf(p).forEach(rg => {
     const code = rg.riskGroupCode;
     const agg = {
-      medPct: 0, medPer: 0, occPct: 0, occPer: 0, tempPct: 0, tempPer: 0, tempUntil: '',
+      medPct: 0, medPer: 0, tempPct: 0, tempPer: 0, tempUntil: '',
       details: [], exclusions: [], rejected: false, rejectedBy: [],
     };
     findings.forEach(f => {
@@ -3814,9 +3849,8 @@ function computeRiskGroupTotals(p) {
       if (!c) return;
       if (c.decision === 'REJECTION') { agg.rejected = true; agg.rejectedBy.push(findingCode(f)); return; }
       const mp = +c.medicalAdditionPercent || 0, mpm = +c.medicalAdditionPermille || 0;
-      const op = +c.occupationalAdditionPercent || 0, opm = +c.occupationalAdditionPermille || 0;
       const tp = +c.temporaryAdditionPercent || 0, tpm = +c.temporaryAdditionPermille || 0;
-      agg.medPct += mp; agg.medPer += mpm; agg.occPct += op; agg.occPer += opm;
+      agg.medPct += mp; agg.medPer += mpm;
       agg.tempPct += tp; agg.tempPer += tpm;
       if (c.temporaryUntil && !agg.tempUntil) agg.tempUntil = c.temporaryUntil;
       if ((c.decision === 'EXCLUSION' || c.exclusionText) && c.exclusionText) {
@@ -3825,8 +3859,6 @@ function computeRiskGroupTotals(p) {
       const bits = [];
       if (mp) bits.push('+' + fmtNum(mp) + '%');
       if (mpm) bits.push('+' + fmtPermille(mpm));
-      if (op) bits.push('+' + fmtNum(op) + '% (עיסוקי)');
-      if (opm) bits.push('+' + fmtPermille(opm) + ' (עיסוקי)');
       if (tp || tpm) {
         const tt = [];
         if (tp) tt.push('+' + fmtNum(tp) + '%');
@@ -3851,8 +3883,6 @@ function rgTotalLabel(agg) {
   const parts = [];
   if (agg.medPct) parts.push('+' + fmtNum(agg.medPct) + '%');
   if (agg.medPer) parts.push('+' + fmtPermille(agg.medPer));
-  if (agg.occPct) parts.push('+' + fmtNum(agg.occPct) + '% עיסוקי');
-  if (agg.occPer) parts.push('+' + fmtPermille(agg.occPer) + ' עיסוקי');
   if (agg.tempPct || agg.tempPer) {
     const tt = [];
     if (agg.tempPct) tt.push('+' + fmtNum(agg.tempPct) + '%');
@@ -3950,16 +3980,9 @@ function uwmCard(f, rg) {
     ${policiesHtml}
     ${swissHtml}
     <div class="uwm-fields">
-      <div class="uwm-sub">תוספת רפואית</div>
-      <div class="uwm-field"><label>אחוז (%)</label>${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)}</div>
-      <div class="uwm-field"><label>פרומיל (‰)</label>${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)}</div>
-      <div class="uwm-sub">תוספת עיסוקית</div>
-      <div class="uwm-field"><label>אחוז (%)</label>${num('occupationalAdditionPercent', c.occupationalAdditionPercent, 25)}</div>
-      <div class="uwm-field"><label>פרומיל (‰)</label>${num('occupationalAdditionPermille', c.occupationalAdditionPermille, 0.5)}</div>
-      <div class="uwm-sub">תוספת זמנית</div>
-      <div class="uwm-field"><label>אחוז (%)</label>${num('temporaryAdditionPercent', c.temporaryAdditionPercent, 25)}</div>
-      <div class="uwm-field"><label>פרומיל (‰)</label>${num('temporaryAdditionPermille', c.temporaryAdditionPermille, 0.5)}</div>
-      <div class="uwm-field full"><label>תוקף התוספת הזמנית (עד תאריך)</label><input type="date" value="${c.temporaryUntil || ''}" onchange="onUwCellChange('${code}','temporaryUntil',this.value)"></div>
+      <div class="uwm-field"><label>תוספת אחוז (%)</label>${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)}</div>
+      <div class="uwm-field"><label>תוספת פרומיל (‰)</label>${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)}</div>
+      <div class="uwm-field full"><label>תוספת זמנית</label><button class="uwm-temp-btn" onclick="openUwTemp('${code}')">⏱ ${escapeHtml(tempLabel(c))}</button></div>
       <div class="uwm-field full"><label>החרגה (exclusion)</label><input type="text" value="${escapeHtml(c.exclusionText)}" placeholder="טקסט החרגה — יופיע במכתב" onchange="onUwCellChange('${code}','exclusionText',this.value)"></div>
       <div class="uwm-field full"><label>מלל חופשי לחתם</label><textarea rows="2" style="resize:vertical;" onchange="onUwCellChange('${code}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea></div>
       <label class="uwm-reject-row"><input type="checkbox" ${rejected ? 'checked' : ''} onchange="onUwReject('${code}',this.checked)"> דחיית קבוצת הסיכון (בגין ${escapeHtml(findingCode(f))}) — תגרור דחיית מזהה התהליך</label>
@@ -3970,7 +3993,6 @@ function uwmCard(f, rg) {
 function recomputeDecision(c) {
   if (c.decision === 'REJECTION') return;
   const anyNum = (+c.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) ||
-    (+c.occupationalAdditionPercent || 0) || (+c.occupationalAdditionPermille || 0) ||
     (+c.temporaryAdditionPercent || 0) || (+c.temporaryAdditionPermille || 0);
   const hasExcl = (c.exclusionText || '').trim();
   c.decision = anyNum ? 'LOADING' : (hasExcl ? 'EXCLUSION' : 'CLEAN');
@@ -4023,6 +4045,48 @@ function refreshAfterUnderwriting() {
   renderDiagnoses();
   renderLifestyle();
   renderUwSummary();
+}
+
+// ----- temporary addition (per risk-group cell), opened from the underwriting card -----
+function tempLabel(c) {
+  const bits = [];
+  if (+c.temporaryAdditionPercent) bits.push('+' + fmtNum(+c.temporaryAdditionPercent) + '%');
+  if (+c.temporaryAdditionPermille) bits.push('+' + fmtPermille(+c.temporaryAdditionPermille));
+  if (!bits.length) return 'הוסף תוספת זמנית';
+  return bits.join(' / ') + (c.temporaryUntil ? ' · עד ' + fmtDate(c.temporaryUntil) : '');
+}
+let uwTempRg = null;
+function openUwTemp(code) {
+  uwTempRg = code;
+  const f = uwFindingByRef(uwCtx); if (!f) return;
+  const c = f.uw[code];
+  document.getElementById('uwtemp-meta').textContent = findingCode(f) + ' · ' + (riskGroupNames[code] || code);
+  document.getElementById('uwtemp-pct').value = c.temporaryAdditionPercent || 0;
+  document.getElementById('uwtemp-permille').value = c.temporaryAdditionPermille || 0;
+  document.getElementById('uwtemp-until').value = c.temporaryUntil || '';
+  const has = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille);
+  document.getElementById('uwtemp-clear').style.display = has ? 'inline-block' : 'none';
+  document.getElementById('uwtemp-popup').classList.add('open');
+}
+function confirmUwTemp() {
+  const f = uwFindingByRef(uwCtx); if (!f || !uwTempRg) return;
+  const c = f.uw[uwTempRg];
+  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 25) * 25);
+  c.temporaryAdditionPermille = Math.max(0, parseFloat(document.getElementById('uwtemp-permille').value) || 0);
+  c.temporaryUntil = document.getElementById('uwtemp-until').value;
+  recomputeDecision(c);
+  closePopup('uwtemp-popup');
+  renderUnderwritingModal();
+  refreshAfterUnderwriting();
+}
+function clearUwTemp() {
+  const f = uwFindingByRef(uwCtx); if (!f || !uwTempRg) return;
+  const c = f.uw[uwTempRg];
+  c.temporaryAdditionPercent = 0; c.temporaryAdditionPermille = 0; c.temporaryUntil = '';
+  recomputeDecision(c);
+  closePopup('uwtemp-popup');
+  renderUnderwritingModal();
+  refreshAfterUnderwriting();
 }
 
 function updateAgg() {
