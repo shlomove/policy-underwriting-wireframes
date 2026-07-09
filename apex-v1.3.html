@@ -2228,9 +2228,24 @@
   .rguw-cancel-reason { flex:1; min-width:160px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
   .rguw-cancel-reason:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
   .uw-referent-note { font-size:12.5px; line-height:1.6; color:var(--text); background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); padding:9px 11px; }
-  .tag.rg-tag { cursor:pointer; transition:background .12s, color .12s, border-color .12s; }
-  .tag.rg-tag:hover { background:var(--bg-hover); border-color:var(--mig-blue); }
-  .tag.rg-tag.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); }
+  .tag.rg-tag {
+    cursor:pointer; font-size:13.5px; font-weight:700; padding:8px 18px; border-radius:999px;
+    border:1.5px solid var(--mig-line); color:var(--text); background:#fff; line-height:1.1;
+    transition:background .12s, color .12s, border-color .12s, box-shadow .12s;
+  }
+  .tag.rg-tag:hover { background:var(--bg-hover); border-color:var(--mig-blue); color:var(--mig-blue); }
+  .tag.rg-tag.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); box-shadow:0 2px 6px rgba(37,86,158,.28); }
+  .tags-row { gap:8px; }
+
+  /* in-section tab bar for the per-risk-group underwriting form */
+  .rgform-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px; }
+  .rgform-tab {
+    font-size:13.5px; font-weight:800; padding:9px 20px; border-radius:999px;
+    border:1.5px solid var(--mig-line); background:#fff; color:var(--text-muted); cursor:pointer;
+    transition:background .12s, color .12s, border-color .12s, box-shadow .12s;
+  }
+  .rgform-tab:hover { background:var(--bg-hover); color:var(--text); }
+  .rgform-tab.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); box-shadow:0 2px 6px rgba(37,86,158,.28); }
   .rguw-meta { display:flex; gap:10px 22px; flex-wrap:wrap; align-items:center; margin-bottom:10px; padding:8px 10px; background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); }
   .rguw-meta-item { display:flex; align-items:center; gap:6px; font-size:12px; }
   .rguw-meta-lbl { font-size:10.5px; font-weight:700; color:var(--text-light); }
@@ -3408,9 +3423,13 @@ function renderRgUnderwriting() {
   if (!wrap) return;
   const p = patientsState[currentIdx];
   const groups = riskGroupsOf(p);
-  wrap.innerHTML = groups.length
-    ? groups.map(rg => rgUwRow(rg)).join('')
-    : '<div class="uw-summary-empty">אין קבוצות סיכון למבוטח זה</div>';
+  if (!groups.length) { wrap.innerHTML = '<div class="uw-summary-empty">אין קבוצות סיכון למבוטח זה</div>'; return; }
+  if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) selectedRgCode = groups[0].riskGroupCode;
+  // like the ID tabs: show a SEPARATE form for the selected risk group only
+  const tabs = groups.map(g =>
+    `<button class="rgform-tab ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')">${escapeHtml(g.riskGroupName)}</button>`).join('');
+  const rg = groups.find(g => g.riskGroupCode === selectedRgCode);
+  wrap.innerHTML = `<div class="rgform-tabs">${tabs}</div>${rgUwRow(rg)}`;
 }
 function rgUwRow(rg) {
   const code = rg.riskGroupCode;
@@ -3532,9 +3551,8 @@ function requestTypeLabel(t) {
 let selectedRgCode = null; // header coverage selector → drives requested/existing amount + reasons
 function selectCoverage(code) {
   selectedRgCode = code;
-  renderHeader();
-  const card = document.getElementById('rguw-card-' + code);
-  if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  renderHeader();            // updates active button + requested/existing amount + reasons
+  renderRgUnderwriting();    // shows the separate form for this risk group (no scroll/jump)
 }
 
 function renderHeader() {
