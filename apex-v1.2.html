@@ -3416,7 +3416,7 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סוג מוצר</div><div class="hd-value" style="font-size:12px;">${p.policyType}</div></div>
+    <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="tags-row">${(p.riskGroups||[]).map(rg => `<span class="tag">${rg.riskGroupName}</span>`).join('') || '—'}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
     <div class="divider-v"></div>
