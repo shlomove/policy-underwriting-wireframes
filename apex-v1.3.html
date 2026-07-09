@@ -2330,6 +2330,11 @@
   .proc-type { font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:999px; padding:2px 9px; color:var(--text-muted); background:var(--bg-hover); }
   .proc-meta { font-size:11.5px; color:var(--text-light); }
   .proc-note { font-size:12px; color:var(--text-muted); margin-top:3px; }
+  #proc-popup { z-index:1100; }
+  .proc-row-disabled { cursor:not-allowed; opacity:.8; }
+  .proc-row-disabled:hover { background:#fdf4f4; border-color:#e3a8ab; }
+  .proc-note-warn { color:var(--error); font-weight:700; transition:background .15s; }
+  .proc-note-warn.flash { background:#fdecec; border:1px solid #e3a8ab; border-radius:var(--radius); padding:3px 8px; }
 
   /* ===== Migdal full-colour theme (lo-fi grayscale lifted) ===== */
   :root {
@@ -2386,14 +2391,14 @@
 <div id="landing">
   <div class="landing-card">
     <div class="landing-logo">APEX</div>
-    <div class="landing-title">כניסה לחיתום</div>
-    <div class="landing-sub">הזן/י מספר מזהה תהליך (לדוגמה: 1) לפתיחת מסך החיתום, או ת״ז לרשימת מזהי התהליך הפתוחים</div>
+    <div class="landing-title">הזן ת״ז</div>
+    <div class="landing-sub">הזן/י ת״ז לצפייה במזהי התהליך הפתוחים לחיתום</div>
     <div class="landing-search-wrap">
-      <input type="text" id="landing-input" class="landing-input" placeholder="מספר מזהה תהליך (לדוגמה: 1) או ת״ז"
+      <input type="text" id="landing-input" class="landing-input" placeholder="ת״ז מבוטח (לדוגמה: 111)"
         autocomplete="off" onkeydown="if(event.key==='Enter')submitPolicySearch()">
       <span class="landing-search-icon">⌕</span>
     </div>
-    <button class="landing-btn" onclick="submitPolicySearch()">כניסה למסך החיתום ▸</button>
+    <button class="landing-btn" onclick="submitPolicySearch()">המשך ▸</button>
     <div class="landing-error" id="landing-error"></div>
   </div>
 </div>
@@ -5555,15 +5560,9 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
 // LANDING PAGE — POLICY SEARCH
 // =====================================================================
 function submitLogin() {
-  const user = (document.getElementById('login-user').value || '').trim();
-  const pass = (document.getElementById('login-pass').value || '').trim();
+  // demo: any username / password is accepted
   const err = document.getElementById('login-error');
-  if (!user || !pass) {
-    err.textContent = 'יש להזין שם משתמש וסיסמה';
-    err.classList.add('show');
-    return;
-  }
-  err.classList.remove('show');
+  if (err) err.classList.remove('show');
   document.getElementById('login').classList.add('hidden');
   const li = document.getElementById('landing-input');
   if (li) li.focus();
@@ -5577,12 +5576,11 @@ function fmtDateTime(iso) {
   return dp.length === 3 ? `${dp[2]}.${dp[1]}.${dp[0]}${time ? ' ' + time : ''}` : iso;
 }
 
-// open processes waiting for underwriting for an ID (mock: the real one + 2 extras)
+// open processes waiting for underwriting for an ID
 function processListFor(p) {
   return [
-    { processId: p.processId, requestType: p.requestType, date: p.requestOpenDate, note: p.clerkNotesToUnderwriter, primary: true },
-    { processId: 'PRC-2026-00098', requestType: 'SHINUIM', date: '2026-06-22T11:10:00', note: 'עדכון מוטבים — ללא שינוי חיתומי מהותי.' },
-    { processId: 'PRC-2026-00074', requestType: 'SHINUIM_MUNCHIM', date: '2026-05-30T15:40:00', note: 'הגדלת סכום ביטוח — נדרש חיתום מחדש.' },
+    { processId: 'PRC-2026-00111', requestType: 'HAFAKA', date: '2026-07-07T09:30:00', note: 'מבוטח יחיד, מבקש הרחבת כיסוי. סתירת עישון — לבדיקת חתם.', supported: true },
+    { processId: 'PRC-2026-00122', requestType: 'SHINUIM', date: '2026-06-18T14:05:00', note: '', supported: false },
   ];
 }
 
@@ -5596,34 +5594,45 @@ function submitPolicySearch() {
   const val = (document.getElementById('landing-input').value || '').trim();
   const err = document.getElementById('landing-error');
   const p = patients[0];
-  // quick demo shortcuts → straight to the underwriting screen
-  const direct = val === '1' || val === '111';
-  const ok = direct || val === p.id || (p.policy && val === p.policy) ||
-    val.toLowerCase() === (p.processId || '').toLowerCase();
+  const ok = val === '111' || val === p.id;
   if (!ok) {
-    err.textContent = 'לא נמצא. נסה/י מזהה תהליך 1 או ת״ז 046262002';
+    err.textContent = 'ת״ז לא נמצאה. נסה/י 111';
     err.classList.add('show');
     return;
   }
   err.classList.remove('show');
-  if (direct) { openUwScreen(); return; }   // "1" → open Ronen's underwriting screen directly
-  openProcessList();                         // ת״ז → list of open process IDs
+  openProcessList();
 }
 
 function openProcessList() {
   const p = patientsState[0];
   const list = processListFor(p);
   document.getElementById('proc-popup-meta').textContent =
-    `ת״ז ${p.id} · ${p.name} · ${list.length} מזהי תהליך פתוחים`;
-  document.getElementById('proc-popup-body').innerHTML = list.map(pr => `
-    <button class="proc-row" onclick="chooseProcess('${pr.processId}')">
-      <span class="proc-id">${pr.processId}</span>
-      <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
-      <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}${pr.primary ? ' · <b style="color:var(--mig-blue);">לחיתום כעת</b>' : ''}</span>
-    </button>
-    <div class="proc-note" style="margin:-4px 4px 11px;">${escapeHtml(pr.note || '')}</div>
-  `).join('');
+    `ת״ז ${p.id} · ${p.name} · ${list.length} מזהי תהליך`;
+  document.getElementById('proc-popup-body').innerHTML = list.map(pr => {
+    if (pr.supported) {
+      return `
+        <button class="proc-row" onclick="chooseProcess('${pr.processId}')">
+          <span class="proc-id">${pr.processId}</span>
+          <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+          <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)} · <b style="color:var(--mig-blue);">לחיתום כעת</b></span>
+        </button>
+        <div class="proc-note" style="margin:-4px 4px 11px;">${escapeHtml(pr.note || '')}</div>`;
+    }
+    return `
+      <button class="proc-row proc-row-disabled" onclick="unsupportedProcess('${pr.processId}')">
+        <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
+        <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+        <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
+      </button>
+      <div class="proc-note proc-note-warn" id="proc-warn-${pr.processId}" style="margin:-4px 4px 11px;">⚠ תהליך לא נתמך במערכת</div>`;
+  }).join('');
   document.getElementById('proc-popup').classList.add('open');
+}
+
+function unsupportedProcess(id) {
+  const el = document.getElementById('proc-warn-' + id);
+  if (el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 700); }
 }
 
 function chooseProcess(id) {
@@ -5649,12 +5658,7 @@ function chooseProcess(id) {
   renderUwSummary();
   renderAllFeedback();
   updateAgg();
-
-  // --- TEMP: bypass the login/landing flow — open Ronen's underwriting screen directly.
-  //     The flow code is kept intact (submitLogin / submitPolicySearch / process list);
-  //     to restore it, remove these two lines. ---
-  const _lg = document.getElementById('login'); if (_lg) _lg.classList.add('hidden');
-  const _ld = document.getElementById('landing'); if (_ld) _ld.classList.add('hidden');
+  // login → enter ID → process list is the entry flow (no bypass)
 })();
 </script>
 </body>
