@@ -683,6 +683,14 @@
   .cmc-result-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
   .cmc-result-value { font-size: 28px; font-weight: 700; color: var(--text); }
   .cmc-result-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  .cmc-bd { margin-top:8px; border-top:1px dashed var(--border); padding-top:8px; }
+  .cmc-bd-row { display:flex; justify-content:space-between; gap:10px; font-size:11.5px; padding:3px 0; color:var(--text); }
+  .cmc-bd-row .cmc-bd-f { color:var(--text-muted); }
+  .cmc-bd-row .cmc-bd-r { font-variant-numeric:tabular-nums; font-weight:700; }
+  .cmc-bd-row.up .cmc-bd-r { color:#8a6d1f; }
+  .cmc-bd-total { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; font-weight:800; margin-top:5px; padding-top:6px; border-top:1px solid var(--border); color:var(--text); }
+  .cmc-bd-total .cmc-bd-r { color:var(--mig-blue); }
+  .cmc-flag { display:inline-block; font-size:10.5px; font-weight:700; color:#8a5a1f; background:#fff4e5; border:1px solid #e6c98f; border-radius:999px; padding:2px 9px; margin-top:7px; }
 
   .error-hint {
     font-size: 11px;
@@ -2489,7 +2497,8 @@
 
     <!-- CMC -->
     <div class="api-panel active" id="panel-cmc">
-      <div class="section-title" style="margin-bottom:10px;">מחשבון קרדיומטאבולי</div>
+      <div class="section-title" style="margin-bottom:2px;">מחשבון קרדיומטאבולי</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">דירוג משולב (CMC) — מכפלת יחסי התמותה של כל גורמי הסיכון, לא סכימה. כל צירוף קלט מפיק דירוג מצרפי אחד.</div>
       <div class="cmc-form">
         <div class="form-grid">
           <div class="form-field">
@@ -2522,7 +2531,7 @@
           </div>
           <div class="form-field">
             <label class="form-label">HbA1c (%)</label>
-            <input type="number" class="form-input" id="cmc-hba1c" placeholder="6.2" step="0.1">
+            <input type="number" class="form-input" id="cmc-hba1c" placeholder="6.2" step="0.1" value="5.4">
           </div>
           <div class="form-field">
             <label class="form-label">עישון</label>
@@ -2558,7 +2567,7 @@
           <button class="btn-secondary" onclick="clearCMC()">נקה</button>
         </div>
         <div class="cmc-result" id="cmc-result">
-          <div class="cmc-result-label">תוצאת מחשבון CMC</div>
+          <div class="cmc-result-label">דירוג משולב — CMC</div>
           <div class="cmc-result-value" id="cmc-result-value">—</div>
           <div class="cmc-result-note" id="cmc-result-note"></div>
         </div>
@@ -5398,41 +5407,80 @@ function submitCMC() {
   document.getElementById('cmc-error').classList.toggle('show', err);
   if (err) return;
 
-  const hba1c = parseFloat(document.getElementById('cmc-hba1c').value);
+  const age = parseInt(document.getElementById('cmc-age').value);
+  const gender = document.getElementById('cmc-gender').value;
   const bmi = parseFloat(document.getElementById('cmc-bmi').value);
   const bp = parseInt(document.getElementById('cmc-bp').value);
+  const chol = parseFloat(document.getElementById('cmc-chol').value);
+  const hdl = parseFloat(document.getElementById('cmc-hdl').value);
+  const hba1c = parseFloat(document.getElementById('cmc-hba1c').value);
   const smoke = document.getElementById('cmc-smoke').value;
   const diabetes = document.getElementById('cmc-diabetes').value;
   const meds = document.getElementById('cmc-meds').value;
 
-  let loading = 0;
-  const notes = [];
+  const dbLabel = { no: 'ללא סוכרת', type1: 'Type 1', type2: 'Type 2', pre: 'Pre-diabetes' }[diabetes] || '';
+  const smLabel = { never: 'לא מעשן', past: 'עישון בעבר', current: 'עישון פעיל' }[smoke] || '';
 
-  if (diabetes === 'type2' || diabetes === 'type1') {
-    if (hba1c < 6.5) { loading += 0; }
-    else if (hba1c <= 7.0) { loading += 50; notes.push(`HbA1c ${hba1c}% — סוכרת מבוקרת`); }
-    else if (hba1c <= 8.0) { loading += 75; notes.push(`HbA1c ${hba1c}% — שליטה חלקית`); }
-    else { loading += 150; notes.push(`HbA1c ${hba1c}% — שליטה לקויה`); }
+  // Each factor contributes a mortality RATIO (×). Combined rating = PRODUCT of ratios (not a sum) —
+  // so co-occurring cardiometabolic factors compound. Every input combination yields one combined rating.
+  const factors = [];
+  const add = (label, detail, ratio) => factors.push({ label, detail, ratio });
+
+  let rBmi = bmi >= 40 ? 1.9 : bmi >= 35 ? 1.6 : bmi >= 30 ? 1.3 : bmi >= 27 ? 1.1 : 1.0;
+  add('BMI', bmi, rBmi);
+
+  let rBp = bp >= 180 ? 1.9 : bp >= 160 ? 1.55 : bp >= 140 ? 1.3 : 1.0;
+  if (meds === 'yes' && rBp < 1.15) rBp = 1.15; // treated hypertension counts even if controlled
+  add('ל״ד' + (meds === 'yes' ? ' (מטופל)' : ''), bp + ' mmHg', rBp);
+
+  const chr = hdl > 0 ? chol / hdl : 0; // total/HDL ratio — the cardiometabolic lipid marker
+  let rChol = chr >= 7 ? 1.5 : chr >= 6 ? 1.35 : chr >= 5 ? 1.2 : chr >= 4.5 ? 1.1 : 1.0;
+  add('כולסטרול/HDL', chr ? chr.toFixed(1) : '—', rChol);
+
+  let rGly;
+  if (diabetes === 'type1' || diabetes === 'type2') {
+    rGly = hba1c > 8.0 ? 2.4 : hba1c > 7.0 ? 1.9 : hba1c >= 6.5 ? 1.5 : 1.3;
+    if (diabetes === 'type1') rGly = Math.round(rGly * 1.1 * 100) / 100;
   } else if (diabetes === 'pre') {
-    loading += 0;
-    notes.push('Pre-diabetes — ללא תוספת עצמאית');
+    rGly = hba1c >= 6.0 ? 1.2 : 1.1;
+  } else {
+    rGly = hba1c >= 6.5 ? 1.3 : hba1c >= 5.7 ? 1.1 : 1.0;
   }
+  add('HbA1c / סוכרת', hba1c + '% · ' + dbLabel, rGly);
 
-  if (bmi >= 35) { loading += 50; notes.push(`BMI ${bmi} — השמנה מדרגה 2+`); }
-  else if (bmi >= 30) { loading += 25; notes.push(`BMI ${bmi} — השמנה מדרגה 1`); }
+  let rSmoke = smoke === 'current' ? 1.5 : smoke === 'past' ? 1.15 : 1.0;
+  add('עישון', smLabel, rSmoke);
 
-  if (bp >= 160) { loading += 50; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם חמור`); }
-  else if (bp >= 140) { loading += 25; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם`); }
+  let rAge = age >= 60 ? 1.1 : age >= 50 ? 1.05 : 1.0;
+  add('גיל', age + (gender === 'f' ? ' · נקבה' : gender === 'm' ? ' · זכר' : ''), rAge);
 
-  if (smoke === 'current') { loading += 50; notes.push('עישון פעיל'); }
-  else if (smoke === 'past') { loading += 25; notes.push('עישון בעבר'); }
+  const product = factors.reduce((p, f) => p * f.ratio, 1);
+  let loading = Math.round((product - 1) * 100 / 25) * 25;
+  if (loading < 0) loading = 0;
 
-  loading = Math.round(loading / 25) * 25;
+  // metabolic-syndrome clustering flag (≥3 elevated cardiometabolic components)
+  let comps = 0;
+  if (rBmi > 1) comps++;
+  if (rBp > 1) comps++;
+  if (rChol > 1 || hdl < 40) comps++;
+  if (rGly > 1) comps++;
+  const metSyn = comps >= 3;
+  const decline = product >= 4.0 || loading > 300;
 
-  document.getElementById('cmc-result-value').textContent = loading + '%';
-  document.getElementById('cmc-result-note').innerHTML = notes.length
-    ? '<strong>גורמי סיכון שנמצאו:</strong><br>' + notes.map(n => '• ' + n).join('<br>')
-    : '✓ לא נמצאו גורמי סיכון משמעותיים מעבר לאבחנות';
+  const valEl = document.getElementById('cmc-result-value');
+  valEl.textContent = decline ? 'שקול דחייה / מבטח משנה' : '+' + loading + '%';
+  valEl.style.fontSize = decline ? '18px' : '';
+
+  const rows = factors.map(f => {
+    const up = f.ratio > 1;
+    return `<div class="cmc-bd-row ${up ? 'up' : ''}"><span class="cmc-bd-f">${f.label} <span style="color:var(--text-light)">(${f.detail})</span></span><span class="cmc-bd-r">×${f.ratio.toFixed(2)}</span></div>`;
+  }).join('');
+  const flag = metSyn ? `<div class="cmc-flag">⚠ אשכול מטבולי — ${comps} גורמים משולבים (Metabolic syndrome)</div>` : '';
+  document.getElementById('cmc-result-note').innerHTML =
+    `<div class="cmc-bd">${rows}
+      <div class="cmc-bd-total"><span>דירוג משולב (מכפלה)</span><span class="cmc-bd-r">×${product.toFixed(2)} → +${loading}%</span></div>
+    </div>${flag}
+    <div style="margin-top:7px;font-size:10.5px;color:var(--text-light);">הדירוג מצרפי — מכפלת יחסי התמותה, לא סכום התוספות — ומשקף אינטראקציה בין גורמי הסיכון הקרדיומטבוליים.</div>`;
   document.getElementById('cmc-result').classList.add('show');
 }
 
