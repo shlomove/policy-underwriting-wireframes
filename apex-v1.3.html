@@ -2228,6 +2228,15 @@
   .rguw-cancel-reason { flex:1; min-width:160px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
   .rguw-cancel-reason:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
   .uw-referent-note { font-size:12.5px; line-height:1.6; color:var(--text); background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); padding:9px 11px; }
+  .tag.rg-tag { cursor:pointer; transition:background .12s, color .12s, border-color .12s; }
+  .tag.rg-tag:hover { background:var(--bg-hover); border-color:var(--mig-blue); }
+  .tag.rg-tag.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); }
+  .rguw-meta { display:flex; gap:10px 22px; flex-wrap:wrap; align-items:center; margin-bottom:10px; padding:8px 10px; background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); }
+  .rguw-meta-item { display:flex; align-items:center; gap:6px; font-size:12px; }
+  .rguw-meta-lbl { font-size:10.5px; font-weight:700; color:var(--text-light); }
+  .rguw-meta-val { font-weight:700; color:var(--text); }
+  .rguw-meta-reasons { flex-wrap:wrap; }
+  .rguw-meta-reasons .tags-row { display:inline-flex; gap:4px; flex-wrap:wrap; }
   .uwm-policies { font-size:11px; color:var(--text-light); margin-bottom:8px; line-height:1.5; }
   .uwm-policies .ltr { direction:ltr; unicode-bidi:isolate; }
   .uwm-swiss { font-size:11.5px; background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:7px 9px; margin-bottom:9px; line-height:1.5; }
@@ -2355,7 +2364,7 @@
   <div class="header-top">
     <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">V1.3</span></div>
     <div class="id-search-wrap">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי פוליסה או ת״ז"
+      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז"
         oninput="filterIds(this.value)" autocomplete="off">
       <span class="id-search-icon">⌕</span>
     </div>
@@ -2986,19 +2995,23 @@ const patients = [
     riskGroups: [
       { riskGroupCode: 'RISK',     riskGroupName: 'ריסק',
         policies: [{ policyNumber: 'POL-2026-00111', productType: 'ביטוח חיים — ריסק' }],
-        requestedAmount: 1000000, existingAmount: 500000 },
+        requestedAmount: 1000000, existingAmount: 500000,
+        reasons: ['תביעה קודמת', 'שאלון רפואי'] },
       { riskGroupCode: 'ACC_DIS',  riskGroupName: 'נכות מתאונה',
         policies: [{ policyNumber: 'POL-2026-00112', productType: 'נכות מתאונה' }],
-        requestedAmount: 750000, existingAmount: 0 },
+        requestedAmount: 750000, existingAmount: 0,
+        reasons: ['שאלון רפואי'] },
       { riskGroupCode: 'WORK_DIS', riskGroupName: 'אכ״ע',
         policies: [{ policyNumber: 'POL-2026-00113', productType: 'אובדן כושר עבודה' }],
-        requestedAmount: 20000, existingAmount: 8000, amountIsMonthly: true },
+        requestedAmount: 20000, existingAmount: 8000, amountIsMonthly: true,
+        reasons: ['שאלון רפואי', 'עיסוק בסיכון'] },
       { riskGroupCode: 'MORTGAGE', riskGroupName: 'ביטוח משכנתא',
         policies: [
           { policyNumber: 'POL-2026-00121', productType: 'משכנתא — מסלול 1' },
           { policyNumber: 'POL-2026-00122', productType: 'משכנתא — מסלול 2' },
         ],
-        requestedAmount: 900000, existingAmount: 0 },
+        requestedAmount: 900000, existingAmount: 0,
+        reasons: ['שאלון רפואי'] },
     ],
     crossCheckFlags: [
       { type: 'SMOKING_MISMATCH', text: 'Cotinine בשתן גבוה מול הצהרת אי-עישון', sourceDoc: 'בדיקת שתן 2026-06-20' },
@@ -3406,12 +3419,19 @@ function rgUwRow(rg) {
     `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}<span class="ltr">${pl.policyNumber}</span> · ${escapeHtml(pl.productType)}`).join(' · ');
   const totals = computeRiskGroupTotals(patientsState[currentIdx]);
   const label = rgTotalLabel(totals[code]);
-  return `<div class="rguw-card">
+  const fmtAmt = (key) => (rg[key] == null ? '—' : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : ''));
+  const reasons = (rg.reasons || []).map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
+  return `<div class="rguw-card" id="rguw-card-${code}">
     <div class="rguw-head">
       <span class="rguw-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
       <span class="rguw-total">סה״כ <b>${escapeHtml(label)}</b></span>
     </div>
     <div class="rguw-policies" style="margin-bottom:9px;">${policies}</div>
+    <div class="rguw-meta">
+      <div class="rguw-meta-item"><span class="rguw-meta-lbl">סכום מבוקש</span><span class="rguw-meta-val">${fmtAmt('requestedAmount')}</span></div>
+      <div class="rguw-meta-item"><span class="rguw-meta-lbl">סכום קיים</span><span class="rguw-meta-val">${fmtAmt('existingAmount')}</span></div>
+      <div class="rguw-meta-item rguw-meta-reasons"><span class="rguw-meta-lbl">סיבות חיתום</span><span class="tags-row">${reasons}</span></div>
+    </div>
     <div class="rguw-controls">
       <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+rg.uwPercent || 0}" onchange="onRgChange('${code}','uwPercent',this.value)"><span>%</span></label>
       <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+rg.uwPermille || 0}" onchange="onRgChange('${code}','uwPermille',this.value)"><span>‰</span></label>
@@ -3497,7 +3517,7 @@ function filterIds(query) {
   patients.forEach((p, i) => {
     const tab = document.getElementById('id-tab-' + i);
     if (!tab) return;
-    const haystack = ((p.policy || '') + ' ' + (p.id || '')).toLowerCase();
+    const haystack = (p.id || '').toLowerCase();
     const match = !q || haystack.includes(q);
     tab.classList.toggle('hidden-tab', !match);
     if (match) visibleCount++;
@@ -3509,6 +3529,14 @@ function requestTypeLabel(t) {
   return { HAFAKA: 'הפקה', SHINUIM: 'שינויים', SHINUIM_MUNCHIM: 'שינויים מונחים' }[t] || t || '—';
 }
 
+let selectedRgCode = null; // header coverage selector → drives requested/existing amount + reasons
+function selectCoverage(code) {
+  selectedRgCode = code;
+  renderHeader();
+  const card = document.getElementById('rguw-card-' + code);
+  if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
 function renderHeader() {
   const p = patientsState[currentIdx];
   document.getElementById('footer-name').textContent = p.name;
@@ -3516,7 +3544,16 @@ function renderHeader() {
   if (badge) badge.textContent = p.processId || '—';
   const pb = document.getElementById('process-badge');
   if (pb) pb.title = 'סוג בקשה: ' + requestTypeLabel(p.requestType) + (p.clerkNotesToUnderwriter ? ' · הערת רפרנטית: ' + p.clerkNotesToUnderwriter : '');
-  const tagsHtml = p.reasons.map(r => `<span class="tag">${r}</span>`).join('');
+  const groups = riskGroupsOf(p);
+  if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) {
+    selectedRgCode = groups[0] ? groups[0].riskGroupCode : null;
+  }
+  const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || {};
+  const selReasons = selRg.reasons || p.reasons || [];
+  const tagsHtml = selReasons.map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
+  const rgTagsHtml = groups.map(g =>
+    `<span class="tag rg-tag ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')" title="בחר קבוצת סיכון — משפיע על סכום מבוקש / קיים / סיבות חיתום">${escapeHtml(g.riskGroupName)}</span>`).join('') || '—';
+  const fmtAmt = (rg, key) => (rg[key] == null ? '—' : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : ''));
   document.getElementById('header-data').innerHTML = `
     <div class="hd-field"><div class="hd-label">מזהה תהליך</div><div class="hd-value ltr">${p.processId || '—'}</div></div>
     <div class="divider-v"></div>
@@ -3538,11 +3575,11 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="tags-row">${(p.riskGroups||[]).map(rg => `<span class="tag">${rg.riskGroupName}</span>`).join('') || '—'}</div></div>
+    <div class="hd-field"><div class="hd-label">קבוצות סיכון <span style="font-weight:400;color:var(--text-light);">(בחרו)</span></div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום מבוקש <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName || '')}</span></div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'requestedAmount')}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'existingAmount')}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
   `;
