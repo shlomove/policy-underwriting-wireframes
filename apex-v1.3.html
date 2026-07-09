@@ -2425,9 +2425,9 @@
       <div class="diagnoses-list" id="lifestyle-list"></div>
     </div>
 
-    <div>
+    <div id="financial-section">
       <div class="section-head">
-        <div class="section-title">חיתום פיננסי</div>
+        <div class="section-title">חיתום פיננסי <span style="font-weight:400;color:var(--text-light);font-size:12px;">· רלוונטי לריסק ולביטוח משכנתא</span></div>
         <div class="feedback-btns" id="fb-financial"></div>
       </div>
       <div id="financial-list"></div>
@@ -3425,11 +3425,9 @@ function renderRgUnderwriting() {
   const groups = riskGroupsOf(p);
   if (!groups.length) { wrap.innerHTML = '<div class="uw-summary-empty">אין קבוצות סיכון למבוטח זה</div>'; return; }
   if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) selectedRgCode = groups[0].riskGroupCode;
-  // like the ID tabs: show a SEPARATE form for the selected risk group only
-  const tabs = groups.map(g =>
-    `<button class="rgform-tab ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')">${escapeHtml(g.riskGroupName)}</button>`).join('');
+  // separate form for the selected risk group only — selector is the header buttons (top of page)
   const rg = groups.find(g => g.riskGroupCode === selectedRgCode);
-  wrap.innerHTML = `<div class="rgform-tabs">${tabs}</div>${rgUwRow(rg)}`;
+  wrap.innerHTML = rgUwRow(rg);
 }
 function rgUwRow(rg) {
   const code = rg.riskGroupCode;
@@ -3549,10 +3547,16 @@ function requestTypeLabel(t) {
 }
 
 let selectedRgCode = null; // header coverage selector → drives requested/existing amount + reasons
+const FINANCIAL_COVERAGES = ['RISK', 'MORTGAGE']; // financial underwriting only for ריסק + ביטוח משכנתא
+function updateFinancialVisibility() {
+  const sec = document.getElementById('financial-section');
+  if (sec) sec.style.display = FINANCIAL_COVERAGES.includes(selectedRgCode) ? '' : 'none';
+}
 function selectCoverage(code) {
   selectedRgCode = code;
   renderHeader();            // updates active button + requested/existing amount + reasons
   renderRgUnderwriting();    // shows the separate form for this risk group (no scroll/jump)
+  updateFinancialVisibility();
 }
 
 function renderHeader() {
@@ -4911,6 +4915,7 @@ function renderFinancial() {
         </div>
       </div>
     </div>`;
+  updateFinancialVisibility();
 }
 
 function onFinChange(field, val) {
