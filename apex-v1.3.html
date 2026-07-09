@@ -2221,6 +2221,13 @@
   .rguw-controls { display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin-bottom:9px; }
   .rguw-text { width:100%; min-height:72px; font-family:inherit; font-size:12px; line-height:1.55; border:1px solid var(--border); border-radius:var(--radius); padding:8px 10px; resize:vertical; background:#fffdf7; }
   .rguw-text:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .rguw-total { margin-inline-start:auto; font-size:13px; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+  .rguw-total b { color:var(--mig-blue); font-weight:800; }
+  .rguw-lbl { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin:2px 0 4px; }
+  .rguw-cancel-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:9px; padding-top:9px; border-top:1px dashed var(--border-light); }
+  .rguw-cancel-reason { flex:1; min-width:160px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
+  .rguw-cancel-reason:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .uw-referent-note { font-size:12.5px; line-height:1.6; color:var(--text); background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); padding:9px 11px; }
   .uwm-policies { font-size:11px; color:var(--text-light); margin-bottom:8px; line-height:1.5; }
   .uwm-policies .ltr { direction:ltr; unicode-bidi:isolate; }
   .uwm-swiss { font-size:11.5px; background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:7px 9px; margin-bottom:9px; line-height:1.5; }
@@ -2426,29 +2433,16 @@
         <div class="section-title">חיתום פר קבוצת סיכון</div>
         <div class="feedback-btns" id="fb-rguw"></div>
       </div>
+      <div id="rg-reject-banner"></div>
       <div id="rg-underwriting"></div>
     </div>
 
     <div>
       <div class="section-head">
-        <div class="section-title">הערות חיתום</div>
+        <div class="section-title">הערות חתם ורפרנט בתהליך</div>
         <div class="feedback-btns" id="fb-uwnotes"></div>
       </div>
       <div id="uw-summary"></div>
-    </div>
-
-    <div>
-      <div class="section-head">
-        <div class="section-title">סיכום תוספות</div>
-        <div class="feedback-btns" id="fb-summary"></div>
-      </div>
-      <div class="agg-label" style="margin-bottom:8px;">סיכום תוספות פר קבוצת סיכון — הטלה של מטריצת האבחנה × קבוצת הסיכון</div>
-      <div id="rg-reject-banner"></div>
-      <div id="rg-summary"></div>
-      <div class="agg-extra-field" style="margin-top:10px;">
-        <span class="agg-extra-label">הסבר לביטול תוספת</span>
-        <textarea class="uw-note-input" id="agg-cancel-note" placeholder="כתוב/י כאן את ההסבר לביטול התוספת"></textarea>
-      </div>
     </div>
 
   </div>
@@ -3410,17 +3404,25 @@ function rgUwRow(rg) {
   const multi = rg.policies && rg.policies.length > 1;
   const policies = (rg.policies || []).map((pl, i) =>
     `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}<span class="ltr">${pl.policyNumber}</span> · ${escapeHtml(pl.productType)}`).join(' · ');
+  const totals = computeRiskGroupTotals(patientsState[currentIdx]);
+  const label = rgTotalLabel(totals[code]);
   return `<div class="rguw-card">
     <div class="rguw-head">
       <span class="rguw-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
-      <span class="rguw-policies">${policies}</span>
+      <span class="rguw-total">סה״כ <b>${escapeHtml(label)}</b></span>
     </div>
+    <div class="rguw-policies" style="margin-bottom:9px;">${policies}</div>
     <div class="rguw-controls">
       <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+rg.uwPercent || 0}" onchange="onRgChange('${code}','uwPercent',this.value)"><span>%</span></label>
       <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+rg.uwPermille || 0}" onchange="onRgChange('${code}','uwPermille',this.value)"><span>‰</span></label>
       <button class="uwi-temp" onclick="openRgTemp('${code}')">⏱ ${escapeHtml(rgTempLabel(rg))}</button>
     </div>
-    <textarea class="rguw-text" placeholder="הדבק/י כאן את הטבלה מ-Swiss וכתוב/י מלל חופשי — פירוט התוספות פר אבחנה, החרגות ונימוקים" onchange="onRgChange('${code}','detailText',this.value)">${escapeHtml(rg.detailText || '')}</textarea>
+    <label class="rguw-lbl">הערות חיתום</label>
+    <textarea class="rguw-text" placeholder="פירוט התוספות פר אבחנה, החרגות ונימוקים — ניתן להדביק את הטבלה מ-Swiss" onchange="onRgChange('${code}','detailText',this.value)">${escapeHtml(rg.detailText || '')}</textarea>
+    <div class="rguw-cancel-row">
+      <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="5" value="${+rg.cancellingAddition || 0}" onchange="onRgChange('${code}','cancellingAddition',this.value)"><span>%</span></label>
+      <input type="text" class="rguw-cancel-reason" placeholder="נימוק לתוספת מתבטלת" value="${escapeHtml(rg.cancellingReason || '')}" onchange="onRgChange('${code}','cancellingReason',this.value)">
+    </div>
   </div>`;
 }
 function rgByCode(code) {
@@ -3428,7 +3430,8 @@ function rgByCode(code) {
 }
 function onRgChange(code, field, val) {
   const rg = rgByCode(code); if (!rg) return;
-  if (field === 'detailText') { rg.detailText = val; updateAgg(); return; }
+  if (field === 'detailText') { rg.detailText = val; return; }
+  if (field === 'cancellingReason') { rg.cancellingReason = val; return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
   if (field === 'uwPercent') n = Math.round(n / 25) * 25;
   rg[field] = n;
@@ -4872,22 +4875,13 @@ function renderUwSummary() {
   const wrap = document.getElementById('uw-summary');
   if (!wrap) return;
   const p = patientsState[currentIdx];
-  const items = (p.diagnoses || [])
-    .filter(dx => dx.uwNote && dx.uwNote.trim())
-    .map(dx => {
-      const bits = riskGroupsOf(p).map(rg => {
-        const c = dx.uw[rg.riskGroupCode]; const s = cellSummary(c);
-        return (s && s !== 'נקי') ? `${rg.riskGroupName} ${s}` : null;
-      }).filter(Boolean);
-      const load = bits.length ? ` · ${bits.join(' · ')}` : '';
-      return `<div class="uw-summary-item"><span class="uw-summary-code">${dx.code}</span>${load}<div>${dx.uwNote}</div></div>`;
-    }).join('');
-  const body = items || '<div class="uw-summary-empty">אין עדיין הערות חיתום לאבחנות — ניתן להוסיף הערה והסבר להחלטה בתוך כל אבחנה.</div>';
+  const referent = p.clerkNotesToUnderwriter || '';
   wrap.innerHTML = `
     <div class="uw-summary-card">
-      ${body}
-      <label class="uw-general-label">הערת חיתום כללית לתיק (הסבר מרוכז להחלטות — החרגות, תוספות, נימוקים)</label>
-      <textarea class="uw-note-input" placeholder="כתוב/י כאן סיכום והסבר כולל להחלטות החיתום בתיק זה" onchange="onGeneralUwNoteChange(this.value)">${p.generalUwNote || ''}</textarea>
+      <label class="uw-general-label">הערת רפרנט בתהליך${p.processId ? ` <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(p.processId)}</span>` : ''}</label>
+      <div class="uw-referent-note">${referent ? escapeHtml(referent) : '<span style="color:var(--text-light);font-style:italic;">אין הערת רפרנט בתהליך זה</span>'}</div>
+      <label class="uw-general-label" style="margin-top:13px;">הערת חתם</label>
+      <textarea class="uw-note-input" placeholder="כתוב/י כאן את הערות החתם — סיכום והסבר כולל להחלטות החיתום בתיק זה" onchange="onGeneralUwNoteChange(this.value)">${p.generalUwNote || ''}</textarea>
     </div>`;
 }
 
