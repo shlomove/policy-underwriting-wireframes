@@ -2237,7 +2237,7 @@
   .uwi-expl:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
 
   /* ===== V1.4: per-item underwriting card (item × active risk group) ===== */
-  .itemuw { display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; border:1px solid var(--border); border-top:none; background:#fff; padding:9px 12px; border-radius:0 0 var(--radius) var(--radius); margin:-2px 0 0; }
+  .itemuw { display:inline-flex; align-items:center; gap:6px 10px; flex-wrap:wrap; }
   .dxsum-decided { font-size:12.5px; color:var(--text); margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
   .dxsum-decided b { color:var(--text); }
   .itemuw-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
@@ -2277,8 +2277,8 @@
   .gs-notes { width:100%; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:6px 8px; resize:vertical; background:#fffdf7; }
   .gs-notes:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
   .gs-final-calc { font-size:12px; color:var(--text-muted); margin-top:10px; padding-top:9px; border-top:1px solid var(--border); line-height:1.7; }
-  .gs-final-b { color:var(--mig-blue); font-size:14px; }
-  .gs-saved { font-size:11px; font-weight:800; color:#2a7d4f; background:#eaf6ef; border:1px solid #a9d8bd; border-radius:999px; padding:2px 9px; }
+  .gs-final-b { color:var(--text); font-size:14px; }
+  .gs-saved { font-size:11px; font-weight:800; color:var(--text-muted); background:var(--bg-hover); border:1px solid var(--border); border-radius:999px; padding:2px 9px; }
   .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
 
   /* ===== V1.4: cross-group overview modal ===== */
@@ -3080,7 +3080,7 @@ const patients = [
         reasons: ['שאלון רפואי'] },
     ],
     crossCheckFlags: [
-      { type: 'SMOKING_MISMATCH', text: 'Cotinine בשתן גבוה מול הצהרת אי-עישון', sourceDoc: 'בדיקת שתן 2026-06-20' },
+      { type: 'DECL_MISMATCH', text: 'אבחנה Tinnitus לא נמצא בהצהרת הבריאות' },
     ],
     diagnoses: [
       {
@@ -3689,7 +3689,7 @@ function renderCrossChecks() {
   if (!wrap) return;
   const flags = patientsState[currentIdx].crossCheckFlags || [];
   wrap.innerHTML = flags.map(fl =>
-    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check — סתירת נתונים:</b> ${escapeHtml(fl.text)} <span style="color:var(--text-light);">(${escapeHtml(fl.sourceDoc || '')})</span> — מעדכן את סטטוס העישון לבדיקת החתם; אינו תא חיתום בפני עצמו.</span></div>`
+    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check —</b> ${escapeHtml(fl.text)}</span></div>`
   ).join('');
 }
 
@@ -3988,12 +3988,12 @@ function buildCard(dx, idx) {
         <span class="dx-name">${dx.code}</span>
         ${tagHtml}
         <span class="dx-full-name">— ${dx.fullName}</span>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;margin-right:auto;">
+        <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
+          ${itemUwCard('dx', String(idx), dx)}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editDx(${idx})" title="ערוך אבחנה">✏</button>
           <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
         </div>
       </div>
-      ${itemUwCard('dx', String(idx), dx)}
       <div class="timeline-container" id="tl-${idx}">
         <div class="timeline-title">אירועים רפואיים — לחץ על פריט לפתיחת מסמך מקור</div>
         ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
@@ -4386,8 +4386,7 @@ function itemAddText(c) {
 function itemUwCard(type, ref, f) {
   const code = selectedRgCode;
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
-  return `<div class="itemuw" id="itemuw-${type}-${ref}">
-    <span class="itemuw-rg">חיתום עבור: <b>${escapeHtml(riskGroupNames[code] || code)}</b></span>
+  return `<div class="itemuw" id="itemuw-${type}-${ref}" onclick="event.stopPropagation()">
     <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="5" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
     <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
     <button class="itemuw-btn" onclick="openItemSummary('${type}','${ref}')">סיכום אבחנה ▸</button>
@@ -4928,12 +4927,12 @@ function renderLifestyle() {
         <span class="dx-toggle" id="ls-toggle-${r.key}">▶</span>
         <span class="dx-name">${r.kind}</span>
         <span class="dx-full-name">— ${r.data.value || '—'}</span>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;margin-right:auto;">
+        <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
+          ${itemUwCard('ls', r.key, r.data)}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
           ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
         </div>
       </div>
-      ${itemUwCard('ls', r.key, r.data)}
       <div class="timeline-container" id="ls-tl-${r.key}">
         <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
         <div class="ls-source-row">
