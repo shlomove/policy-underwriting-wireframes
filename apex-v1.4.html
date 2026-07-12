@@ -2261,6 +2261,12 @@
   /* ===== V1.4: per-group bottom summary ===== */
   .gs-card { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:12px 14px; }
   .gs-head { font-size:13px; font-weight:800; color:var(--text); margin-bottom:9px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .gs-excl { color:#8a6d1f; font-weight:700; }
+  .itemuw-btn.has { border-color:#e6c98f; background:#fff8ec; color:#8a6d1f; }
+  .excl-row { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:10px 12px; margin-bottom:9px; }
+  .excl-input { width:100%; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:6px 8px; resize:vertical; background:#fff; margin-bottom:8px; }
+  .excl-input:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .excl-actions { display:flex; gap:8px; flex-wrap:wrap; }
   .gs-lines { display:flex; flex-direction:column; gap:5px; margin-bottom:9px; }
   .gs-line { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:5px 8px; background:var(--bg-hover); border-radius:var(--radius); }
   .gs-item b { color:var(--text); }
@@ -2995,6 +3001,20 @@
       <button class="popup-close" onclick="closePopup('dxsum-popup')">✕ סגור</button>
     </div>
     <div class="popup-body" id="dxsum-body"></div>
+  </div>
+</div>
+
+<!-- ===== EXCLUSIONS POPUP (per item × coverage, repeatable) ===== -->
+<div class="popup-overlay" id="excl-popup" style="z-index:600;">
+  <div class="popup-box" style="max-width:560px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="excl-title">החרגות</div>
+        <div class="popup-meta" id="excl-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('excl-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body" id="excl-body"></div>
   </div>
 </div>
 
@@ -4271,7 +4291,7 @@ function tempLabel(c) {
   const bits = [];
   if (+c.temporaryAdditionPercent) bits.push('+' + fmtNum(+c.temporaryAdditionPercent) + '%');
   if (+c.temporaryAdditionPermille) bits.push('+' + fmtPermille(+c.temporaryAdditionPermille));
-  if (!bits.length) return 'הוסף תוספת זמנית';
+  if (!bits.length) return 'תוספת זמנית';
   return bits.join(' / ') + (c.temporaryUntil ? ' · עד ' + fmtDate(c.temporaryUntil) : '');
 }
 let uwTempRg = null;
@@ -4386,12 +4406,61 @@ function itemAddText(c) {
 function itemUwCard(type, ref, f) {
   const code = selectedRgCode;
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
+  // exclusion available only for coverages other than ריסק / ביטוח משכנתא
+  const showExcl = code !== 'RISK' && code !== 'MORTGAGE';
+  const exclCount = (c.exclusions || []).filter(x => (x || '').trim()).length;
+  const exclBtn = showExcl
+    ? `<button class="itemuw-btn${exclCount ? ' has' : ''}" onclick="openExclusion('${type}','${ref}')">החרגה${exclCount ? ` (${exclCount})` : ''}</button>` : '';
   return `<div class="itemuw" id="itemuw-${type}-${ref}" onclick="event.stopPropagation()">
     <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="5" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
     <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
     <button class="itemuw-btn" onclick="openItemSummary('${type}','${ref}')">סיכום אבחנה ▸</button>
     <button class="itemuw-btn" onclick="openItemTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
+    ${exclBtn}
   </div>`;
+}
+// ----- exclusions (per item × group) — repeatable list -----
+let exclCtx = null;
+function openExclusion(type, ref) {
+  exclCtx = { type, ref };
+  const f = _v14ref(type, ref); if (!f) return;
+  const c = f.uw[selectedRgCode];
+  if (!Array.isArray(c.exclusions)) c.exclusions = (c.exclusionText || '').trim() ? [c.exclusionText] : [];
+  if (c.exclusions.length === 0) c.exclusions.push('');
+  document.getElementById('excl-title').textContent = 'החרגות — ' + findingCode(f) + ' · ' + (riskGroupNames[selectedRgCode] || selectedRgCode);
+  document.getElementById('excl-meta').textContent = findingTitle(f);
+  renderExclusion();
+  document.getElementById('excl-popup').classList.add('open');
+}
+function renderExclusion() {
+  if (!exclCtx) return;
+  const { type, ref } = exclCtx; const f = _v14ref(type, ref); if (!f) return;
+  const arr = f.uw[selectedRgCode].exclusions || [];
+  document.getElementById('excl-body').innerHTML = arr.map((txt, i) => `
+    <div class="excl-row">
+      <label class="itemuw-note-lbl">תיאור החרגה${arr.length > 1 ? ' #' + (i + 1) : ''}</label>
+      <textarea class="excl-input" rows="2" placeholder="תיאור ההחרגה" onchange="onExclusionText(${i}, this.value)">${escapeHtml(txt)}</textarea>
+      <div class="excl-actions">
+        <button class="itemuw-btn" onclick="addExclusion()">＋ הוסף החרגה</button>
+        <button class="itemuw-btn" onclick="removeExclusion(${i})">🗑 מחק החרגה</button>
+      </div>
+    </div>`).join('');
+}
+function onExclusionText(i, val) {
+  if (!exclCtx) return; const { type, ref } = exclCtx; const f = _v14ref(type, ref); if (!f) return;
+  f.uw[selectedRgCode].exclusions[i] = val;
+  refreshItemCard(type, ref); renderGroupSummary();
+}
+function addExclusion() {
+  if (!exclCtx) return; const { type, ref } = exclCtx; const f = _v14ref(type, ref); if (!f) return;
+  f.uw[selectedRgCode].exclusions.push('');
+  renderExclusion(); refreshItemCard(type, ref);
+}
+function removeExclusion(i) {
+  if (!exclCtx) return; const { type, ref } = exclCtx; const f = _v14ref(type, ref); if (!f) return;
+  const arr = f.uw[selectedRgCode].exclusions;
+  arr.splice(i, 1); if (arr.length === 0) arr.push('');
+  renderExclusion(); refreshItemCard(type, ref); renderGroupSummary();
 }
 // "סיכום אבחנה" per item×group — Swiss table as received + editable underwriter rationale
 function openItemSummary(type, ref) {
@@ -4478,8 +4547,14 @@ function itemHasAdd(c) {
     (+c.occupationalAdditionPercent || 0) || (+c.occupationalAdditionPermille || 0) ||
     (+c.temporaryAdditionPercent || 0) || (+c.temporaryAdditionPermille || 0));
 }
+function itemHasExcl(c) {
+  return c && Array.isArray(c.exclusions) && c.exclusions.some(x => (x || '').trim());
+}
+function itemExclList(c) {
+  return (c && Array.isArray(c.exclusions) ? c.exclusions : []).map(x => (x || '').trim()).filter(Boolean);
+}
 function groupSignedItems(p, code) {
-  return itemFindings(p).map(it => ({ ...it, c: it.f.uw[code] })).filter(it => itemHasAdd(it.c));
+  return itemFindings(p).map(it => ({ ...it, c: it.f.uw[code] })).filter(it => itemHasAdd(it.c) || itemHasExcl(it.c));
 }
 function groupTotals(p, code) {
   let pct = 0, per = 0;
@@ -4499,10 +4574,11 @@ function renderGroupSummary() {
   const items = groupSignedItems(p, code);
   const t = groupTotals(p, code);
   const lines = items.length ? items.map(it => {
-    const c = it.c; const add = itemAddText(c) || 'נקי';
+    const c = it.c; const add = itemAddText(c) || (itemHasExcl(c) ? '—' : 'נקי');
     const tmp = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille)
       ? ` <span class="gs-temp">⏱ זמנית ${escapeHtml(tempLabel(c))}</span>` : '';
-    return `<div class="gs-line"><span class="gs-item">${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b></span><span class="gs-val">${escapeHtml(add)}${tmp}</span></div>`;
+    const exl = itemHasExcl(c) ? ` <span class="gs-excl">⊘ החרגה (${itemExclList(c).length})</span>` : '';
+    return `<div class="gs-line"><span class="gs-item">${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b></span><span class="gs-val">${escapeHtml(add)}${tmp}${exl}</span></div>`;
   }).join('') : '<div class="uw-summary-empty">טרם נחתמו פריטים בקבוצת סיכון זו</div>';
   const cancelPct = +rg.cancelPct || 0, cancelPer = +rg.cancelPermille || 0;
   const finalPct = Math.max(0, t.pct - cancelPct), finalPer = Math.max(0, t.per - cancelPer);
@@ -4573,11 +4649,12 @@ function openUwOverview() {
     const itemsHtml = items.length ? items.map(it => {
       const c = it.c; const add = itemAddText(c) || 'נקי';
       const temp = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille) ? `<div class="ov-sub">⏱ תוספת זמנית: ${escapeHtml(tempLabel(c))}</div>` : '';
+      const excl = itemHasExcl(c) ? `<div class="ov-sub">⊘ החרגות: ${itemExclList(c).map(escapeHtml).join(' · ')}</div>` : '';
       const note = (c.freeText || '').trim() ? `<div class="ov-sub">נימוק חתם: ${escapeHtml(c.freeText)}</div>` : '';
       const expl = it.f.loadingTableKey ? `<button class="ov-expl" onclick="openLoadingTable('${it.f.loadingTableKey}')">explainability ▸</button>` : '';
       return `<div class="ov-item">
         <div class="ov-item-head">▸ ${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b> <span class="ov-add">תוספת ${escapeHtml(add)}</span> ${expl}</div>
-        ${temp}${note}</div>`;
+        ${temp}${excl}${note}</div>`;
     }).join('') : '<div class="ov-empty">— טרם נחתמו פריטים בקבוצה זו —</div>';
     const cancelLine = (cancelPct || cancelPer) ? `<div class="ov-cancel">תוספת מתבטלת: −${fmtNum(cancelPct)}%${cancelPer ? (' · −' + fmtPermille(cancelPer)) : ''}${(rg.cancelReason || '').trim() ? (' · הסבר: ' + escapeHtml(rg.cancelReason)) : ''}</div>` : '';
     const notesLine = (rg.groupNotes || '').trim() ? `<div class="ov-cancel">הערות: ${escapeHtml(rg.groupNotes)}</div>` : '';
