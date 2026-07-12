@@ -2237,7 +2237,9 @@
   .uwi-expl:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
 
   /* ===== V1.4: per-item underwriting card (item × active risk group) ===== */
-  .itemuw { border:1px solid var(--border); border-top:none; background:var(--bg-hover); padding:10px 12px; border-radius:0 0 var(--radius) var(--radius); margin:-2px 0 0; }
+  .itemuw { display:flex; align-items:center; gap:8px 12px; flex-wrap:wrap; border:1px solid var(--border); border-top:none; background:#fff; padding:9px 12px; border-radius:0 0 var(--radius) var(--radius); margin:-2px 0 0; }
+  .dxsum-decided { font-size:12.5px; color:var(--text); margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
+  .dxsum-decided b { color:var(--text); }
   .itemuw-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
   .itemuw-badge { font-size:11px; font-weight:800; border-radius:999px; padding:3px 10px; }
   .itemuw-badge.unsigned { color:#8a5a1f; background:#fff4e5; border:1px solid #e6c98f; }
@@ -4384,29 +4386,46 @@ function itemAddText(c) {
 function itemUwCard(type, ref, f) {
   const code = selectedRgCode;
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
-  const sw = f.swiss[code];
-  const signed = !!c.signed;
-  const hasSw = swissHasContent(sw);
-  const overridden = hasSw && ((+c.medicalAdditionPercent || 0) !== (+sw.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) !== (+sw.medicalAdditionPermille || 0));
-  const needNote = overridden && !(c.freeText || '').trim();
-  const explBtn = f.loadingTableKey ? `<button class="itemuw-btn" onclick="openLoadingTable('${f.loadingTableKey}')">טבלת הסברים ▸</button>` : '';
-  const swLine = hasSw ? `<div class="itemuw-sw">מוצע אוטומטית (Swiss): <b>${escapeHtml(cellSummary(sw))}</b>${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}</div>` : '';
   return `<div class="itemuw" id="itemuw-${type}-${ref}">
-    <div class="itemuw-head">
-      <span class="itemuw-badge ${signed ? 'signed' : 'unsigned'}">${signed ? '✓ נחתם בקבוצה זו' : '● טרם נחתם'}</span>
-      <span class="itemuw-rg">חיתום עבור: <b>${escapeHtml(riskGroupNames[code] || code)}</b></span>
-    </div>
-    ${swLine}
-    <div class="itemuw-controls">
-      <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
-      <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
-      <button class="itemuw-btn" onclick="openItemTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
-      ${explBtn}
-      ${signed ? '' : `<button class="itemuw-sign" onclick="signItem('${type}','${ref}')">החתם פריט ✓</button>`}
-    </div>
-    <label class="itemuw-note-lbl">הערת חתם${needNote ? ' <span class="itemuw-req">· חובה — שונה מהערך שהוצע</span>' : ''}</label>
-    <textarea class="itemuw-note ${needNote ? 'req' : ''}" rows="2" placeholder="נימוק להחלטה (חובה כאשר משנים ערך שהוצע אוטומטית)" onchange="onItemUw('${type}','${ref}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea>
+    <span class="itemuw-rg">חיתום עבור: <b>${escapeHtml(riskGroupNames[code] || code)}</b></span>
+    <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="5" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
+    <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
+    <button class="itemuw-btn" onclick="openItemSummary('${type}','${ref}')">סיכום אבחנה ▸</button>
+    <button class="itemuw-btn" onclick="openItemTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
   </div>`;
+}
+// "סיכום אבחנה" per item×group — Swiss table as received + editable underwriter rationale
+function openItemSummary(type, ref) {
+  const f = _v14ref(type, ref); if (!f) return;
+  const code = selectedRgCode; const c = f.uw[code]; const sw = f.swiss[code];
+  document.getElementById('dxsum-title').textContent = 'סיכום אבחנה — ' + findingCode(f) + ' · ' + (riskGroupNames[code] || code);
+  document.getElementById('dxsum-meta').textContent = findingTitle(f);
+  const swissRec = swissHasContent(sw)
+    ? `<div class="uwm-swiss"><span class="uwm-swiss-lbl">מוצע מ-Swiss:</span> ${escapeHtml(cellSummary(sw))}${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}</div>` : '';
+  let tableHtml = '<div class="uw-summary-empty">אין טבלת Swiss זמינה לפריט זה.</div>';
+  const t = loadingTables[f.loadingTableKey];
+  if (t) {
+    const colH = t.cols.map(col => `<th>${escapeHtml(col)}</th>`).join('');
+    const rowsH = t.rows.map(row => {
+      const act = row.active;
+      const cells = row.vals.map(v => `<td class="${act ? 'active-cell' : ''}">${escapeHtml(v)}</td>`).join('');
+      return `<tr><td class="${act ? 'row-active-label' : ''}">${escapeHtml(row.label)}</td>${cells}</tr>`;
+    }).join('');
+    tableHtml = `<div class="loading-table-wrap"><table class="loading-table"><thead><tr>${colH}</tr></thead><tbody>${rowsH}</tbody></table></div>${t.note ? `<div class="table-note">${escapeHtml(t.note)}</div>` : ''}`;
+  }
+  document.getElementById('dxsum-body').innerHTML = `
+    ${swissRec}
+    <div class="itemuw-note-lbl" style="margin-bottom:6px;">טבלת התוספות כפי שהתקבלה מ-Swiss</div>
+    ${tableHtml}
+    <div class="dxsum-decided">תוספת שנקבעה בפועל (${escapeHtml(riskGroupNames[code] || code)}): <b>${escapeHtml(cellSummary(c))}</b></div>
+    <label class="itemuw-note-lbl" style="margin-top:12px;">הערת חתם — מה בדיוק הוחלט ולמה ניתנה התוספת (רישום מלא)</label>
+    <textarea class="itemuw-note" rows="4" placeholder="פרט/י את ההחלטה החיתומית והנימוק — לרבות בסיס הדירוג מהטבלה, חומרה/איזון, וכל שינוי מהערך שהוצע" onchange="onItemSummaryNote('${type}','${ref}',this.value)">${escapeHtml(c.freeText || '')}</textarea>`;
+  document.getElementById('dxsum-popup').classList.add('open');
+}
+function onItemSummaryNote(type, ref, val) {
+  const f = _v14ref(type, ref); if (!f) return;
+  f.uw[selectedRgCode].freeText = val;
+  renderGroupSummary();
 }
 function _v14ref(type, ref) { const p = patientsState[currentIdx]; return type === 'dx' ? p.diagnoses[+ref] : p.lifestyle[ref]; }
 function refreshItemCard(type, ref) {
@@ -4416,15 +4435,9 @@ function refreshItemCard(type, ref) {
 function onItemUw(type, ref, field, val) {
   const f = _v14ref(type, ref); if (!f) return;
   const c = f.uw[selectedRgCode];
-  if (field === 'freeText') { c.freeText = val; c.signed = true; refreshItemCard(type, ref); renderGroupSummary(); return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
   if (/Percent$/.test(field)) n = Math.round(n / 5) * 5;
-  c[field] = n; c.signed = true; recomputeDecision(c);
-  refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
-}
-function signItem(type, ref) {
-  const f = _v14ref(type, ref); if (!f) return;
-  f.uw[selectedRgCode].signed = true;
+  c[field] = n; recomputeDecision(c);
   refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
 
@@ -4461,8 +4474,13 @@ function clearItemTemp() {
 }
 
 // ---- per-group bottom summary (active tab) ----
+function itemHasAdd(c) {
+  return c && ((+c.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) ||
+    (+c.occupationalAdditionPercent || 0) || (+c.occupationalAdditionPermille || 0) ||
+    (+c.temporaryAdditionPercent || 0) || (+c.temporaryAdditionPermille || 0));
+}
 function groupSignedItems(p, code) {
-  return itemFindings(p).map(it => ({ ...it, c: it.f.uw[code] })).filter(it => it.c && it.c.signed);
+  return itemFindings(p).map(it => ({ ...it, c: it.f.uw[code] })).filter(it => itemHasAdd(it.c));
 }
 function groupTotals(p, code) {
   let pct = 0, per = 0;
