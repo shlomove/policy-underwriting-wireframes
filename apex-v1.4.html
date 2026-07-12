@@ -683,6 +683,30 @@
   .cmc-result-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
   .cmc-result-value { font-size: 28px; font-weight: 700; color: var(--text); }
   .cmc-result-note { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  .cmc-bd { margin-top:8px; border-top:1px dashed var(--border); padding-top:8px; }
+  .cmc-bd-row { display:flex; justify-content:space-between; gap:10px; font-size:11.5px; padding:3px 0; color:var(--text); }
+  .cmc-bd-row .cmc-bd-f { color:var(--text-muted); }
+  .cmc-bd-row .cmc-bd-r { font-variant-numeric:tabular-nums; font-weight:700; }
+  .cmc-bd-row.up .cmc-bd-r { color:#8a6d1f; }
+  .cmc-bd-total { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; font-weight:800; margin-top:5px; padding-top:6px; border-top:1px solid var(--border); color:var(--text); }
+  .cmc-bd-total .cmc-bd-r { color:var(--mig-blue); }
+  .cmc-flag { display:inline-block; font-size:10.5px; font-weight:700; color:#8a5a1f; background:#fff4e5; border:1px solid #e6c98f; border-radius:999px; padding:2px 9px; margin-top:7px; }
+  .cmc-basics { margin-bottom:12px; }
+  .cmc-basics-title { font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; margin:0 0 6px; }
+  .cmc-basics-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .cmc-b-field { display:flex; flex-direction:column; gap:3px; font-size:10.5px; font-weight:700; color:var(--text-muted); flex:1; min-width:88px; }
+  .cmc-b-field input, .cmc-b-field select { font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 7px; background:#fff; }
+  .cmc-chip-row { margin-bottom:12px; }
+  .cmc-chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .cmc-chip { font-size:11.5px; font-weight:700; border:1.5px solid var(--mig-line); background:#fff; color:var(--text-muted); border-radius:999px; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+  .cmc-chip:hover { background:var(--bg-hover); color:var(--text); }
+  .cmc-chip.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); }
+  .cmc-chip-ic { font-size:13px; line-height:1; }
+  .cmc-section { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:10px 12px; margin-bottom:8px; }
+  .cmc-section-head { font-size:12.5px; font-weight:800; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .cmc-num-wrap { display:flex; gap:5px; }
+  .cmc-num-wrap .form-input { flex:1; min-width:0; }
+  .cmc-unit { font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:0 6px; background:#fff; min-width:68px; }
 
   .error-hint {
     font-size: 11px;
@@ -2212,6 +2236,66 @@
   .uwi-expl { flex:1; min-width:150px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
   .uwi-expl:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
 
+  /* ===== V1.4: per-item underwriting card (item × active risk group) ===== */
+  .itemuw { border:1px solid var(--border); border-top:none; background:var(--bg-hover); padding:10px 12px; border-radius:0 0 var(--radius) var(--radius); margin:-2px 0 0; }
+  .itemuw-head { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .itemuw-badge { font-size:11px; font-weight:800; border-radius:999px; padding:3px 10px; }
+  .itemuw-badge.unsigned { color:#8a5a1f; background:#fff4e5; border:1px solid #e6c98f; }
+  .itemuw-badge.signed { color:#2a7d4f; background:#eaf6ef; border:1px solid #a9d8bd; }
+  .itemuw-rg { font-size:11.5px; color:var(--text-muted); }
+  .itemuw-rg b { color:var(--text); }
+  .itemuw-sw { font-size:11.5px; color:var(--text-muted); background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:6px 9px; margin-bottom:8px; }
+  .itemuw-controls { display:flex; gap:8px 12px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  .itemuw-btn { font-size:11px; font-weight:700; color:var(--text); background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:5px 10px; cursor:pointer; white-space:nowrap; }
+  .itemuw-btn:hover { background:var(--bg-hover); }
+  .itemuw-sign { font-size:11px; font-weight:800; color:#fff; background:var(--mig-blue); border:1px solid var(--mig-blue); border-radius:var(--radius); padding:5px 12px; cursor:pointer; }
+  .itemuw-sign:hover { filter:brightness(1.08); }
+  .itemuw-note-lbl { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin:2px 0 4px; }
+  .itemuw-req { color:var(--error); font-weight:800; }
+  .itemuw-note { width:100%; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:6px 8px; resize:vertical; background:#fff; }
+  .itemuw-note.req { border-color:var(--error); box-shadow:0 0 0 1px #fdecec inset; }
+  .itemuw-note:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+
+  /* ===== V1.4: per-group bottom summary ===== */
+  .gs-card { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:12px 14px; }
+  .gs-head { font-size:13px; font-weight:800; color:var(--text); margin-bottom:9px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .gs-lines { display:flex; flex-direction:column; gap:5px; margin-bottom:9px; }
+  .gs-line { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:5px 8px; background:var(--bg-hover); border-radius:var(--radius); }
+  .gs-item b { color:var(--text); }
+  .gs-val { font-weight:700; color:var(--text); white-space:nowrap; }
+  .gs-temp { color:#8a6d1f; font-weight:700; }
+  .gs-row { display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:6px 0; }
+  .gs-total { font-weight:800; border-top:1px dashed var(--border-light); }
+  .gs-total-val { color:var(--text); }
+  .gs-cancel { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:8px 0; }
+  .gs-cancel-fields { display:flex; gap:10px; flex-wrap:wrap; }
+  .gs-cancel-reason { flex:1; min-width:180px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
+  .gs-cancel-reason.req { border-color:var(--error); box-shadow:0 0 0 1px #fdecec inset; }
+  .gs-cancel-reason:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .gs-notes { width:100%; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:6px 8px; resize:vertical; background:#fffdf7; }
+  .gs-notes:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .gs-final-calc { font-size:12px; color:var(--text-muted); margin-top:10px; padding-top:9px; border-top:1px solid var(--border); line-height:1.7; }
+  .gs-final-b { color:var(--mig-blue); font-size:14px; }
+  .gs-saved { font-size:11px; font-weight:800; color:#2a7d4f; background:#eaf6ef; border:1px solid #a9d8bd; border-radius:999px; padding:2px 9px; }
+  .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
+
+  /* ===== V1.4: cross-group overview modal ===== */
+  .ov-group { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:12px 14px; margin-bottom:12px; }
+  .ov-group-head { font-size:14px; font-weight:800; color:var(--text); margin-bottom:8px; }
+  .ov-items { display:flex; flex-direction:column; gap:7px; }
+  .ov-item { border-inline-start:3px solid var(--mig-line); padding:2px 10px; }
+  .ov-item-head { font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .ov-add { font-weight:800; color:var(--mig-blue); }
+  .ov-sub { font-size:11.5px; color:var(--text-muted); margin:2px 0 0 12px; }
+  .ov-expl { font-size:10.5px; font-weight:700; color:var(--text-muted); background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:2px 8px; cursor:pointer; }
+  .ov-expl:hover { background:var(--bg-hover); }
+  .ov-empty { font-size:12px; color:var(--text-light); font-style:italic; }
+  .ov-sep { border-top:1px dashed var(--border); margin:10px 0 8px; }
+  .ov-tot { font-size:12.5px; color:var(--text-muted); }
+  .ov-cancel { font-size:12px; color:#8a6d1f; margin-top:3px; }
+  .ov-final { font-size:14px; font-weight:800; color:var(--text); margin-top:4px; }
+  .ov-final b { color:var(--mig-blue); }
+
   /* ===== Dedicated per-risk-group underwriting section (V1.3) ===== */
   .rguw-card { border:1px solid var(--border); border-radius:var(--radius); background:#fff; padding:11px 13px; margin-bottom:9px; }
   .rguw-head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:9px; }
@@ -2221,17 +2305,37 @@
   .rguw-controls { display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin-bottom:9px; }
   .rguw-text { width:100%; min-height:72px; font-family:inherit; font-size:12px; line-height:1.55; border:1px solid var(--border); border-radius:var(--radius); padding:8px 10px; resize:vertical; background:#fffdf7; }
   .rguw-text:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .rguw-total { margin-inline-start:auto; font-size:13px; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+  .rguw-total b { color:var(--mig-blue); font-weight:800; }
+  .rguw-lbl { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin:2px 0 4px; }
+  .rguw-cancel-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:9px; padding-top:9px; border-top:1px dashed var(--border-light); }
+  .rguw-cancel-reason { flex:1; min-width:160px; font-family:inherit; font-size:12px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; background:#fff; }
+  .rguw-cancel-reason:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
+  .uw-referent-note { font-size:12.5px; line-height:1.6; color:var(--text); background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); padding:9px 11px; }
+  .tag.rg-tag {
+    cursor:pointer; font-size:13.5px; font-weight:700; padding:8px 18px; border-radius:999px;
+    border:1.5px solid var(--mig-line); color:var(--text); background:#fff; line-height:1.1;
+    transition:background .12s, color .12s, border-color .12s, box-shadow .12s;
+  }
+  .tag.rg-tag:hover { background:var(--bg-hover); border-color:var(--mig-blue); color:var(--mig-blue); }
+  .tag.rg-tag.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); box-shadow:0 2px 6px rgba(37,86,158,.28); }
+  .tags-row { gap:8px; }
 
-  /* ===== V1.4 clickable risk-group tags + consolidated per-coverage screen ===== */
-  .tag.rg-tag { cursor:pointer; transition:background .12s, color .12s, border-color .12s; }
-  .tag.rg-tag:hover { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); }
-  .cov-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
-  .cov-tab { font-size:12.5px; font-weight:700; border:1px solid var(--border); background:#fff; border-radius:999px; padding:6px 15px; cursor:pointer; color:var(--text-muted); }
-  .cov-tab:hover { background:var(--bg-hover); color:var(--text); }
-  .cov-tab.active { background:var(--mig-blue); border-color:var(--mig-blue); color:#fff; }
-  .cov-total-bar { font-size:13px; font-weight:700; color:var(--text); background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); padding:9px 13px; margin-bottom:12px; }
-  .cov-total-bar b { color:var(--mig-blue); }
-  .cov-rows { display:flex; flex-direction:column; gap:7px; }
+  /* in-section tab bar for the per-risk-group underwriting form */
+  .rgform-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px; }
+  .rgform-tab {
+    font-size:13.5px; font-weight:800; padding:9px 20px; border-radius:999px;
+    border:1.5px solid var(--mig-line); background:#fff; color:var(--text-muted); cursor:pointer;
+    transition:background .12s, color .12s, border-color .12s, box-shadow .12s;
+  }
+  .rgform-tab:hover { background:var(--bg-hover); color:var(--text); }
+  .rgform-tab.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); box-shadow:0 2px 6px rgba(37,86,158,.28); }
+  .rguw-meta { display:flex; gap:10px 22px; flex-wrap:wrap; align-items:center; margin-bottom:10px; padding:8px 10px; background:var(--bg-hover); border:1px solid var(--border); border-radius:var(--radius); }
+  .rguw-meta-item { display:flex; align-items:center; gap:6px; font-size:12px; }
+  .rguw-meta-lbl { font-size:10.5px; font-weight:700; color:var(--text-light); }
+  .rguw-meta-val { font-weight:700; color:var(--text); }
+  .rguw-meta-reasons { flex-wrap:wrap; }
+  .rguw-meta-reasons .tags-row { display:inline-flex; gap:4px; flex-wrap:wrap; }
   .uwm-policies { font-size:11px; color:var(--text-light); margin-bottom:8px; line-height:1.5; }
   .uwm-policies .ltr { direction:ltr; unicode-bidi:isolate; }
   .uwm-swiss { font-size:11.5px; background:#eef4fb; border:1px solid #cfe0f2; border-radius:var(--radius); padding:7px 9px; margin-bottom:9px; line-height:1.5; }
@@ -2286,6 +2390,11 @@
   .proc-type { font-size:11px; font-weight:700; border:1px solid var(--border); border-radius:999px; padding:2px 9px; color:var(--text-muted); background:var(--bg-hover); }
   .proc-meta { font-size:11.5px; color:var(--text-light); }
   .proc-note { font-size:12px; color:var(--text-muted); margin-top:3px; }
+  #proc-popup { z-index:1100; }
+  .proc-row-disabled { cursor:not-allowed; opacity:.8; }
+  .proc-row-disabled:hover { background:#fdf4f4; border-color:#e3a8ab; }
+  .proc-note-warn { color:var(--error); font-weight:700; transition:background .15s; }
+  .proc-note-warn.flash { background:#fdecec; border:1px solid #e3a8ab; border-radius:var(--radius); padding:3px 8px; }
 
   /* ===== Migdal full-colour theme (lo-fi grayscale lifted) ===== */
   :root {
@@ -2342,14 +2451,14 @@
 <div id="landing">
   <div class="landing-card">
     <div class="landing-logo">APEX</div>
-    <div class="landing-title">כניסה לחיתום</div>
-    <div class="landing-sub">הזן/י מספר מזהה תהליך (לדוגמה: 1) לפתיחת מסך החיתום, או ת״ז לרשימת מזהי התהליך הפתוחים</div>
+    <div class="landing-title">הזן ת״ז</div>
+    <div class="landing-sub">הזן/י ת״ז לצפייה במזהי התהליך הפתוחים לחיתום</div>
     <div class="landing-search-wrap">
-      <input type="text" id="landing-input" class="landing-input" placeholder="מספר מזהה תהליך (לדוגמה: 1) או ת״ז"
+      <input type="text" id="landing-input" class="landing-input" placeholder="ת״ז מבוטח (לדוגמה: 111)"
         autocomplete="off" onkeydown="if(event.key==='Enter')submitPolicySearch()">
       <span class="landing-search-icon">⌕</span>
     </div>
-    <button class="landing-btn" onclick="submitPolicySearch()">כניסה למסך החיתום ▸</button>
+    <button class="landing-btn" onclick="submitPolicySearch()">המשך ▸</button>
     <div class="landing-error" id="landing-error"></div>
   </div>
 </div>
@@ -2359,7 +2468,7 @@
   <div class="header-top">
     <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">V1.4</span></div>
     <div class="id-search-wrap">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי פוליסה או ת״ז"
+      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז"
         oninput="filterIds(this.value)" autocomplete="off">
       <span class="id-search-icon">⌕</span>
     </div>
@@ -2405,9 +2514,9 @@
       <div class="diagnoses-list" id="lifestyle-list"></div>
     </div>
 
-    <div>
+    <div id="financial-section">
       <div class="section-head">
-        <div class="section-title">חיתום פיננסי</div>
+        <div class="section-title">חיתום פיננסי <span style="font-weight:400;color:var(--text-light);font-size:12px;">· רלוונטי לריסק ולביטוח משכנתא</span></div>
         <div class="feedback-btns" id="fb-financial"></div>
       </div>
       <div id="financial-list"></div>
@@ -2432,27 +2541,21 @@
       <div id="docs-status"></div>
     </div>
 
-
     <div>
       <div class="section-head">
-        <div class="section-title">הערות חיתום</div>
-        <div class="feedback-btns" id="fb-uwnotes"></div>
+        <div class="section-title">חיתום פר קבוצת סיכון</div>
+        <div class="feedback-btns" id="fb-rguw"></div>
       </div>
-      <div id="uw-summary"></div>
+      <div id="rg-reject-banner"></div>
+      <div id="rg-underwriting"></div>
     </div>
 
     <div>
       <div class="section-head">
-        <div class="section-title">סיכום תוספות</div>
-        <div class="feedback-btns" id="fb-summary"></div>
+        <div class="section-title">הערות חתם ורפרנט בתהליך</div>
+        <div class="feedback-btns" id="fb-uwnotes"></div>
       </div>
-      <div class="agg-label" style="margin-bottom:8px;">סיכום תוספות פר קבוצת סיכון — הטלה של מטריצת האבחנה × קבוצת הסיכון</div>
-      <div id="rg-reject-banner"></div>
-      <div id="rg-summary"></div>
-      <div class="agg-extra-field" style="margin-top:10px;">
-        <span class="agg-extra-label">הסבר לביטול תוספת</span>
-        <textarea class="uw-note-input" id="agg-cancel-note" placeholder="כתוב/י כאן את ההסבר לביטול התוספת"></textarea>
-      </div>
+      <div id="uw-summary"></div>
     </div>
 
   </div>
@@ -2475,79 +2578,19 @@
 
     <!-- CMC -->
     <div class="api-panel active" id="panel-cmc">
-      <div class="section-title" style="margin-bottom:10px;">מחשבון קרדיומטאבולי</div>
-      <div class="cmc-form">
-        <div class="form-grid">
-          <div class="form-field">
-            <label class="form-label">גיל</label>
-            <input type="number" class="form-input" id="cmc-age" placeholder="42" min="18" max="100" value="65">
-          </div>
-          <div class="form-field">
-            <label class="form-label">מין</label>
-            <select class="form-select" id="cmc-gender">
-              <option value="">בחר...</option>
-              <option value="f">נקבה</option>
-              <option value="m" selected>זכר</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label">BMI (ק״ג/מ״ר)</label>
-            <input type="number" class="form-input" id="cmc-bmi" placeholder="26.4" step="0.1" value="23.6">
-          </div>
-          <div class="form-field">
-            <label class="form-label">לחץ דם סיסטולי (mmHg)</label>
-            <input type="number" class="form-input" id="cmc-bp" placeholder="128" value="119">
-          </div>
-          <div class="form-field">
-            <label class="form-label">כולסטרול כולל (mg/dL)</label>
-            <input type="number" class="form-input" id="cmc-chol" placeholder="210" value="190">
-          </div>
-          <div class="form-field">
-            <label class="form-label">HDL (mg/dL)</label>
-            <input type="number" class="form-input" id="cmc-hdl" placeholder="55" value="47.5">
-          </div>
-          <div class="form-field">
-            <label class="form-label">HbA1c (%)</label>
-            <input type="number" class="form-input" id="cmc-hba1c" placeholder="6.2" step="0.1">
-          </div>
-          <div class="form-field">
-            <label class="form-label">עישון</label>
-            <select class="form-select" id="cmc-smoke">
-              <option value="">בחר...</option>
-              <option value="never" selected>אף פעם</option>
-              <option value="past">לשעבר</option>
-              <option value="current">מעשן/ת פעיל</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label">סוכרת מאובחנת</label>
-            <select class="form-select" id="cmc-diabetes">
-              <option value="">בחר...</option>
-              <option value="no" selected>לא</option>
-              <option value="type1">כן — Type 1</option>
-              <option value="type2">כן — Type 2</option>
-              <option value="pre">Pre-diabetes</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label">תרופות ל-BP</label>
-            <select class="form-select" id="cmc-meds">
-              <option value="">בחר...</option>
-              <option value="no" selected>לא</option>
-              <option value="yes">כן</option>
-            </select>
-          </div>
-        </div>
-        <div class="error-hint" id="cmc-error">⚠ יש למלא את כל השדות לפני שליחה</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button class="submit-btn" onclick="submitCMC()">חשב תוספת</button>
-          <button class="btn-secondary" onclick="clearCMC()">נקה</button>
-        </div>
-        <div class="cmc-result" id="cmc-result">
-          <div class="cmc-result-label">תוצאת מחשבון CMC</div>
-          <div class="cmc-result-value" id="cmc-result-value">—</div>
-          <div class="cmc-result-note" id="cmc-result-note"></div>
-        </div>
+      <div class="section-title" style="margin-bottom:2px;">Cardiometabolic Calculator (CMC)</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">דירוג משולב — בחר/י מקטעים והזן/י ערכים; הדירוג הוא מכפלת יחסי התמותה של כל גורמי הסיכון (מתעדכן אונליין).</div>
+      <div class="cmc-basics" id="cmc-basics"></div>
+      <div class="cmc-chip-row" id="cmc-chip-row"></div>
+      <div id="cmc-sections"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+        <button class="submit-btn" onclick="computeCMC()">חשב דירוג</button>
+        <button class="btn-secondary" onclick="resetCMC()">נקה</button>
+      </div>
+      <div class="cmc-result" id="cmc-result">
+        <div class="cmc-result-label">דירוג משולב — CMC</div>
+        <div class="cmc-result-value" id="cmc-result-value">—</div>
+        <div class="cmc-result-note" id="cmc-result-note"></div>
       </div>
     </div>
 
@@ -2594,8 +2637,26 @@
   </div>
   <div class="footer-actions">
     <button class="footer-save-btn" onclick="openNoUnderwriting()">לא נדרש חיתום</button>
+    <button class="footer-save-btn" onclick="openUwOverview()">סיכום חיתום</button>
     <button class="footer-save-btn">שמור טיוטה</button>
     <button class="footer-submit-btn" onclick="openApprovalPopup()">שלח לאישור ▸</button>
+  </div>
+</div>
+
+<!-- ===== UW OVERVIEW POPUP (cross-group, read-only) ===== -->
+<div class="popup-overlay" id="overview-popup">
+  <div class="popup-box" style="max-width:820px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">סיכום חיתום — תצוגה חוצה קבוצות סיכון</div>
+        <div class="popup-meta" id="overview-meta"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="doc-action-btn" onclick="printOverview()">🖨 הדפס / ייצוא</button>
+        <button class="popup-close" onclick="closePopup('overview-popup')">✕ סגור</button>
+      </div>
+    </div>
+    <div class="popup-body" id="overview-body"></div>
   </div>
 </div>
 
@@ -2910,9 +2971,9 @@
           <input type="date" class="form-input" id="uwtemp-until">
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="submit-btn" onclick="confirmCovTemp()">אישור</button>
+          <button class="submit-btn" onclick="confirmItemTemp()">אישור</button>
           <button class="btn-secondary" onclick="closePopup('uwtemp-popup')">ביטול</button>
-          <button class="btn-secondary" id="uwtemp-clear" onclick="clearCovTemp()" style="margin-right:auto;">הסר תוספת זמנית</button>
+          <button class="btn-secondary" id="uwtemp-clear" onclick="clearItemTemp()" style="margin-right:auto;">הסר תוספת זמנית</button>
         </div>
       </div>
     </div>
@@ -2996,19 +3057,23 @@ const patients = [
     riskGroups: [
       { riskGroupCode: 'RISK',     riskGroupName: 'ריסק',
         policies: [{ policyNumber: 'POL-2026-00111', productType: 'ביטוח חיים — ריסק' }],
-        requestedAmount: 1000000, existingAmount: 500000 },
+        requestedAmount: 1000000, existingAmount: 500000,
+        reasons: ['תביעה קודמת', 'שאלון רפואי'] },
       { riskGroupCode: 'ACC_DIS',  riskGroupName: 'נכות מתאונה',
         policies: [{ policyNumber: 'POL-2026-00112', productType: 'נכות מתאונה' }],
-        requestedAmount: 750000, existingAmount: 0 },
+        requestedAmount: 750000, existingAmount: 0,
+        reasons: ['שאלון רפואי'] },
       { riskGroupCode: 'WORK_DIS', riskGroupName: 'אכ״ע',
         policies: [{ policyNumber: 'POL-2026-00113', productType: 'אובדן כושר עבודה' }],
-        requestedAmount: 20000, existingAmount: 8000, amountIsMonthly: true },
+        requestedAmount: 20000, existingAmount: 8000, amountIsMonthly: true,
+        reasons: ['שאלון רפואי', 'עיסוק בסיכון'] },
       { riskGroupCode: 'MORTGAGE', riskGroupName: 'ביטוח משכנתא',
         policies: [
           { policyNumber: 'POL-2026-00121', productType: 'משכנתא — מסלול 1' },
           { policyNumber: 'POL-2026-00122', productType: 'משכנתא — מסלול 2' },
         ],
-        requestedAmount: 900000, existingAmount: 0 },
+        requestedAmount: 900000, existingAmount: 0,
+        reasons: ['שאלון רפואי'] },
     ],
     crossCheckFlags: [
       { type: 'SMOKING_MISMATCH', text: 'Cotinine בשתן גבוה מול הצהרת אי-עישון', sourceDoc: 'בדיקת שתן 2026-06-20' },
@@ -3401,30 +3466,43 @@ function rgTempLabel(rg) {
   return parts.join(' / ') + (rg.tempUntil ? ' · עד ' + fmtDate(rg.tempUntil) : '');
 }
 function renderRgUnderwriting() {
-  const wrap = document.getElementById('rg-underwriting');
-  if (!wrap) return;
+  // V1.4: the section renders the per-group summary (from signed item×group cells)
   const p = patientsState[currentIdx];
   const groups = riskGroupsOf(p);
-  wrap.innerHTML = groups.length
-    ? groups.map(rg => rgUwRow(rg)).join('')
-    : '<div class="uw-summary-empty">אין קבוצות סיכון למבוטח זה</div>';
+  if (groups.length && (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode))) selectedRgCode = groups[0].riskGroupCode;
+  renderGroupSummary();
 }
 function rgUwRow(rg) {
   const code = rg.riskGroupCode;
   const multi = rg.policies && rg.policies.length > 1;
   const policies = (rg.policies || []).map((pl, i) =>
     `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}<span class="ltr">${pl.policyNumber}</span> · ${escapeHtml(pl.productType)}`).join(' · ');
-  return `<div class="rguw-card">
+  const totals = computeRiskGroupTotals(patientsState[currentIdx]);
+  const label = rgTotalLabel(totals[code]);
+  const fmtAmt = (key) => (rg[key] == null ? '—' : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : ''));
+  const reasons = (rg.reasons || []).map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
+  return `<div class="rguw-card" id="rguw-card-${code}">
     <div class="rguw-head">
       <span class="rguw-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
-      <span class="rguw-policies">${policies}</span>
+      <span class="rguw-total">סה״כ <b>${escapeHtml(label)}</b></span>
+    </div>
+    <div class="rguw-policies" style="margin-bottom:9px;">${policies}</div>
+    <div class="rguw-meta">
+      <div class="rguw-meta-item"><span class="rguw-meta-lbl">סכום מבוקש</span><span class="rguw-meta-val">${fmtAmt('requestedAmount')}</span></div>
+      <div class="rguw-meta-item"><span class="rguw-meta-lbl">סכום קיים</span><span class="rguw-meta-val">${fmtAmt('existingAmount')}</span></div>
+      <div class="rguw-meta-item rguw-meta-reasons"><span class="rguw-meta-lbl">סיבות חיתום</span><span class="tags-row">${reasons}</span></div>
     </div>
     <div class="rguw-controls">
       <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+rg.uwPercent || 0}" onchange="onRgChange('${code}','uwPercent',this.value)"><span>%</span></label>
       <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+rg.uwPermille || 0}" onchange="onRgChange('${code}','uwPermille',this.value)"><span>‰</span></label>
       <button class="uwi-temp" onclick="openRgTemp('${code}')">⏱ ${escapeHtml(rgTempLabel(rg))}</button>
     </div>
-    <textarea class="rguw-text" placeholder="הדבק/י כאן את הטבלה מ-Swiss וכתוב/י מלל חופשי — פירוט התוספות פר אבחנה, החרגות ונימוקים" onchange="onRgChange('${code}','detailText',this.value)">${escapeHtml(rg.detailText || '')}</textarea>
+    <label class="rguw-lbl">הערות חיתום</label>
+    <textarea class="rguw-text" placeholder="פירוט התוספות פר אבחנה, החרגות ונימוקים — ניתן להדביק את הטבלה מ-Swiss" onchange="onRgChange('${code}','detailText',this.value)">${escapeHtml(rg.detailText || '')}</textarea>
+    <div class="rguw-cancel-row">
+      <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="5" value="${+rg.cancellingAddition || 0}" onchange="onRgChange('${code}','cancellingAddition',this.value)"><span>%</span></label>
+      <input type="text" class="rguw-cancel-reason" placeholder="נימוק לתוספת מתבטלת" value="${escapeHtml(rg.cancellingReason || '')}" onchange="onRgChange('${code}','cancellingReason',this.value)">
+    </div>
   </div>`;
 }
 function rgByCode(code) {
@@ -3432,7 +3510,8 @@ function rgByCode(code) {
 }
 function onRgChange(code, field, val) {
   const rg = rgByCode(code); if (!rg) return;
-  if (field === 'detailText') { rg.detailText = val; updateAgg(); return; }
+  if (field === 'detailText') { rg.detailText = val; return; }
+  if (field === 'cancellingReason') { rg.cancellingReason = val; return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
   if (field === 'uwPercent') n = Math.round(n / 25) * 25;
   rg[field] = n;
@@ -3498,7 +3577,7 @@ function filterIds(query) {
   patients.forEach((p, i) => {
     const tab = document.getElementById('id-tab-' + i);
     if (!tab) return;
-    const haystack = ((p.policy || '') + ' ' + (p.id || '')).toLowerCase();
+    const haystack = (p.id || '').toLowerCase();
     const match = !q || haystack.includes(q);
     tab.classList.toggle('hidden-tab', !match);
     if (match) visibleCount++;
@@ -3510,6 +3589,21 @@ function requestTypeLabel(t) {
   return { HAFAKA: 'הפקה', SHINUIM: 'שינויים', SHINUIM_MUNCHIM: 'שינויים מונחים' }[t] || t || '—';
 }
 
+let selectedRgCode = null; // header coverage selector → drives requested/existing amount + reasons
+const FINANCIAL_COVERAGES = ['RISK', 'MORTGAGE']; // financial underwriting only for ריסק + ביטוח משכנתא
+function updateFinancialVisibility() {
+  const sec = document.getElementById('financial-section');
+  if (sec) sec.style.display = FINANCIAL_COVERAGES.includes(selectedRgCode) ? '' : 'none';
+}
+function selectCoverage(code) {
+  selectedRgCode = code;      // active risk-group tab = context of the whole screen
+  renderHeader();             // active button + requested/existing amount + reasons
+  renderDiagnoses();          // re-render item cards for the new group's underwriting
+  renderLifestyle();
+  renderGroupSummary();       // per-group bottom summary for the new group
+  updateFinancialVisibility();
+}
+
 function renderHeader() {
   const p = patientsState[currentIdx];
   document.getElementById('footer-name').textContent = p.name;
@@ -3517,7 +3611,16 @@ function renderHeader() {
   if (badge) badge.textContent = p.processId || '—';
   const pb = document.getElementById('process-badge');
   if (pb) pb.title = 'סוג בקשה: ' + requestTypeLabel(p.requestType) + (p.clerkNotesToUnderwriter ? ' · הערת רפרנטית: ' + p.clerkNotesToUnderwriter : '');
-  const tagsHtml = p.reasons.map(r => `<span class="tag">${r}</span>`).join('');
+  const groups = riskGroupsOf(p);
+  if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) {
+    selectedRgCode = groups[0] ? groups[0].riskGroupCode : null;
+  }
+  const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || {};
+  const selReasons = selRg.reasons || p.reasons || [];
+  const tagsHtml = selReasons.map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
+  const rgTagsHtml = groups.map(g =>
+    `<span class="tag rg-tag ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')" title="בחר קבוצת סיכון — משפיע על סכום מבוקש / קיים / סיבות חיתום">${escapeHtml(g.riskGroupName)}</span>`).join('') || '—';
+  const fmtAmt = (rg, key) => (rg[key] == null ? '—' : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : ''));
   document.getElementById('header-data').innerHTML = `
     <div class="hd-field"><div class="hd-label">מזהה תהליך</div><div class="hd-value ltr">${p.processId || '—'}</div></div>
     <div class="divider-v"></div>
@@ -3539,11 +3642,11 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">קבוצות סיכון <span style="font-weight:400;color:var(--text-light);">(לחצו לחיתום)</span></div><div class="tags-row">${(p.riskGroups||[]).map(rg => `<span class="tag rg-tag" onclick="openCoverageUw('${rg.riskGroupCode}')" title="פתח חיתום — ${escapeHtml(rg.riskGroupName)}">${escapeHtml(rg.riskGroupName)}</span>`).join('') || '—'}</div></div>
+    <div class="hd-field"><div class="hd-label">קבוצות סיכון <span style="font-weight:400;color:var(--text-light);">(בחרו)</span></div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום מבוקש <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName || '')}</span></div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'requestedAmount')}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'existingAmount')}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
   `;
@@ -3886,6 +3989,7 @@ function buildCard(dx, idx) {
           <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
         </div>
       </div>
+      ${itemUwCard('dx', String(idx), dx)}
       <div class="timeline-container" id="tl-${idx}">
         <div class="timeline-title">אירועים רפואיים — לחץ על פריט לפתיחת מסמך מקור</div>
         ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
@@ -3987,134 +4091,28 @@ function cellSummary(c) {
   return bits.join(' · ') || 'נקי';
 }
 
-// V1.4: totals are the projection of the finding×coverage matrix onto each risk group.
+// V1.4: totals derived from signed item×group cells, minus the per-group cancelling addition.
 function computeRiskGroupTotals(p) {
-  const findings = allFindings(p);
   const res = {};
   riskGroupsOf(p).forEach(rg => {
     const code = rg.riskGroupCode;
-    const agg = { medPct: 0, medPer: 0, tempPct: 0, tempPer: 0, tempUntil: '', details: [], exclusions: [], rejected: false, rejectedBy: [] };
-    findings.forEach(f => {
-      const c = f.uw && f.uw[code]; if (!c) return;
-      const mp = +c.medicalAdditionPercent || 0, mpm = +c.medicalAdditionPermille || 0;
-      const tp = +c.temporaryAdditionPercent || 0, tpm = +c.temporaryAdditionPermille || 0;
-      agg.medPct += mp; agg.medPer += mpm; agg.tempPct += tp; agg.tempPer += tpm;
-      if (c.temporaryUntil && !agg.tempUntil) agg.tempUntil = c.temporaryUntil;
-      const bits = [];
-      if (mp) bits.push('+' + fmtNum(mp) + '%');
-      if (mpm) bits.push('+' + fmtPermille(mpm));
-      if (tp || tpm) {
-        const tt = [];
-        if (tp) tt.push('+' + fmtNum(tp) + '%');
-        if (tpm) tt.push('+' + fmtPermille(tpm));
-        bits.push('זמנית ' + tt.join('/') + (c.temporaryUntil ? ' עד ' + fmtDate(c.temporaryUntil) : ''));
-      }
-      if (bits.length) agg.details.push({ code: findingCode(f), bits });
-    });
-    res[code] = agg;
+    const t = groupTotals(p, code);
+    const finalPct = Math.max(0, t.pct - (+rg.cancelPct || 0));
+    const finalPer = Math.max(0, t.per - (+rg.cancelPermille || 0));
+    const details = groupSignedItems(p, code)
+      .map(it => ({ code: findingCode(it.f), bits: [itemAddText(it.c)] }))
+      .filter(d => d.bits[0]);
+    res[code] = {
+      medPct: finalPct, medPer: finalPer, occPct: 0, occPer: 0,
+      tempPct: 0, tempPer: 0, tempUntil: '',
+      details, exclusions: [], rejected: false, rejectedBy: [],
+    };
   });
   return res;
 }
 function processIsRejected(p) {
   const t = computeRiskGroupTotals(p);
   return riskGroupsOf(p).some(rg => t[rg.riskGroupCode] && t[rg.riskGroupCode].rejected);
-}
-
-// =====================================================================
-// V1.4 — consolidated per-coverage underwriting screen (opened from header tags)
-// =====================================================================
-// all findings with a stable (type, ref) so cells can be addressed
-function enumFindings(p) {
-  const out = (p.diagnoses || []).map((f, i) => ({ type: 'dx', ref: '' + i, f }));
-  if (p.lifestyle) {
-    if (p.lifestyle.occupation) out.push({ type: 'ls', ref: 'occupation', f: p.lifestyle.occupation });
-    if (p.lifestyle.profession) out.push({ type: 'ls', ref: 'profession', f: p.lifestyle.profession });
-  }
-  return out;
-}
-let covCtx = null; // currently focused risk-group code
-function openCoverageUw(code) {
-  covCtx = code;
-  renderCoverageUw();
-  document.getElementById('uw-popup').classList.add('open');
-}
-function renderCoverageUw() {
-  const p = patientsState[currentIdx];
-  const rg = riskGroupsOf(p).find(r => r.riskGroupCode === covCtx);
-  if (!rg) return;
-  const multi = rg.policies && rg.policies.length > 1;
-  const pol = (rg.policies || []).map((x, i) => `${multi ? ('מסלול ' + (i + 1) + ': ') : ''}${x.policyNumber} · ${x.productType}`).join('   |   ');
-  document.getElementById('uw-popup-title').textContent = 'חיתום — ' + rg.riskGroupName;
-  document.getElementById('uw-popup-meta').textContent = pol;
-  const tabs = riskGroupsOf(p).map(g =>
-    `<button class="cov-tab ${g.riskGroupCode === covCtx ? 'active' : ''}" onclick="openCoverageUw('${g.riskGroupCode}')">${escapeHtml(g.riskGroupName)}</button>`).join('');
-  const totals = computeRiskGroupTotals(p);
-  const label = rgTotalLabel(totals[covCtx]);
-  const rows = enumFindings(p).map(x => covFindingRow(x.type, x.ref, x.f)).join('');
-  document.getElementById('uw-popup-body').innerHTML = `
-    <div class="cov-tabs">${tabs}</div>
-    <div class="cov-total-bar">סה״כ ${escapeHtml(rg.riskGroupName)}: <b>${escapeHtml(label)}</b>${multi ? ` · <span style="font-weight:400;color:var(--text-light);">${rg.policies.length} מסלולים</span>` : ''}</div>
-    <div class="cov-rows">${rows}</div>`;
-}
-function covFindingRow(type, ref, f) {
-  const code = covCtx;
-  const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
-  const src = f.findingSource === 'OCCUPATION' ? (f.value || 'עיסוק') : '';
-  const num = (field, val, step) =>
-    `<input type="number" class="uwi-inp" min="0" step="${step}" value="${val || 0}" onchange="onCovCellChange('${type}','${ref}','${field}',this.value)">`;
-  return `<div class="uwi-row" title="${escapeHtml(findingTitle(f))}">
-    <span class="uwi-name">${escapeHtml(findingCode(f))}${src ? `<span class="uwm-maslul">${src}</span>` : ''}</span>
-    <label class="uwi-inp-wrap">תוספת ${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)}<span>%</span></label>
-    <label class="uwi-inp-wrap">פרומיל ${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)}<span>‰</span></label>
-    <button class="uwi-temp" onclick="openCovTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
-    <input type="text" class="uwi-expl" placeholder="הסבר / נימוק להחלטה" value="${escapeHtml(c.freeText)}" onchange="onCovCellChange('${type}','${ref}','freeText',this.value)">
-  </div>`;
-}
-function onCovCellChange(type, ref, field, val) {
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[covCtx];
-  if (field === 'freeText') { c.freeText = val; return; }
-  let n = parseFloat(val) || 0; if (n < 0) n = 0;
-  if (/Percent$/.test(field)) n = Math.round(n / 25) * 25;
-  c[field] = n;
-  recomputeDecision(c);
-  renderCoverageUw();
-  updateAgg();
-}
-// temporary-addition popup for a coverage cell
-let covTempCtx = null;
-function openCovTemp(type, ref) {
-  covTempCtx = { type, ref, code: covCtx };
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[covCtx];
-  document.getElementById('uwtemp-meta').textContent = findingCode(f) + ' · ' + (riskGroupNames[covCtx] || covCtx);
-  document.getElementById('uwtemp-pct').value = c.temporaryAdditionPercent || 0;
-  document.getElementById('uwtemp-permille').value = c.temporaryAdditionPermille || 0;
-  document.getElementById('uwtemp-until').value = c.temporaryUntil || '';
-  document.getElementById('uwtemp-clear').style.display = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille) ? 'inline-block' : 'none';
-  document.getElementById('uwtemp-popup').classList.add('open');
-}
-function confirmCovTemp() {
-  if (!covTempCtx) return;
-  const f = _findingRef(covTempCtx.type, covTempCtx.ref); if (!f) return;
-  const c = f.uw[covTempCtx.code];
-  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 25) * 25);
-  c.temporaryAdditionPermille = Math.max(0, parseFloat(document.getElementById('uwtemp-permille').value) || 0);
-  c.temporaryUntil = document.getElementById('uwtemp-until').value;
-  recomputeDecision(c);
-  closePopup('uwtemp-popup');
-  renderCoverageUw();
-  updateAgg();
-}
-function clearCovTemp() {
-  if (!covTempCtx) return;
-  const f = _findingRef(covTempCtx.type, covTempCtx.ref); if (!f) return;
-  const c = f.uw[covTempCtx.code];
-  c.temporaryAdditionPercent = 0; c.temporaryAdditionPermille = 0; c.temporaryUntil = '';
-  recomputeDecision(c);
-  closePopup('uwtemp-popup');
-  renderCoverageUw();
-  updateAgg();
 }
 // compact "+75%" style label for a risk-group total (medical + occupational combined text)
 function rgTotalLabel(agg) {
@@ -4359,81 +4357,225 @@ function _findingRef(type, ref) {
   const p = patientsState[currentIdx];
   return type === 'dx' ? p.diagnoses[+ref] : p.lifestyle[ref];
 }
-function renderInlineUw(type, ref) {
-  const p = patientsState[currentIdx];
-  const f = _findingRef(type, ref);
-  if (!f) return '';
-  const rows = riskGroupsOf(p).map(rg => inlineUwRow(type, ref, f, rg)).join('');
-  return `<div class="uw-inline" id="uwinline-${type}-${ref}" onclick="event.stopPropagation()">
-    <div class="uw-inline-title">חיתום פר קבוצת סיכון</div>
-    <div class="uw-inline-rows">${rows}</div>
-  </div>`;
+// =====================================================================
+// V1.4 — underwriting per ITEM × RISK GROUP (active group tab = screen context)
+// =====================================================================
+function itemFindings(p) {
+  const out = (p.diagnoses || []).map((d, i) => ({ type: 'dx', ref: String(i), f: d }));
+  if (p.lifestyle) {
+    out.push({ type: 'ls', ref: 'occupation', f: p.lifestyle.occupation });
+    out.push({ type: 'ls', ref: 'profession', f: p.lifestyle.profession });
+  }
+  return out.filter(it => it.f);
 }
-function inlineUwRow(type, ref, f, rg) {
-  const code = rg.riskGroupCode;
+function itemKind(f) { return f.findingSource === 'OCCUPATION' ? 'עיסוק' : f.findingSource === 'HOBBY' ? 'תחביב' : 'אבחנה'; }
+function itemAddText(c) {
+  const parts = [];
+  const p = (+c.medicalAdditionPercent || 0) + (+c.occupationalAdditionPercent || 0);
+  const pm = (+c.medicalAdditionPermille || 0) + (+c.occupationalAdditionPermille || 0);
+  if (p) parts.push('+' + fmtNum(p) + '%');
+  if (pm) parts.push('+' + fmtPermille(pm));
+  return parts.join(' · ');
+}
+
+// ---- per-item underwriting card (for the ACTIVE risk-group tab) ----
+function itemUwCard(type, ref, f) {
+  const code = selectedRgCode;
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
-  const multi = rg.policies && rg.policies.length > 1;
-  const num = (field, val, step) =>
-    `<input type="number" class="uwi-inp" min="0" step="${step}" value="${val || 0}" onchange="onInlineCellChange('${type}','${ref}','${code}','${field}',this.value)">`;
-  return `<div class="uwi-row" title="${escapeHtml((rg.policies || []).map(pl => pl.policyNumber + ' · ' + pl.productType).join('  |  '))}">
-    <span class="uwi-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
-    <label class="uwi-inp-wrap">תוספת ${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)}<span>%</span></label>
-    <label class="uwi-inp-wrap">פרומיל ${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)}<span>‰</span></label>
-    <button class="uwi-temp" onclick="openInlineTemp('${type}','${ref}','${code}')">⏱ ${escapeHtml(tempLabel(c))}</button>
-    <input type="text" class="uwi-expl" placeholder="הסבר / נימוק להחלטה" value="${escapeHtml(c.freeText)}" onchange="onInlineCellChange('${type}','${ref}','${code}','freeText',this.value)">
+  const sw = f.swiss[code];
+  const signed = !!c.signed;
+  const hasSw = swissHasContent(sw);
+  const overridden = hasSw && ((+c.medicalAdditionPercent || 0) !== (+sw.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) !== (+sw.medicalAdditionPermille || 0));
+  const needNote = overridden && !(c.freeText || '').trim();
+  const explBtn = f.loadingTableKey ? `<button class="itemuw-btn" onclick="openLoadingTable('${f.loadingTableKey}')">טבלת הסברים ▸</button>` : '';
+  const swLine = hasSw ? `<div class="itemuw-sw">מוצע אוטומטית (Swiss): <b>${escapeHtml(cellSummary(sw))}</b>${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}</div>` : '';
+  return `<div class="itemuw" id="itemuw-${type}-${ref}">
+    <div class="itemuw-head">
+      <span class="itemuw-badge ${signed ? 'signed' : 'unsigned'}">${signed ? '✓ נחתם בקבוצה זו' : '● טרם נחתם'}</span>
+      <span class="itemuw-rg">חיתום עבור: <b>${escapeHtml(riskGroupNames[code] || code)}</b></span>
+    </div>
+    ${swLine}
+    <div class="itemuw-controls">
+      <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
+      <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
+      <button class="itemuw-btn" onclick="openItemTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
+      ${explBtn}
+      ${signed ? '' : `<button class="itemuw-sign" onclick="signItem('${type}','${ref}')">החתם פריט ✓</button>`}
+    </div>
+    <label class="itemuw-note-lbl">הערת חתם${needNote ? ' <span class="itemuw-req">· חובה — שונה מהערך שהוצע</span>' : ''}</label>
+    <textarea class="itemuw-note ${needNote ? 'req' : ''}" rows="2" placeholder="נימוק להחלטה (חובה כאשר משנים ערך שהוצע אוטומטית)" onchange="onItemUw('${type}','${ref}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea>
   </div>`;
 }
-function onInlineCellChange(type, ref, code, field, val) {
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[code];
-  if (field === 'freeText') { c.freeText = val; return; }   // no re-render needed while typing notes
+function _v14ref(type, ref) { const p = patientsState[currentIdx]; return type === 'dx' ? p.diagnoses[+ref] : p.lifestyle[ref]; }
+function refreshItemCard(type, ref) {
+  const el = document.getElementById('itemuw-' + type + '-' + ref);
+  if (el) el.outerHTML = itemUwCard(type, ref, _v14ref(type, ref));
+}
+function onItemUw(type, ref, field, val) {
+  const f = _v14ref(type, ref); if (!f) return;
+  const c = f.uw[selectedRgCode];
+  if (field === 'freeText') { c.freeText = val; c.signed = true; refreshItemCard(type, ref); renderGroupSummary(); return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
-  if (/Percent$/.test(field)) n = Math.round(n / 25) * 25;
-  c[field] = n;
-  recomputeDecision(c);
-  refreshInline(type, ref);
+  if (/Percent$/.test(field)) n = Math.round(n / 5) * 5;
+  c[field] = n; c.signed = true; recomputeDecision(c);
+  refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
-function refreshInline(type, ref) {
-  const el = document.getElementById('uwinline-' + type + '-' + ref);
-  if (el) el.outerHTML = renderInlineUw(type, ref);
-  updateAgg();
-  renderUwSummary();
+function signItem(type, ref) {
+  const f = _v14ref(type, ref); if (!f) return;
+  f.uw[selectedRgCode].signed = true;
+  refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
-// temporary-addition popup for an inline cell (reuses the temp popup overlay)
-let inlineTempCtx = null;
-function openInlineTemp(type, ref, code) {
-  inlineTempCtx = { type, ref, code };
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[code];
-  document.getElementById('uwtemp-meta').textContent = findingCode(f) + ' · ' + (riskGroupNames[code] || code);
+
+// ---- per-item temporary-addition popup (reuses the temp popup overlay) ----
+let itemTempCtx = null;
+function openItemTemp(type, ref) {
+  itemTempCtx = { type, ref };
+  const f = _v14ref(type, ref); if (!f) return;
+  const c = f.uw[selectedRgCode];
+  document.getElementById('uwtemp-meta').textContent = findingCode(f) + ' · ' + (riskGroupNames[selectedRgCode] || selectedRgCode);
   document.getElementById('uwtemp-pct').value = c.temporaryAdditionPercent || 0;
   document.getElementById('uwtemp-permille').value = c.temporaryAdditionPermille || 0;
   document.getElementById('uwtemp-until').value = c.temporaryUntil || '';
   document.getElementById('uwtemp-clear').style.display = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille) ? 'inline-block' : 'none';
   document.getElementById('uwtemp-popup').classList.add('open');
 }
-function confirmInlineTemp() {
-  if (!inlineTempCtx) return;
-  const { type, ref, code } = inlineTempCtx;
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[code];
-  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 25) * 25);
+function confirmItemTemp() {
+  if (!itemTempCtx) return;
+  const { type, ref } = itemTempCtx;
+  const f = _v14ref(type, ref); if (!f) return;
+  const c = f.uw[selectedRgCode];
+  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 5) * 5);
   c.temporaryAdditionPermille = Math.max(0, parseFloat(document.getElementById('uwtemp-permille').value) || 0);
-  c.temporaryUntil = document.getElementById('uwtemp-until').value;
-  recomputeDecision(c);
-  closePopup('uwtemp-popup');
-  refreshInline(type, ref);
+  c.temporaryUntil = document.getElementById('uwtemp-until').value; c.signed = true; recomputeDecision(c);
+  closePopup('uwtemp-popup'); refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
-function clearInlineTemp() {
-  if (!inlineTempCtx) return;
-  const { type, ref, code } = inlineTempCtx;
-  const f = _findingRef(type, ref); if (!f) return;
-  const c = f.uw[code];
-  c.temporaryAdditionPercent = 0; c.temporaryAdditionPermille = 0; c.temporaryUntil = '';
-  recomputeDecision(c);
-  closePopup('uwtemp-popup');
-  refreshInline(type, ref);
+function clearItemTemp() {
+  if (!itemTempCtx) return;
+  const { type, ref } = itemTempCtx;
+  const f = _v14ref(type, ref); if (!f) return;
+  const c = f.uw[selectedRgCode];
+  c.temporaryAdditionPercent = 0; c.temporaryAdditionPermille = 0; c.temporaryUntil = ''; recomputeDecision(c);
+  closePopup('uwtemp-popup'); refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
+
+// ---- per-group bottom summary (active tab) ----
+function groupSignedItems(p, code) {
+  return itemFindings(p).map(it => ({ ...it, c: it.f.uw[code] })).filter(it => it.c && it.c.signed);
+}
+function groupTotals(p, code) {
+  let pct = 0, per = 0;
+  groupSignedItems(p, code).forEach(it => {
+    const c = it.c;
+    pct += (+c.medicalAdditionPercent || 0) + (+c.occupationalAdditionPercent || 0);
+    per += (+c.medicalAdditionPermille || 0) + (+c.occupationalAdditionPermille || 0);
+  });
+  return { pct, per };
+}
+function _grp() { return riskGroupsOf(patientsState[currentIdx]).find(r => r.riskGroupCode === selectedRgCode); }
+function renderGroupSummary() {
+  const wrap = document.getElementById('rg-underwriting'); if (!wrap) return;
+  const p = patientsState[currentIdx]; const code = selectedRgCode;
+  const rg = riskGroupsOf(p).find(r => r.riskGroupCode === code);
+  if (!rg) { wrap.innerHTML = ''; return; }
+  const items = groupSignedItems(p, code);
+  const t = groupTotals(p, code);
+  const lines = items.length ? items.map(it => {
+    const c = it.c; const add = itemAddText(c) || 'נקי';
+    const tmp = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille)
+      ? ` <span class="gs-temp">⏱ זמנית ${escapeHtml(tempLabel(c))}</span>` : '';
+    return `<div class="gs-line"><span class="gs-item">${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b></span><span class="gs-val">${escapeHtml(add)}${tmp}</span></div>`;
+  }).join('') : '<div class="uw-summary-empty">טרם נחתמו פריטים בקבוצת סיכון זו</div>';
+  const cancelPct = +rg.cancelPct || 0, cancelPer = +rg.cancelPermille || 0;
+  const finalPct = Math.max(0, t.pct - cancelPct), finalPer = Math.max(0, t.per - cancelPer);
+  const savedBadge = rg.savedStatus ? `<span class="gs-saved">✓ נשמר · ${escapeHtml(rg.riskGroupName)}</span>` : '';
+  const reasonReq = (cancelPct || cancelPer) && !(rg.cancelReason || '').trim();
+  wrap.innerHTML = `
+    <div class="gs-card">
+      <div class="gs-head">סיכום קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b> ${savedBadge}</div>
+      <div class="gs-lines">${lines}</div>
+      <div class="gs-row gs-total"><span>סך תוספות (אדיטיבי)</span><span class="gs-total-val">${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</span></div>
+      <div class="gs-cancel">
+        <div class="gs-cancel-fields">
+          <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="5" value="${cancelPct}" onchange="onGroupCancel('pct',this.value)"><span>%</span></label>
+          <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${cancelPer}" onchange="onGroupCancel('per',this.value)"><span>‰</span></label>
+        </div>
+        <input type="text" class="gs-cancel-reason ${reasonReq ? 'req' : ''}" placeholder="הסבר לתוספת מתבטלת (חובה)" value="${escapeHtml(rg.cancelReason || '')}" onchange="onGroupCancel('reason',this.value)">
+      </div>
+      <label class="itemuw-note-lbl">הערות (קבוצת סיכון)</label>
+      <textarea class="gs-notes" rows="2" placeholder="הערות ברמת קבוצת הסיכון" onchange="onGroupNotes(this.value)">${escapeHtml(rg.groupNotes || '')}</textarea>
+      <div class="gs-final-calc">סך תוספות: <b>${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</b> → תוספת מתבטלת: <b>−${fmtNum(cancelPct)}%${cancelPer ? (' · −' + fmtPermille(cancelPer)) : ''}</b> → סך הכל סופי: <b class="gs-final-b">${fmtNum(finalPct)}%${finalPer ? (' · ' + fmtPermille(finalPer)) : ''}</b></div>
+      <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+        <button class="submit-btn" onclick="saveGroup()">שמור</button>
+        <span id="gs-status"></span>
+      </div>
+    </div>`;
+}
+function onGroupCancel(which, val) {
+  const rg = _grp(); if (!rg) return;
+  if (which === 'reason') { rg.cancelReason = val; rg.savedStatus = false; renderGroupSummary(); return; }
+  let n = parseFloat(val) || 0; if (n < 0) n = 0;
+  if (which === 'pct') rg.cancelPct = Math.round(n / 5) * 5; else rg.cancelPermille = n;
+  rg.savedStatus = false; renderGroupSummary(); updateAgg();
+}
+function onGroupNotes(val) { const rg = _grp(); if (rg) { rg.groupNotes = val; rg.savedStatus = false; } }
+function saveGroup() {
+  const rg = _grp(); if (!rg) return;
+  const st = document.getElementById('gs-status');
+  if ((+rg.cancelPct || +rg.cancelPermille) && !(rg.cancelReason || '').trim()) {
+    renderGroupSummary();
+    const s = document.getElementById('gs-status');
+    if (s) s.innerHTML = '<span class="gs-err">⚠ יש להזין הסבר לתוספת המתבטלת</span>';
+    return;
+  }
+  const p = patientsState[currentIdx];
+  const missing = groupSignedItems(p, selectedRgCode).filter(it => {
+    const sw = it.f.swiss[selectedRgCode]; const c = it.c;
+    const ov = swissHasContent(sw) && ((+c.medicalAdditionPercent || 0) !== (+sw.medicalAdditionPercent || 0) || (+c.medicalAdditionPermille || 0) !== (+sw.medicalAdditionPermille || 0));
+    return ov && !(c.freeText || '').trim();
+  });
+  if (missing.length) {
+    if (st) st.innerHTML = '<span class="gs-err">⚠ נדרש נימוק חתם לפריטים ששונו מהערך שהוצע (' + missing.map(m => escapeHtml(findingCode(m.f))).join(', ') + ')</span>';
+    return;
+  }
+  rg.savedStatus = true; renderGroupSummary(); updateAgg();
+  const st2 = document.getElementById('gs-status');
+  if (st2) st2.innerHTML = '<span class="gs-saved">✓ נשמר · ' + escapeHtml(rg.riskGroupName) + '</span>';
+}
+
+// ---- cross-group "סיכום חיתום" modal (read-only) ----
+function openUwOverview() {
+  const p = patientsState[currentIdx];
+  const html = riskGroupsOf(p).map(rg => {
+    const code = rg.riskGroupCode;
+    const items = groupSignedItems(p, code);
+    const t = groupTotals(p, code);
+    const cancelPct = +rg.cancelPct || 0, cancelPer = +rg.cancelPermille || 0;
+    const finalPct = Math.max(0, t.pct - cancelPct), finalPer = Math.max(0, t.per - cancelPer);
+    const itemsHtml = items.length ? items.map(it => {
+      const c = it.c; const add = itemAddText(c) || 'נקי';
+      const temp = (+c.temporaryAdditionPercent || +c.temporaryAdditionPermille) ? `<div class="ov-sub">⏱ תוספת זמנית: ${escapeHtml(tempLabel(c))}</div>` : '';
+      const note = (c.freeText || '').trim() ? `<div class="ov-sub">נימוק חתם: ${escapeHtml(c.freeText)}</div>` : '';
+      const expl = it.f.loadingTableKey ? `<button class="ov-expl" onclick="openLoadingTable('${it.f.loadingTableKey}')">explainability ▸</button>` : '';
+      return `<div class="ov-item">
+        <div class="ov-item-head">▸ ${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b> <span class="ov-add">תוספת ${escapeHtml(add)}</span> ${expl}</div>
+        ${temp}${note}</div>`;
+    }).join('') : '<div class="ov-empty">— טרם נחתמו פריטים בקבוצה זו —</div>';
+    const cancelLine = (cancelPct || cancelPer) ? `<div class="ov-cancel">תוספת מתבטלת: −${fmtNum(cancelPct)}%${cancelPer ? (' · −' + fmtPermille(cancelPer)) : ''}${(rg.cancelReason || '').trim() ? (' · הסבר: ' + escapeHtml(rg.cancelReason)) : ''}</div>` : '';
+    const notesLine = (rg.groupNotes || '').trim() ? `<div class="ov-cancel">הערות: ${escapeHtml(rg.groupNotes)}</div>` : '';
+    return `<div class="ov-group">
+      <div class="ov-group-head">▸ קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b>${rg.savedStatus ? ' <span class="gs-saved">✓ נשמר</span>' : ''}</div>
+      <div class="ov-items">${itemsHtml}</div>
+      <div class="ov-sep"></div>
+      <div class="ov-tot">סך תוספות: <b>${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</b></div>
+      ${cancelLine}${notesLine}
+      <div class="ov-final">סך הכל סופי: <b>${fmtNum(finalPct)}%${finalPer ? (' · ' + fmtPermille(finalPer)) : ''}</b></div>
+    </div>`;
+  }).join('');
+  document.getElementById('overview-meta').textContent = `מזהה תהליך ${p.processId} · ${p.name} · ת״ז ${p.id}`;
+  document.getElementById('overview-body').innerHTML = html;
+  document.getElementById('overview-popup').classList.add('open');
+}
+function printOverview() { window.print(); }
 
 function updateAgg() {
   const p = patientsState[currentIdx];
@@ -4771,6 +4913,7 @@ function renderLifestyle() {
           ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
         </div>
       </div>
+      ${itemUwCard('ls', r.key, r.data)}
       <div class="timeline-container" id="ls-tl-${r.key}">
         <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
         <div class="ls-source-row">
@@ -4969,6 +5112,7 @@ function renderFinancial() {
         </div>
       </div>
     </div>`;
+  updateFinancialVisibility();
 }
 
 function onFinChange(field, val) {
@@ -4988,22 +5132,13 @@ function renderUwSummary() {
   const wrap = document.getElementById('uw-summary');
   if (!wrap) return;
   const p = patientsState[currentIdx];
-  const items = (p.diagnoses || [])
-    .filter(dx => dx.uwNote && dx.uwNote.trim())
-    .map(dx => {
-      const bits = riskGroupsOf(p).map(rg => {
-        const c = dx.uw[rg.riskGroupCode]; const s = cellSummary(c);
-        return (s && s !== 'נקי') ? `${rg.riskGroupName} ${s}` : null;
-      }).filter(Boolean);
-      const load = bits.length ? ` · ${bits.join(' · ')}` : '';
-      return `<div class="uw-summary-item"><span class="uw-summary-code">${dx.code}</span>${load}<div>${dx.uwNote}</div></div>`;
-    }).join('');
-  const body = items || '<div class="uw-summary-empty">אין עדיין הערות חיתום לאבחנות — ניתן להוסיף הערה והסבר להחלטה בתוך כל אבחנה.</div>';
+  const referent = p.clerkNotesToUnderwriter || '';
   wrap.innerHTML = `
     <div class="uw-summary-card">
-      ${body}
-      <label class="uw-general-label">הערת חיתום כללית לתיק (הסבר מרוכז להחלטות — החרגות, תוספות, נימוקים)</label>
-      <textarea class="uw-note-input" placeholder="כתוב/י כאן סיכום והסבר כולל להחלטות החיתום בתיק זה" onchange="onGeneralUwNoteChange(this.value)">${p.generalUwNote || ''}</textarea>
+      <label class="uw-general-label">הערת רפרנט בתהליך${p.processId ? ` <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(p.processId)}</span>` : ''}</label>
+      <div class="uw-referent-note">${referent ? escapeHtml(referent) : '<span style="color:var(--text-light);font-style:italic;">אין הערת רפרנט בתהליך זה</span>'}</div>
+      <label class="uw-general-label" style="margin-top:13px;">הערת חתם</label>
+      <textarea class="uw-note-input" placeholder="כתוב/י כאן את הערות החתם — סיכום והסבר כולל להחלטות החיתום בתיק זה" onchange="onGeneralUwNoteChange(this.value)">${p.generalUwNote || ''}</textarea>
     </div>`;
 }
 
@@ -5447,65 +5582,138 @@ function renderApiPanels() {
 // =====================================================================
 // CMC
 // =====================================================================
-const cmcFields = ['cmc-age','cmc-gender','cmc-bmi','cmc-bp','cmc-chol','cmc-hdl','cmc-hba1c','cmc-smoke','cmc-diabetes','cmc-meds'];
+// =====================================================================
+// CMC — Cardiometabolic Calculator (section-based, combined rating)
+// Structure modeled on Swiss Re LifeGuide CMC: Basics + toggleable sections.
+// =====================================================================
+const CMC_SECTIONS = [
+  { key: 'build', label: 'Build', icon: '⚖', fields: [
+    { id: 'height', label: 'גובה', units: ['cm', 'in'], u: 'cm' },
+    { id: 'weight', label: 'משקל', units: ['kg', 'lb'], u: 'kg' },
+    { id: 'waist',  label: 'היקף מותניים', units: ['cm', 'in'], u: 'cm' },
+  ]},
+  { key: 'bp', label: 'לחץ דם', icon: '🩺', fields: [
+    { id: 'sys', label: 'סיסטולי (mmHg)' },
+    { id: 'dia', label: 'דיאסטולי (mmHg)' },
+    { id: 'bpmeds', label: 'טיפול תרופתי', options: [['no', 'לא'], ['yes', 'כן']] },
+  ]},
+  { key: 'bloods', label: 'סוכרת / דם', icon: '💉', fields: [
+    { id: 'diabetes', label: 'סוכרת', options: [['no', 'ללא'], ['pre', 'Pre-diabetes'], ['type2', 'Type 2'], ['type1', 'Type 1']] },
+    { id: 'hba1c', label: 'HbA1c (%)' },
+    { id: 'glucose', label: 'גלוקוז בצום (mg/dL)' },
+  ]},
+  { key: 'lipids', label: 'Lipids', icon: '🧪', fields: [
+    { id: 'chol', label: 'כולסטרול כולל', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
+    { id: 'hdl',  label: 'HDL', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
+    { id: 'ldl',  label: 'LDL', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
+    { id: 'tg',   label: 'טריגליצרידים', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
+  ]},
+  { key: 'cardiac', label: 'לב', icon: '❤', fields: [
+    { id: 'cardiac', label: 'היסטוריה קרדיאלית', options: [['none', 'ללא'], ['angina', 'אנגינה'], ['mi', 'אוטם בעבר'], ['arr', 'הפרעת קצב']] },
+  ]},
+  { key: 'family', label: 'היסטוריה משפחתית', icon: '👪', fields: [
+    { id: 'famcvd', label: 'CVD מוקדם במשפחה', options: [['no', 'לא'], ['yes', 'כן (<60)']] },
+    { id: 'famdm', label: 'סוכרת במשפחה', options: [['no', 'לא'], ['yes', 'כן']] },
+  ]},
+  { key: 'lifestyle', label: 'עישון / אלכוהול', icon: '🍷', fields: [
+    { id: 'smoke', label: 'עישון', options: [['never', 'לא'], ['past', 'בעבר'], ['current', 'פעיל']] },
+    { id: 'alcohol', label: 'אלכוהול (יח׳/שבוע)' },
+  ]},
+];
+const cmcState = {
+  basics: { age: 47, sex: 'm', country: 'ישראל' },
+  active: { build: true, bp: true, bloods: true, lipids: true, lifestyle: true, cardiac: false, family: false },
+  units: {}, values: {},
+};
+CMC_SECTIONS.forEach(s => s.fields.forEach(f => {
+  if (f.units) cmcState.units[f.id] = f.u;
+  if (f.options) cmcState.values[f.id] = f.options[0][0];
+}));
+Object.assign(cmcState.values, { height: 183, weight: 79, waist: 94, sys: 119, dia: 78, hba1c: 5.4, glucose: 92, chol: 190, hdl: 47.5, ldl: 120, tg: 110, alcohol: 0 });
 
-function submitCMC() {
-  let err = false;
-  cmcFields.forEach(id => {
-    const el = document.getElementById(id);
-    const empty = !el.value;
-    el.classList.toggle('error', empty);
-    if (empty) err = true;
-  });
-  document.getElementById('cmc-error').classList.toggle('show', err);
-  if (err) return;
-
-  const hba1c = parseFloat(document.getElementById('cmc-hba1c').value);
-  const bmi = parseFloat(document.getElementById('cmc-bmi').value);
-  const bp = parseInt(document.getElementById('cmc-bp').value);
-  const smoke = document.getElementById('cmc-smoke').value;
-  const diabetes = document.getElementById('cmc-diabetes').value;
-  const meds = document.getElementById('cmc-meds').value;
-
-  let loading = 0;
-  const notes = [];
-
-  if (diabetes === 'type2' || diabetes === 'type1') {
-    if (hba1c < 6.5) { loading += 0; }
-    else if (hba1c <= 7.0) { loading += 50; notes.push(`HbA1c ${hba1c}% — סוכרת מבוקרת`); }
-    else if (hba1c <= 8.0) { loading += 75; notes.push(`HbA1c ${hba1c}% — שליטה חלקית`); }
-    else { loading += 150; notes.push(`HbA1c ${hba1c}% — שליטה לקויה`); }
-  } else if (diabetes === 'pre') {
-    loading += 0;
-    notes.push('Pre-diabetes — ללא תוספת עצמאית');
-  }
-
-  if (bmi >= 35) { loading += 50; notes.push(`BMI ${bmi} — השמנה מדרגה 2+`); }
-  else if (bmi >= 30) { loading += 25; notes.push(`BMI ${bmi} — השמנה מדרגה 1`); }
-
-  if (bp >= 160) { loading += 50; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם חמור`); }
-  else if (bp >= 140) { loading += 25; notes.push(`BP סיסטולי ${bp} — יתר לחץ דם`); }
-
-  if (smoke === 'current') { loading += 50; notes.push('עישון פעיל'); }
-  else if (smoke === 'past') { loading += 25; notes.push('עישון בעבר'); }
-
-  loading = Math.round(loading / 25) * 25;
-
-  document.getElementById('cmc-result-value').textContent = loading + '%';
-  document.getElementById('cmc-result-note').innerHTML = notes.length
-    ? '<strong>גורמי סיכון שנמצאו:</strong><br>' + notes.map(n => '• ' + n).join('<br>')
-    : '✓ לא נמצאו גורמי סיכון משמעותיים מעבר לאבחנות';
-  document.getElementById('cmc-result').classList.add('show');
+function renderCMC() {
+  const b = cmcState.basics;
+  const bs = document.getElementById('cmc-basics');
+  if (bs) bs.innerHTML = `
+    <div class="cmc-basics-title">Basics</div>
+    <div class="cmc-basics-row">
+      <label class="cmc-b-field"><span>גיל</span><input type="number" value="${b.age}" onchange="cmcState.basics.age=parseInt(this.value)||0;computeCMC()"></label>
+      <label class="cmc-b-field"><span>מין</span><select onchange="cmcState.basics.sex=this.value;computeCMC()"><option value="m" ${b.sex === 'm' ? 'selected' : ''}>זכר</option><option value="f" ${b.sex === 'f' ? 'selected' : ''}>נקבה</option></select></label>
+      <label class="cmc-b-field"><span>מדינה/אזור החוזה</span><input type="text" value="${b.country}" onchange="cmcState.basics.country=this.value"></label>
+    </div>`;
+  const cr = document.getElementById('cmc-chip-row');
+  if (cr) cr.innerHTML = '<div class="cmc-basics-title">מקטעים (לחצו להוספה/הסרה)</div><div class="cmc-chips">' + CMC_SECTIONS.map(s =>
+    `<button class="cmc-chip ${cmcState.active[s.key] ? 'active' : ''}" onclick="toggleCmcSection('${s.key}')"><span class="cmc-chip-ic">${s.icon}</span>${s.label}</button>`).join('') + '</div>';
+  const sw = document.getElementById('cmc-sections');
+  if (sw) sw.innerHTML = CMC_SECTIONS.filter(s => cmcState.active[s.key]).map(cmcSectionHtml).join('')
+    || '<div class="uw-summary-empty" style="margin:8px 0;">בחר/י מקטע אחד או יותר להזנת נתונים</div>';
 }
+function cmcSectionHtml(s) {
+  const fields = s.fields.map(f => {
+    if (f.options) {
+      const opts = f.options.map(o => `<option value="${o[0]}" ${cmcState.values[f.id] === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('');
+      return `<div class="form-field"><label class="form-label">${f.label}</label><select class="form-select" onchange="cmcSet('${f.id}',this.value)">${opts}</select></div>`;
+    }
+    const unit = f.units ? `<select class="cmc-unit" onchange="cmcState.units['${f.id}']=this.value;computeCMC()">${f.units.map(u => `<option value="${u}" ${cmcState.units[f.id] === u ? 'selected' : ''}>${u}</option>`).join('')}</select>` : '';
+    const val = cmcState.values[f.id] == null ? '' : cmcState.values[f.id];
+    return `<div class="form-field"><label class="form-label">${f.label}</label><div class="cmc-num-wrap"><input type="number" class="form-input" value="${val}" onchange="cmcSet('${f.id}',this.value)">${unit}</div></div>`;
+  }).join('');
+  return `<div class="cmc-section"><div class="cmc-section-head"><span class="cmc-chip-ic">${s.icon}</span>${s.label}</div><div class="form-grid">${fields}</div></div>`;
+}
+function cmcSet(id, val) { cmcState.values[id] = val; computeCMC(); }
+function toggleCmcSection(key) { cmcState.active[key] = !cmcState.active[key]; renderCMC(); computeCMC(); }
+function resetCMC() {
+  cmcState.active = { build: true, bp: true, bloods: true, lipids: true, lifestyle: true, cardiac: false, family: false };
+  Object.assign(cmcState.values, { height: 183, weight: 79, waist: 94, sys: 119, dia: 78, hba1c: 5.4, glucose: 92, chol: 190, hdl: 47.5, ldl: 120, tg: 110, alcohol: 0, diabetes: 'no', bpmeds: 'no', smoke: 'never', cardiac: 'none', famcvd: 'no', famdm: 'no' });
+  renderCMC(); computeCMC();
+}
+function _cmcNum(id) { return parseFloat(cmcState.values[id]); }
+function computeCMC() {
+  const v = cmcState.values, u = cmcState.units, A = cmcState.active;
+  const heightCm = u.height === 'in' ? _cmcNum('height') * 2.54 : _cmcNum('height');
+  const weightKg = u.weight === 'lb' ? _cmcNum('weight') / 2.2046 : _cmcNum('weight');
+  const waistCm = u.waist === 'in' ? _cmcNum('waist') * 2.54 : _cmcNum('waist');
+  const bmi = (heightCm > 0 && weightKg > 0) ? weightKg / Math.pow(heightCm / 100, 2) : NaN;
+  const mg = (id) => u[id] === 'mmol/L' ? _cmcNum(id) * 38.67 : _cmcNum(id);
+  const sys = _cmcNum('sys'), hba1c = _cmcNum('hba1c'), chol = mg('chol'), hdl = mg('hdl'), alcohol = _cmcNum('alcohol');
+  const diabetes = v.diabetes, bpmeds = v.bpmeds, smoke = v.smoke, cardiac = v.cardiac, famcvd = v.famcvd;
+  const age = cmcState.basics.age, sex = cmcState.basics.sex;
 
-function clearCMC() {
-  cmcFields.forEach(id => {
-    const el = document.getElementById(id);
-    el.value = '';
-    el.classList.remove('error');
-  });
-  document.getElementById('cmc-error').classList.remove('show');
-  document.getElementById('cmc-result').classList.remove('show');
+  const factors = []; const add = (l, d, r) => factors.push({ label: l, detail: d, ratio: r });
+  if (A.build) {
+    if (!isNaN(bmi)) { const r = bmi >= 40 ? 1.9 : bmi >= 35 ? 1.6 : bmi >= 30 ? 1.3 : bmi >= 27 ? 1.1 : 1.0; add('BMI', bmi.toFixed(1), r); }
+    const wt = sex === 'f' ? 88 : 102;
+    if (waistCm > 0) { const r = waistCm >= wt + 15 ? 1.25 : waistCm >= wt ? 1.1 : 1.0; if (r > 1) add('היקף מותניים', Math.round(waistCm) + 'cm', r); }
+  }
+  if (A.bp && sys > 0) { let r = sys >= 180 ? 1.9 : sys >= 160 ? 1.55 : sys >= 140 ? 1.3 : 1.0; if (bpmeds === 'yes' && r < 1.15) r = 1.15; add('ל״ד' + (bpmeds === 'yes' ? ' (מטופל)' : ''), sys + ' mmHg', r); }
+  if (A.bloods) {
+    let r;
+    if (diabetes === 'type1' || diabetes === 'type2') { r = hba1c > 8 ? 2.4 : hba1c > 7 ? 1.9 : hba1c >= 6.5 ? 1.5 : 1.3; if (diabetes === 'type1') r = Math.round(r * 1.1 * 100) / 100; }
+    else if (diabetes === 'pre') { r = hba1c >= 6 ? 1.2 : 1.1; }
+    else { r = hba1c >= 6.5 ? 1.3 : hba1c >= 5.7 ? 1.1 : 1.0; }
+    add('HbA1c/סוכרת', (isNaN(hba1c) ? '—' : hba1c + '%') + ' · ' + ({ no: 'ללא', pre: 'Pre', type2: 'T2', type1: 'T1' }[diabetes] || ''), r);
+  }
+  if (A.lipids && hdl > 0) { const chr = chol / hdl; const r = chr >= 7 ? 1.5 : chr >= 6 ? 1.35 : chr >= 5 ? 1.2 : chr >= 4.5 ? 1.1 : 1.0; if (r > 1) add('כולסטרול/HDL', chr.toFixed(1), r); }
+  if (A.lifestyle) {
+    const r = smoke === 'current' ? 1.5 : smoke === 'past' ? 1.15 : 1.0; if (r > 1) add('עישון', { current: 'פעיל', past: 'בעבר' }[smoke], r);
+    if (alcohol >= 35) add('אלכוהול', alcohol + ' יח׳', 1.2); else if (alcohol >= 21) add('אלכוהול', alcohol + ' יח׳', 1.1);
+  }
+  if (A.cardiac && cardiac && cardiac !== 'none') { const r = cardiac === 'mi' ? 1.75 : cardiac === 'angina' ? 1.5 : cardiac === 'arr' ? 1.3 : 1.0; add('לב', { angina: 'אנגינה', mi: 'אוטם', arr: 'הפרעת קצב' }[cardiac], r); }
+  if (A.family && famcvd === 'yes') add('היסטוריה משפחתית', 'CVD מוקדם', 1.15);
+  const rAge = age >= 60 ? 1.1 : age >= 50 ? 1.05 : 1.0; add('גיל', age + (sex === 'f' ? ' · נקבה' : ' · זכר'), rAge);
+
+  const product = factors.reduce((p, f) => p * f.ratio, 1);
+  let loading = Math.round((product - 1) * 100 / 25) * 25; if (loading < 0) loading = 0;
+  let comps = 0; factors.forEach(f => { if (['BMI', 'ל״ד', 'HbA1c/סוכרת', 'כולסטרול/HDL', 'היקף מותניים'].some(k => f.label.startsWith(k)) && f.ratio > 1) comps++; });
+  const metSyn = comps >= 3, decline = product >= 4 || loading > 300;
+
+  const valEl = document.getElementById('cmc-result-value'); if (!valEl) return;
+  valEl.textContent = decline ? 'שקול דחייה / מבטח משנה' : '+' + loading + '%';
+  valEl.style.fontSize = decline ? '18px' : '';
+  const rows = factors.map(f => `<div class="cmc-bd-row ${f.ratio > 1 ? 'up' : ''}"><span class="cmc-bd-f">${f.label} <span style="color:var(--text-light)">(${f.detail})</span></span><span class="cmc-bd-r">×${f.ratio.toFixed(2)}</span></div>`).join('');
+  const flag = metSyn ? `<div class="cmc-flag">⚠ אשכול מטבולי — ${comps} גורמים משולבים (Metabolic syndrome)</div>` : '';
+  document.getElementById('cmc-result-note').innerHTML = `<div class="cmc-bd">${rows}<div class="cmc-bd-total"><span>דירוג משולב (מכפלה)</span><span class="cmc-bd-r">×${product.toFixed(2)} → +${loading}%</span></div></div>${flag}<div style="margin-top:7px;font-size:10.5px;color:var(--text-light);">הדירוג מצרפי — מכפלת יחסי התמותה, לא סכום התוספות.</div>`;
+  document.getElementById('cmc-result').classList.add('show');
 }
 
 // =====================================================================
@@ -5580,15 +5788,9 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
 // LANDING PAGE — POLICY SEARCH
 // =====================================================================
 function submitLogin() {
-  const user = (document.getElementById('login-user').value || '').trim();
-  const pass = (document.getElementById('login-pass').value || '').trim();
+  // demo: any username / password is accepted
   const err = document.getElementById('login-error');
-  if (!user || !pass) {
-    err.textContent = 'יש להזין שם משתמש וסיסמה';
-    err.classList.add('show');
-    return;
-  }
-  err.classList.remove('show');
+  if (err) err.classList.remove('show');
   document.getElementById('login').classList.add('hidden');
   const li = document.getElementById('landing-input');
   if (li) li.focus();
@@ -5602,12 +5804,11 @@ function fmtDateTime(iso) {
   return dp.length === 3 ? `${dp[2]}.${dp[1]}.${dp[0]}${time ? ' ' + time : ''}` : iso;
 }
 
-// open processes waiting for underwriting for an ID (mock: the real one + 2 extras)
+// open processes waiting for underwriting for an ID
 function processListFor(p) {
   return [
-    { processId: p.processId, requestType: p.requestType, date: p.requestOpenDate, note: p.clerkNotesToUnderwriter, primary: true },
-    { processId: 'PRC-2026-00098', requestType: 'SHINUIM', date: '2026-06-22T11:10:00', note: 'עדכון מוטבים — ללא שינוי חיתומי מהותי.' },
-    { processId: 'PRC-2026-00074', requestType: 'SHINUIM_MUNCHIM', date: '2026-05-30T15:40:00', note: 'הגדלת סכום ביטוח — נדרש חיתום מחדש.' },
+    { processId: 'PRC-2026-00111', requestType: 'HAFAKA', date: '2026-07-07T09:30:00', note: 'מבוטח יחיד, מבקש הרחבת כיסוי. סתירת עישון — לבדיקת חתם.', supported: true },
+    { processId: 'PRC-2026-00122', requestType: 'SHINUIM', date: '2026-06-18T14:05:00', note: '', supported: false },
   ];
 }
 
@@ -5621,34 +5822,45 @@ function submitPolicySearch() {
   const val = (document.getElementById('landing-input').value || '').trim();
   const err = document.getElementById('landing-error');
   const p = patients[0];
-  // quick demo shortcuts → straight to the underwriting screen
-  const direct = val === '1' || val === '111';
-  const ok = direct || val === p.id || (p.policy && val === p.policy) ||
-    val.toLowerCase() === (p.processId || '').toLowerCase();
+  const ok = val === '111' || val === p.id;
   if (!ok) {
-    err.textContent = 'לא נמצא. נסה/י מזהה תהליך 1 או ת״ז 046262002';
+    err.textContent = 'ת״ז לא נמצאה. נסה/י 111';
     err.classList.add('show');
     return;
   }
   err.classList.remove('show');
-  if (direct) { openUwScreen(); return; }   // "1" → open Ronen's underwriting screen directly
-  openProcessList();                         // ת״ז → list of open process IDs
+  openProcessList();
 }
 
 function openProcessList() {
   const p = patientsState[0];
   const list = processListFor(p);
   document.getElementById('proc-popup-meta').textContent =
-    `ת״ז ${p.id} · ${p.name} · ${list.length} מזהי תהליך פתוחים`;
-  document.getElementById('proc-popup-body').innerHTML = list.map(pr => `
-    <button class="proc-row" onclick="chooseProcess('${pr.processId}')">
-      <span class="proc-id">${pr.processId}</span>
-      <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
-      <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}${pr.primary ? ' · <b style="color:var(--mig-blue);">לחיתום כעת</b>' : ''}</span>
-    </button>
-    <div class="proc-note" style="margin:-4px 4px 11px;">${escapeHtml(pr.note || '')}</div>
-  `).join('');
+    `ת״ז ${p.id} · ${p.name} · ${list.length} מזהי תהליך`;
+  document.getElementById('proc-popup-body').innerHTML = list.map(pr => {
+    if (pr.supported) {
+      return `
+        <button class="proc-row" onclick="chooseProcess('${pr.processId}')">
+          <span class="proc-id">${pr.processId}</span>
+          <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+          <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)} · <b style="color:var(--mig-blue);">לחיתום כעת</b></span>
+        </button>
+        <div class="proc-note" style="margin:-4px 4px 11px;">${escapeHtml(pr.note || '')}</div>`;
+    }
+    return `
+      <button class="proc-row proc-row-disabled" onclick="unsupportedProcess('${pr.processId}')">
+        <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
+        <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+        <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
+      </button>
+      <div class="proc-note proc-note-warn" id="proc-warn-${pr.processId}" style="margin:-4px 4px 11px;">⚠ תהליך לא נתמך במערכת</div>`;
+  }).join('');
   document.getElementById('proc-popup').classList.add('open');
+}
+
+function unsupportedProcess(id) {
+  const el = document.getElementById('proc-warn-' + id);
+  if (el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 700); }
 }
 
 function chooseProcess(id) {
@@ -5658,6 +5870,8 @@ function chooseProcess(id) {
 
 (function init() {
   buildGenericCalcs();
+  renderCMC();
+  computeCMC();
   switchMainTab('scout');
   renderHeader();
   renderHealthBar();
@@ -5672,12 +5886,7 @@ function chooseProcess(id) {
   renderUwSummary();
   renderAllFeedback();
   updateAgg();
-
-  // --- TEMP: bypass the login/landing flow — open Ronen's underwriting screen directly.
-  //     The flow code is kept intact (submitLogin / submitPolicySearch / process list);
-  //     to restore it, remove these two lines. ---
-  const _lg = document.getElementById('login'); if (_lg) _lg.classList.add('hidden');
-  const _ld = document.getElementById('landing'); if (_ld) _ld.classList.add('hidden');
+  // login → enter ID → process list is the entry flow (no bypass)
 })();
 </script>
 </body>
