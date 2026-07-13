@@ -3641,7 +3641,7 @@ function renderHeader() {
   // no auto-selection: on open no coverage is selected (viewer mode)
   const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || null;
   const selReasons = (selRg && selRg.reasons) ? selRg.reasons : (p.reasons || []);
-  const tagsHtml = selReasons.map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
+  const tagsHtml = (p.reasons || []).map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—'; // insured-level (ת״ז), not per coverage
   const rgTagsHtml = groups.map(g => {
     if (!SUPPORTED_COVERAGES.includes(g.riskGroupCode)) {
       return `<span class="tag rg-tag disabled" title="כיסוי לא נתמך לחיתום">${escapeHtml(g.riskGroupName)}</span>`;
@@ -3672,13 +3672,13 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
+    <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">כיסויים <span style="font-weight:400;color:var(--text-light);">(בחרו)</span></div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש${selRg ? ` <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName)}</span>` : ''}</div><div class="hd-value" style="font-size:12px;">${reqAmount}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${exiAmount}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
   `;
 }
 
