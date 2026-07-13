@@ -3625,6 +3625,7 @@ function selectCoverage(code) {
   renderDiagnoses();          // re-render item cards for the new group's underwriting
   renderLifestyle();
   renderGroupSummary();       // per-group bottom summary for the new group
+  renderFinancial();          // financial amount follows the selected group's requested sum
   updateFinancialVisibility();
 }
 
@@ -5169,7 +5170,11 @@ function renderFinancial() {
   const wrap = document.getElementById('financial-list');
   if (!wrap) return;
   const fin = getFinancial();
-  const res = financialEval(fin.purpose, fin.amount);
+  // financial amount is locked to the selected risk group's requested sum (read-only)
+  const rg = (patientsState[currentIdx].riskGroups || []).find(r => r.riskGroupCode === selectedRgCode);
+  const amount = (rg && rg.requestedAmount != null) ? rg.requestedAmount : (fin.amount || 0);
+  fin.amount = amount;
+  const res = financialEval(fin.purpose, amount);
   const pill = res.required
     ? '<span class="fin-pill fin-pill-yes">נדרש חיתום פיננסי</span>'
     : '<span class="fin-pill fin-pill-no">לא נדרש חיתום פיננסי</span>';
@@ -5184,13 +5189,13 @@ function renderFinancial() {
             <select onchange="onFinChange('purpose', this.value)">${purposeOpts}</select>
           </label>
           <label>סכום מבוקש (₪):
-            <input type="number" min="0" step="100000" value="${fin.amount}" onchange="onFinChange('amount', this.value)" style="width:130px;">
+            <input type="number" value="${amount}" readonly title="נעול — שווה לסכום המבוקש של קבוצת הסיכון" style="width:130px;background:var(--bg-hover);color:var(--text-muted);cursor:not-allowed;">
           </label>
         </div>
         <div class="fin-verdict">${pill}</div>
       </div>
       <div class="fin-body">
-        <div class="fin-bracket"><strong>סכום מבוקש:</strong> ${fmtMoney(fin.amount)} · <strong>מדרגה:</strong> ${res.bracket} — תהליך בינארי (כן/לא), ללא החרגות, מבוסס חישוב.</div>
+        <div class="fin-bracket"><strong>סכום מבוקש:</strong> ${fmtMoney(amount)} <span style="color:var(--text-light);">(נעול — כסכום המבוקש)</span> · <strong>מדרגה:</strong> ${res.bracket} — תהליך בינארי (כן/לא), ללא החרגות, מבוסס חישוב.</div>
         <ul class="fin-reqs">${reqs}</ul>
         <button class="fin-rules-toggle" onclick="toggleFinRules()">הצג/הסתר טבלת כללי החיתום הפיננסי המלאה ▸</button>
         <div class="fin-rules" id="fin-rules">
