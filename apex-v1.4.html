@@ -2327,6 +2327,8 @@
   }
   .tag.rg-tag:hover { background:var(--bg-hover); border-color:var(--mig-blue); color:var(--mig-blue); }
   .tag.rg-tag.active { background:var(--mig-blue); color:#fff; border-color:var(--mig-blue); box-shadow:0 2px 6px rgba(37,86,158,.28); }
+  .tag.rg-tag.disabled { cursor:not-allowed; opacity:.5; background:var(--bg-hover); color:var(--text-light); }
+  .tag.rg-tag.disabled:hover { background:var(--bg-hover); color:var(--text-light); border-color:var(--mig-line); }
   .tags-row { gap:8px; }
 
   /* in-section tab bar for the per-risk-group underwriting form */
@@ -2553,7 +2555,7 @@
 
     <div>
       <div class="section-head">
-        <div class="section-title">חיתום פר קבוצת סיכון</div>
+        <div class="section-title">חיתום פר כיסוי</div>
         <div class="feedback-btns" id="fb-rguw"></div>
       </div>
       <div id="rg-reject-banner"></div>
@@ -2632,7 +2634,7 @@
 <!-- ===== FOOTER ===== -->
 <div id="footer">
   <div class="footer-item">
-    <span class="footer-label">תוספות פר קבוצת סיכון:</span>
+    <span class="footer-label">תוספות פר כיסוי:</span>
     <span class="footer-rg-chips" id="footer-rg"></span>
   </div>
   <span class="footer-sep">|</span>
@@ -2647,9 +2649,8 @@
   </div>
   <div class="footer-actions">
     <button class="footer-save-btn" onclick="openNoUnderwriting()">לא נדרש חיתום</button>
-    <button class="footer-save-btn" onclick="openUwOverview()">סיכום חיתום</button>
     <button class="footer-save-btn">שמור טיוטה</button>
-    <button class="footer-submit-btn" onclick="openApprovalPopup()">שלח לאישור ▸</button>
+    <button class="footer-submit-btn" onclick="openUwOverview()">שלח לאישור ▸</button>
   </div>
 </div>
 
@@ -2658,10 +2659,11 @@
   <div class="popup-box" style="max-width:820px;">
     <div class="popup-header">
       <div>
-        <div class="popup-title">סיכום חיתום — תצוגה חוצה קבוצות סיכון</div>
+        <div class="popup-title">סיכום חיתום — תצוגה חוצה כיסויים</div>
         <div class="popup-meta" id="overview-meta"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
+        <button class="footer-submit-btn" onclick="proceedToApproval()">לחץ לאישור ▸</button>
         <button class="doc-action-btn" onclick="printOverview()">🖨 הדפס / ייצוא</button>
         <button class="popup-close" onclick="closePopup('overview-popup')">✕ סגור</button>
       </div>
@@ -2895,7 +2897,7 @@
   <div class="popup-box" style="max-width:420px;">
     <div class="popup-header">
       <div>
-        <div class="popup-title">תוספת זמנית לקבוצת סיכון</div>
+        <div class="popup-title">תוספת זמנית לכיסוי</div>
         <div class="popup-meta" id="temp-popup-meta"></div>
       </div>
       <button class="popup-close" onclick="closePopup('temp-popup')">✕ סגור</button>
@@ -3490,10 +3492,7 @@ function rgTempLabel(rg) {
   return parts.join(' / ') + (rg.tempUntil ? ' · עד ' + fmtDate(rg.tempUntil) : '');
 }
 function renderRgUnderwriting() {
-  // V1.4: the section renders the per-group summary (from signed item×group cells)
-  const p = patientsState[currentIdx];
-  const groups = riskGroupsOf(p);
-  if (groups.length && (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode))) selectedRgCode = groups[0].riskGroupCode;
+  // V1.4: per-coverage summary (only when a coverage is selected)
   renderGroupSummary();
 }
 function rgUwRow(rg) {
@@ -3613,19 +3612,21 @@ function requestTypeLabel(t) {
   return { HAFAKA: 'הפקה', SHINUIM: 'שינויים', SHINUIM_MUNCHIM: 'שינויים מונחים' }[t] || t || '—';
 }
 
-let selectedRgCode = null; // header coverage selector → drives requested/existing amount + reasons
+let selectedRgCode = null; // active coverage; null on open (viewer mode — no coverage selected)
+const SUPPORTED_COVERAGES = ['RISK', 'ACC_DIS', 'MORTGAGE']; // clickable/underwritable coverages (אכ״ע not yet supported)
 const FINANCIAL_COVERAGES = ['RISK', 'MORTGAGE']; // financial underwriting only for ריסק + ביטוח משכנתא
 function updateFinancialVisibility() {
   const sec = document.getElementById('financial-section');
   if (sec) sec.style.display = FINANCIAL_COVERAGES.includes(selectedRgCode) ? '' : 'none';
 }
 function selectCoverage(code) {
-  selectedRgCode = code;      // active risk-group tab = context of the whole screen
-  renderHeader();             // active button + requested/existing amount + reasons
-  renderDiagnoses();          // re-render item cards for the new group's underwriting
+  if (!SUPPORTED_COVERAGES.includes(code)) return;   // unsupported coverage — not clickable
+  selectedRgCode = (selectedRgCode === code) ? null : code; // toggle: click active to deselect (back to viewer)
+  renderHeader();
+  renderDiagnoses();          // item underwriting cards appear only when a coverage is selected
   renderLifestyle();
-  renderGroupSummary();       // per-group bottom summary for the new group
-  renderFinancial();          // financial amount follows the selected group's requested sum
+  renderGroupSummary();
+  renderFinancial();
   updateFinancialVisibility();
 }
 
@@ -3637,15 +3638,19 @@ function renderHeader() {
   const pb = document.getElementById('process-badge');
   if (pb) pb.title = 'סוג בקשה: ' + requestTypeLabel(p.requestType) + (p.clerkNotesToUnderwriter ? ' · הערת רפרנטית: ' + p.clerkNotesToUnderwriter : '');
   const groups = riskGroupsOf(p);
-  if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) {
-    selectedRgCode = groups[0] ? groups[0].riskGroupCode : null;
-  }
-  const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || {};
-  const selReasons = selRg.reasons || p.reasons || [];
+  // no auto-selection: on open no coverage is selected (viewer mode)
+  const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || null;
+  const selReasons = (selRg && selRg.reasons) ? selRg.reasons : (p.reasons || []);
   const tagsHtml = selReasons.map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
-  const rgTagsHtml = groups.map(g =>
-    `<span class="tag rg-tag ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')" title="בחר קבוצת סיכון — משפיע על סכום מבוקש / קיים / סיבות חיתום">${escapeHtml(g.riskGroupName)}</span>`).join('') || '—';
-  const fmtAmt = (rg, key) => (rg[key] == null ? '—' : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : ''));
+  const rgTagsHtml = groups.map(g => {
+    if (!SUPPORTED_COVERAGES.includes(g.riskGroupCode)) {
+      return `<span class="tag rg-tag disabled" title="כיסוי לא נתמך לחיתום">${escapeHtml(g.riskGroupName)}</span>`;
+    }
+    return `<span class="tag rg-tag ${g.riskGroupCode === selectedRgCode ? 'active' : ''}" onclick="selectCoverage('${g.riskGroupCode}')" title="בחר/י כיסוי לחיתום">${escapeHtml(g.riskGroupName)}</span>`;
+  }).join('') || '—';
+  const amt = (rg, key) => (!rg || rg[key] == null) ? null : fmtMoney(rg[key]) + (rg.amountIsMonthly ? ' לחודש' : '');
+  const reqAmount = selRg ? (amt(selRg, 'requestedAmount') || '—') : (p.sumRequested || '—');
+  const exiAmount = selRg ? (amt(selRg, 'existingAmount') || '—') : (p.sumExisting || '—');
   document.getElementById('header-data').innerHTML = `
     <div class="hd-field"><div class="hd-label">מזהה תהליך</div><div class="hd-value ltr">${p.processId || '—'}</div></div>
     <div class="divider-v"></div>
@@ -3667,11 +3672,11 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">קבוצות סיכון <span style="font-weight:400;color:var(--text-light);">(בחרו)</span></div><div class="tags-row">${rgTagsHtml}</div></div>
+    <div class="hd-field"><div class="hd-label">כיסויים <span style="font-weight:400;color:var(--text-light);">(בחרו)</span></div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום מבוקש <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName || '')}</span></div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'requestedAmount')}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום מבוקש${selRg ? ` <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName)}</span>` : ''}</div><div class="hd-value" style="font-size:12px;">${reqAmount}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${fmtAmt(selRg, 'existingAmount')}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${exiAmount}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${tagsHtml}</div></div>
   `;
@@ -4369,7 +4374,7 @@ function openDxSummaryRg(code) {
       <input type="text" value="${escapeHtml(c.exclusionText)}" placeholder="טקסט החרגה — יופיע במכתב" onchange="onUwCellChange('${code}','exclusionText',this.value)"></div>
     <div class="uwm-field full"><label>הערות חתם / נימוק להחלטה</label>
       <textarea rows="3" style="resize:vertical;" onchange="onUwCellChange('${code}','freeText',this.value)">${escapeHtml(c.freeText || '')}</textarea></div>
-    <label class="uwm-reject-row"><input type="checkbox" ${c.decision === 'REJECTION' ? 'checked' : ''} onchange="onUwReject('${code}',this.checked)"> דחיית קבוצת הסיכון (בגין ${escapeHtml(findingCode(f))}) — תגרור דחיית מזהה התהליך</label>
+    <label class="uwm-reject-row"><input type="checkbox" ${c.decision === 'REJECTION' ? 'checked' : ''} onchange="onUwReject('${code}',this.checked)"> דחיית הכיסוי (בגין ${escapeHtml(findingCode(f))}) — תגרור דחיית מזהה התהליך</label>
   `;
   document.getElementById('dxsum-popup').classList.add('open');
 }
@@ -4406,6 +4411,7 @@ function itemAddText(c) {
 // ---- per-item underwriting card (for the ACTIVE risk-group tab) ----
 function itemUwCard(type, ref, f) {
   const code = selectedRgCode;
+  if (!code) return '';   // viewer mode — no coverage selected → no underwriting card
   const c = f.uw[code] || (f.uw[code] = _cell(code, 'CLEAN'));
   // exclusion available only for coverages other than ריסק / ביטוח משכנתא
   const showExcl = code !== 'RISK' && code !== 'MORTGAGE';
@@ -4571,7 +4577,7 @@ function renderGroupSummary() {
   const wrap = document.getElementById('rg-underwriting'); if (!wrap) return;
   const p = patientsState[currentIdx]; const code = selectedRgCode;
   const rg = riskGroupsOf(p).find(r => r.riskGroupCode === code);
-  if (!rg) { wrap.innerHTML = ''; return; }
+  if (!rg) { wrap.innerHTML = '<div class="uw-summary-empty" style="padding:10px 0;">בחר/י כיסוי מהכיסויים שבכותרת כדי לבצע חיתום (אכ״ע אינו נתמך כרגע).</div>'; return; }
   const items = groupSignedItems(p, code);
   const t = groupTotals(p, code);
   const lines = items.length ? items.map(it => {
@@ -4580,14 +4586,14 @@ function renderGroupSummary() {
       ? ` <span class="gs-temp">⏱ זמנית ${escapeHtml(tempLabel(c))}</span>` : '';
     const exl = itemHasExcl(c) ? ` <span class="gs-excl">⊘ החרגה (${itemExclList(c).length})</span>` : '';
     return `<div class="gs-line"><span class="gs-item">${escapeHtml(itemKind(it.f))}: <b>${escapeHtml(findingCode(it.f))}</b></span><span class="gs-val">${escapeHtml(add)}${tmp}${exl}</span></div>`;
-  }).join('') : '<div class="uw-summary-empty">טרם נחתמו פריטים בקבוצת סיכון זו</div>';
+  }).join('') : '<div class="uw-summary-empty">טרם נחתמו פריטים בכיסוי זו</div>';
   const cancelPct = +rg.cancelPct || 0, cancelPer = +rg.cancelPermille || 0;
   const finalPct = Math.max(0, t.pct - cancelPct), finalPer = Math.max(0, t.per - cancelPer);
   const savedBadge = rg.savedStatus ? `<span class="gs-saved">✓ נשמר · ${escapeHtml(rg.riskGroupName)}</span>` : '';
   const reasonReq = (cancelPct || cancelPer) && !(rg.cancelReason || '').trim();
   wrap.innerHTML = `
     <div class="gs-card">
-      <div class="gs-head">סיכום קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b> ${savedBadge}</div>
+      <div class="gs-head">סיכום כיסוי: <b>${escapeHtml(rg.riskGroupName)}</b> ${savedBadge}</div>
       <div class="gs-lines">${lines}</div>
       <div class="gs-row gs-total"><span>סך תוספות (אדיטיבי)</span><span class="gs-total-val">${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</span></div>
       <div class="gs-cancel">
@@ -4597,8 +4603,8 @@ function renderGroupSummary() {
         </div>
         <input type="text" class="gs-cancel-reason ${reasonReq ? 'req' : ''}" placeholder="הסבר לתוספת מתבטלת (חובה)" value="${escapeHtml(rg.cancelReason || '')}" onchange="onGroupCancel('reason',this.value)">
       </div>
-      <label class="itemuw-note-lbl">הערות (קבוצת סיכון)</label>
-      <textarea class="gs-notes" rows="2" placeholder="הערות ברמת קבוצת הסיכון" onchange="onGroupNotes(this.value)">${escapeHtml(rg.groupNotes || '')}</textarea>
+      <label class="itemuw-note-lbl">הערות (כיסוי)</label>
+      <textarea class="gs-notes" rows="2" placeholder="הערות ברמת הכיסוי" onchange="onGroupNotes(this.value)">${escapeHtml(rg.groupNotes || '')}</textarea>
       <div class="gs-final-calc">סך תוספות: <b>${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</b> → תוספת מתבטלת: <b>−${fmtNum(cancelPct)}%${cancelPer ? (' · −' + fmtPermille(cancelPer)) : ''}</b> → סך הכל סופי: <b class="gs-final-b">${fmtNum(finalPct)}%${finalPer ? (' · ' + fmtPermille(finalPer)) : ''}</b></div>
       <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
         <button class="submit-btn" onclick="saveGroup()">שמור</button>
@@ -4639,6 +4645,11 @@ function saveGroup() {
 }
 
 // ---- cross-group "סיכום חיתום" modal (read-only) ----
+// from the summary screen → open the existing approval actions (issue / missing / loadings letters …)
+function proceedToApproval() {
+  closePopup('overview-popup');
+  openApprovalPopup();
+}
 function openUwOverview() {
   const p = patientsState[currentIdx];
   const html = riskGroupsOf(p).map(rg => {
@@ -4660,7 +4671,7 @@ function openUwOverview() {
     const cancelLine = (cancelPct || cancelPer) ? `<div class="ov-cancel">תוספת מתבטלת: −${fmtNum(cancelPct)}%${cancelPer ? (' · −' + fmtPermille(cancelPer)) : ''}${(rg.cancelReason || '').trim() ? (' · הסבר: ' + escapeHtml(rg.cancelReason)) : ''}</div>` : '';
     const notesLine = (rg.groupNotes || '').trim() ? `<div class="ov-cancel">הערות: ${escapeHtml(rg.groupNotes)}</div>` : '';
     return `<div class="ov-group">
-      <div class="ov-group-head">▸ קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b>${rg.savedStatus ? ' <span class="gs-saved">✓ נשמר</span>' : ''}</div>
+      <div class="ov-group-head">▸ כיסוי: <b>${escapeHtml(rg.riskGroupName)}</b>${rg.savedStatus ? ' <span class="gs-saved">✓ נשמר</span>' : ''}</div>
       <div class="ov-items">${itemsHtml}</div>
       <div class="ov-sep"></div>
       <div class="ov-tot">סך תוספות: <b>${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</b></div>
@@ -4684,7 +4695,7 @@ function updateAgg() {
   const banner = document.getElementById('rg-reject-banner');
   if (banner) {
     banner.innerHTML = rejectedGroups.length
-      ? `<div class="rg-reject-banner"><span>⚠</span><span>מזהה התהליך יידחה — דחייה בקבוצת סיכון ${rejectedGroups.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}. לא מבוצעת אגרגציה רגילה; יופק מכתב דחייה ברמת מזהה התהליך.</span></div>`
+      ? `<div class="rg-reject-banner"><span>⚠</span><span>מזהה התהליך יידחה — דחייה בכיסוי ${rejectedGroups.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}. לא מבוצעת אגרגציה רגילה; יופק מכתב דחייה ברמת מזהה התהליך.</span></div>`
       : '';
   }
 
@@ -4709,10 +4720,10 @@ function updateAgg() {
           <span class="rgsum-total ${isReject ? 'reject' : isClean ? 'clean' : ''}">${isReject ? '⚠ דחייה' : 'סה״כ ' + escapeHtml(label)}</span>
         </div>
         <div class="rgsum-detail">${detail}</div>
-        <div class="rgsum-cancel"><span class="rgsum-cancel-lbl">תוספת מתבטלת:</span><input type="text" class="rgsum-cancel-inp" value="${escapeHtml(rg.cancellingAddition || '')}" placeholder="—" title="תוספת מתבטלת עבור קבוצת סיכון זו" onchange="onRgCancellingChange('${rg.riskGroupCode}', this.value)"></div>
+        <div class="rgsum-cancel"><span class="rgsum-cancel-lbl">תוספת מתבטלת:</span><input type="text" class="rgsum-cancel-inp" value="${escapeHtml(rg.cancellingAddition || '')}" placeholder="—" title="תוספת מתבטלת עבור כיסוי זו" onchange="onRgCancellingChange('${rg.riskGroupCode}', this.value)"></div>
         ${exclLine}
       </div>`;
-    }).join('') : '<div class="uw-summary-empty">אין קבוצות סיכון למבוטח זה</div>';
+    }).join('') : '<div class="uw-summary-empty">אין כיסויים למבוטח זה</div>';
   }
 
   // --- footer chips ---
@@ -5189,7 +5200,7 @@ function renderFinancial() {
             <select onchange="onFinChange('purpose', this.value)">${purposeOpts}</select>
           </label>
           <label>סכום מבוקש (₪):
-            <input type="number" value="${amount}" readonly title="נעול — שווה לסכום המבוקש של קבוצת הסיכון" style="width:130px;background:var(--bg-hover);color:var(--text-muted);cursor:not-allowed;">
+            <input type="number" value="${amount}" readonly title="נעול — שווה לסכום המבוקש של הכיסוי" style="width:130px;background:var(--bg-hover);color:var(--text-muted);cursor:not-allowed;">
           </label>
         </div>
         <div class="fin-verdict">${pill}</div>
@@ -5385,7 +5396,7 @@ function runApproval(action) {
 function openLoadingsLetter() {
   const p = patientsState[currentIdx];
   const totals = computeRiskGroupTotals(p);
-  document.getElementById('loading-popup-title').textContent = 'מכתב פירוט תוספות — פר קבוצת סיכון';
+  document.getElementById('loading-popup-title').textContent = 'מכתב פירוט תוספות — פר כיסוי';
   document.getElementById('loading-popup-meta').textContent = `מזהה תהליך ${p.processId} · ${p.name} · ת״ז ${p.id}`;
   const rows = riskGroupsOf(p).map(rg => {
     const a = totals[rg.riskGroupCode];
@@ -5396,9 +5407,9 @@ function openLoadingsLetter() {
   }).join('');
   document.getElementById('loading-popup-body').innerHTML = `
     <div class="loading-table-wrap"><table class="loading-table">
-      <thead><tr><th>קבוצת סיכון</th><th>פירוט תוספות (פר אבחנה)</th><th>סה״כ</th></tr></thead>
+      <thead><tr><th>כיסוי</th><th>פירוט תוספות (פר אבחנה)</th><th>סה״כ</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
-    <div class="table-note">כל שורה = הטלת מטריצת האבחנה × קבוצת הסיכון לאותה קבוצה. ל-BPR משודרת תוספת מצרפית אחת פר קבוצת סיכון (UnderwritingAddition), והפירוט הטקסטואלי (detailText) נשמר לצורך המכתב.</div>`;
+    <div class="table-note">כל שורה = הטלת מטריצת האבחנה × הכיסוי לאותה קבוצה. ל-BPR משודרת תוספת מצרפית אחת פר כיסוי (UnderwritingAddition), והפירוט הטקסטואלי (detailText) נשמר לצורך המכתב.</div>`;
   document.getElementById('loading-popup').classList.add('open');
 }
 
@@ -5410,7 +5421,7 @@ function openRejectionLetter() {
   document.getElementById('loading-popup-title').textContent = 'מכתב דחייה — ברמת מזהה התהליך';
   document.getElementById('loading-popup-meta').textContent = `מזהה תהליך ${p.processId} · ${p.name} · ת״ז ${p.id}`;
   const body = rejected.length
-    ? `מזהה התהליך <b>${escapeHtml(p.processId)}</b> נדחה בשל דחיית קבוצת הסיכון: <b>${rejected.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}</b>.<br>בהתאם לכלל — תהליך המורכב מקבוצת סיכון אחת או יותר נדחה במלואו כאשר קבוצת סיכון אחת נדחית. לא בוצעה אגרגציה רגילה, ונשלח מכתב דחייה מתאים.`
+    ? `מזהה התהליך <b>${escapeHtml(p.processId)}</b> נדחה בשל דחיית הכיסוי: <b>${rejected.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}</b>.<br>בהתאם לכלל — תהליך המורכב מכיסוי אחת או יותר נדחה במלואו כאשר כיסוי אחת נדחית. לא בוצעה אגרגציה רגילה, ונשלח מכתב דחייה מתאים.`
     : `לא קיימת דחייה פעילה בתיק. ניתן לסמן "דחייה" בתא כלשהו בחלון החיתום כדי להפעיל מסלול זה.`;
   document.getElementById('loading-popup-body').innerHTML =
     `<div class="doc-placeholder"><div class="doc-placeholder-label">טיוטת מכתב דחייה</div><div class="doc-excerpt" style="line-height:1.8;">${body}</div></div>`;
@@ -5426,7 +5437,7 @@ const feedbackSections = {
   'financial': { wrapId: 'fb-financial', label: 'חיתום פיננסי' },
   'diagnoses': { wrapId: 'fb-diagnoses', label: 'אבחנות רפואיות' },
   'docs':      { wrapId: 'fb-docs',      label: 'מסמכים' },
-  'rguw':      { wrapId: 'fb-rguw',      label: 'חיתום פר קבוצת סיכון' },
+  'rguw':      { wrapId: 'fb-rguw',      label: 'חיתום פר כיסוי' },
   'uwnotes':   { wrapId: 'fb-uwnotes',   label: 'הערות חיתום' },
   'summary':   { wrapId: 'fb-summary',   label: 'סיכום תוספות' },
 };
