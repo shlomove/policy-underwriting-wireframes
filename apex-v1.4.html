@@ -2133,9 +2133,10 @@
 
   /* ===== Medical metrics modal ===== */
   .metrics-calc-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
-  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--mig-blue); background:#fff; border:1.5px solid var(--mig-line); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
-  .metrics-calc-btn:hover { background:var(--bg-hover); border-color:var(--mig-blue); }
-  .metrics-calc-btn.active { background:var(--mig-blue); border-color:var(--mig-blue); color:#fff; }
+  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text); background:#fff; border:1.5px solid var(--border); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
+  .metrics-calc-btn:hover:not(:disabled) { background:#f2f3f5; border-color:var(--text-muted); }
+  .metrics-calc-btn.active { background:#e9eaec; border-color:var(--text-muted); color:var(--text); }
+  .metrics-calc-btn:disabled { opacity:.4; cursor:not-allowed; }
   .metrics-calc-sub { font-size:10px; font-weight:500; opacity:.75; }
   .metrics-table { width:100%; border-collapse:collapse; font-size:12px; }
   .metrics-table th, .metrics-table td { border:1px solid var(--border); padding:7px 9px; text-align:right; vertical-align:middle; }
@@ -2151,6 +2152,13 @@
   .metrics-add-bar { display:flex; gap:8px; align-items:center; margin-top:14px; flex-wrap:wrap; }
   .metrics-file-name { font-size:11px; color:var(--text-muted); }
   .metrics-uw-cell { white-space:nowrap; }
+  .metrics-uw-block { margin-top:14px; padding:12px 14px; border:1px solid var(--border); border-radius:var(--radius); background:#fafbfc; }
+  .metrics-uw-title { font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:10px; }
+  /* PDF/image source placeholder in the doc view */
+  .doc-file-ph { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; height:300px; border:2px dashed var(--border); border-radius:var(--radius); background:#fafbfc; color:var(--text-light); text-align:center; }
+  .doc-file-ph .ic { font-size:46px; line-height:1; }
+  .doc-file-ph .t { font-size:13px; font-weight:800; color:var(--text-muted); }
+  .doc-file-ph .s { font-size:11px; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -3294,15 +3302,15 @@ const docs = {
 // Medical metrics (per profile) — each metric is tagged with the calculators it feeds.
 // doc = source docKey (existing document) OR uploadedDoc set at creation time.
 const medicalMetrics = [
-  { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4', isMetric: true, loadingTableKey: 'lt-bmi',  uw: {}, swiss: {} },
-  { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4', isMetric: true, loadingTableKey: 'lt-bmi',  uw: {}, swiss: {} },
-  { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4', isMetric: true, loadingTableKey: 'lt-bmi',  uw: {}, swiss: {} },
-  { id: 'M-004', name: 'לחץ דם',       value: '119/81', unit: 'mmHg', date: '10.03.2024', calc: ['cmc', 'cad', 'lvmc', 'cc'], doc: 'doc-sarc-4', isMetric: true, loadingTableKey: 'lt-bp',   uw: {}, swiss: {} },
-  { id: 'M-005', name: 'סטטוס עישון',  value: 'מעולם לא', unit: '—',   date: '10.03.2024', calc: ['cmc', 'cad'],              doc: 'doc-sarc-4', isMetric: true, loadingTableKey: 'lt-smoke', uw: {}, swiss: {} },
-  { id: 'M-006', name: 'סטורציה (SpO₂)', value: '98',   unit: '%',    date: '23.02.2016', calc: ['cc'],                      doc: 'doc-sarc-1', isMetric: true, loadingTableKey: 'sarcoid',  uw: {}, swiss: {} },
-  { id: 'M-007', name: 'FEV1',         value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2', isMetric: true, loadingTableKey: 'sarcoid',  uw: {}, swiss: {} },
-  { id: 'M-008', name: 'FVC',          value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2', isMetric: true, loadingTableKey: 'sarcoid',  uw: {}, swiss: {} },
-  { id: 'M-009', name: 'DLCO',         value: '91',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2', isMetric: true, loadingTableKey: 'sarcoid',  uw: {}, swiss: {} },
+  { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-004', name: 'לחץ דם',       value: '119/81', unit: 'mmHg', date: '10.03.2024', calc: ['cmc', 'cad', 'lvmc', 'cc'], doc: 'doc-sarc-4' },
+  { id: 'M-005', name: 'סטטוס עישון',  value: 'מעולם לא', unit: '—',   date: '10.03.2024', calc: ['cmc', 'cad'],              doc: 'doc-sarc-4' },
+  { id: 'M-006', name: 'סטורציה (SpO₂)', value: '98',   unit: '%',    date: '23.02.2016', calc: ['cc'],                      doc: 'doc-sarc-1' },
+  { id: 'M-007', name: 'FEV1',         value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+  { id: 'M-008', name: 'FVC',          value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+  { id: 'M-009', name: 'DLCO',         value: '91',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
 ];
 
 const healthDeclarations = [
@@ -3327,46 +3335,6 @@ const patientDocuments = [
 ];
 
 const loadingTables = {
-  'lt-bmi': {
-    title: 'טבלת דירוג — מדד מסת גוף (BMI)',
-    meta: 'טבלת תוספות סטנדרטית לפי BMI',
-    note: '* השורה המסומנת = טווח ה-BMI של המבוטח (23.6).',
-    cols: ['טווח BMI', 'סיווג', 'תוספת רפואית'],
-    rows: [
-      { label: '< 18.5', vals: ['תת-משקל', '+50%'] },
-      { label: '18.5–24.9', vals: ['תקין', 'ללא תוספת'], active: true },
-      { label: '25.0–29.9', vals: ['עודף משקל', '+25%'] },
-      { label: '30.0–34.9', vals: ['השמנה דרגה I', '+50%'] },
-      { label: '35.0–39.9', vals: ['השמנה דרגה II', '+100%'] },
-      { label: '≥ 40', vals: ['השמנה דרגה III', '+150% / הפניה'] },
-    ],
-  },
-  'lt-bp': {
-    title: 'טבלת דירוג — לחץ דם',
-    meta: 'טבלת תוספות לפי לחץ דם סיסטולי/דיאסטולי',
-    note: '* השורה המסומנת = טווח לחץ הדם של המבוטח (119/81).',
-    cols: ['סיסטולי / דיאסטולי', 'סיווג', 'תוספת רפואית'],
-    rows: [
-      { label: '< 120 / < 80', vals: ['תקין', 'ללא תוספת'], active: true },
-      { label: '120–129 / < 80', vals: ['מוגבר', 'ללא תוספת'] },
-      { label: '130–139 / 80–89', vals: ['יתר ל״ד שלב 1', '+25%'] },
-      { label: '140–159 / 90–99', vals: ['יתר ל״ד שלב 2', '+50%'] },
-      { label: '≥ 160 / ≥ 100', vals: ['יתר ל״ד חמור', '+100% / הפניה'] },
-    ],
-  },
-  'lt-smoke': {
-    title: 'טבלת דירוג — סטטוס עישון',
-    meta: 'טבלת תוספות לפי סטטוס עישון',
-    note: '* השורה המסומנת = סטטוס העישון של המבוטח (מעולם לא).',
-    cols: ['סטטוס', 'פירוט', 'תוספת רפואית'],
-    rows: [
-      { label: 'מעולם לא', vals: ['ללא עישון', 'ללא תוספת'], active: true },
-      { label: 'הפסיק מעל 3 שנים', vals: ['גמילה מבוססת', 'ללא תוספת'] },
-      { label: 'הפסיק מתחת ל-3 שנים', vals: ['גמילה עדכנית', '+25%'] },
-      { label: 'מעשן פעיל', vals: ['עד חפיסה ליום', '+50%'] },
-      { label: 'מעשן כבד', vals: ['מעל חפיסה ליום', '+100%'] },
-    ],
-  },
   sarcoid: {
     title: 'טבלת מקור — Pulmonary Sarcoidosis Stage II',
     meta: 'נתוני מקור שחולצו ממסמכי רונן קדישב | 2016–2024',
@@ -4080,7 +4048,7 @@ function openDocumentOriginal(i) {
     : '';
   document.getElementById('doc-popup-body').innerHTML = `
     ${reasonBlock}
-    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
       <button class="doc-action-btn">הורד PDF</button>
       <button class="doc-action-btn">צפה במקור בגודל מלא</button>
@@ -4130,7 +4098,6 @@ function buildCard(dx, idx) {
       <div class="tl-dot"></div>
       <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="לחץ לפרטי האירוע וצפייה במקור">${item.text}</div>
       <div class="tl-actions">
-        <button class="tl-mini-btn tl-info-btn" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" title="אינדיקציית אירוע — גיל, תאריך סיום, מס׳ תיק תביעה">ⓘ</button>
         ${(item.uploadedDoc || item.doc) ? `<button class="tl-mini-btn" onclick="event.stopPropagation();${item.uploadedDoc ? `openUploadedSource('${item.uploadedDoc}')` : `openDoc('${item.doc}')`}" title="צפייה במסמך מקור">📄</button>` : ''}
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
         <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
@@ -4232,14 +4199,14 @@ function allFindings(p) {
 }
 // short label / code for a finding
 function findingCode(f) {
-  if (f.isMetric) return f.name;
+  if (f.isCalcUw) return f.code;
   if (f.code) return f.code;
   if (f.findingSource === 'OCCUPATION') return 'עיסוק';
   if (f.findingSource === 'HOBBY') return 'תחביב';
   return f.value || '—';
 }
 function findingTitle(f) {
-  if (f.isMetric) return f.name + (f.unit && f.unit !== '—' ? ' (' + f.unit + ')' : '') + ' — ' + f.value;
+  if (f.isCalcUw) return f.name;
   if (f.fullName) return f.fullName;
   return f.value || findingCode(f);
 }
@@ -4542,10 +4509,10 @@ function itemFindings(p) {
     out.push({ type: 'ls', ref: 'occupation', f: p.lifestyle.occupation });
     out.push({ type: 'ls', ref: 'profession', f: p.lifestyle.profession });
   }
-  medicalMetrics.forEach((m, i) => out.push({ type: 'metric', ref: String(i), f: m }));
+  calcList.forEach(k => out.push({ type: 'calc', ref: k, f: calcUnderwriting[k] }));
   return out.filter(it => it.f);
 }
-function itemKind(f) { return f.isMetric ? 'מדד' : f.findingSource === 'OCCUPATION' ? 'עיסוק' : f.findingSource === 'HOBBY' ? 'תחביב' : 'אבחנה'; }
+function itemKind(f) { return f.isCalcUw ? 'מחשבון' : f.findingSource === 'OCCUPATION' ? 'עיסוק' : f.findingSource === 'HOBBY' ? 'תחביב' : 'אבחנה'; }
 function itemAddText(c) {
   const parts = [];
   const p = (+c.medicalAdditionPercent || 0) + (+c.occupationalAdditionPercent || 0);
@@ -4649,7 +4616,7 @@ function onItemSummaryNote(type, ref, val) {
   f.uw[selectedRgCode].freeText = val;
   renderGroupSummary();
 }
-function _v14ref(type, ref) { const p = patientsState[currentIdx]; return type === 'dx' ? p.diagnoses[+ref] : type === 'metric' ? medicalMetrics[+ref] : p.lifestyle[ref]; }
+function _v14ref(type, ref) { const p = patientsState[currentIdx]; return type === 'dx' ? p.diagnoses[+ref] : type === 'calc' ? calcUnderwriting[ref] : p.lifestyle[ref]; }
 function refreshItemCard(type, ref) {
   const el = document.getElementById('itemuw-' + type + '-' + ref);
   if (el) el.outerHTML = itemUwCard(type, ref, _v14ref(type, ref));
@@ -4947,10 +4914,13 @@ function openMetrics() {
   const p = patientsState[currentIdx];
   document.getElementById('metrics-popup-meta').textContent =
     `PROFILE-001 · ${p.name} · ת״ז ${p.id}`;
-  document.getElementById('metrics-calc-row').innerHTML = calcList.map(k =>
-    `<button class="metrics-calc-btn" id="mcalc-${k}" onclick="selectMetricsCalc('${k}')">${k.toUpperCase()}<span class="metrics-calc-sub"> · ${escapeHtml(calcMeta[k].replace(/\s*\([^)]*\)/, ''))}</span></button>`
-  ).join('');
-  selectMetricsCalc(metricsActiveCalc);
+  // only CMC is enabled for now — all other calculators are disabled
+  document.getElementById('metrics-calc-row').innerHTML = calcList.map(k => {
+    const disabled = k !== 'cmc';
+    return `<button class="metrics-calc-btn" id="mcalc-${k}" ${disabled ? 'disabled title="מחשבון זה אינו זמין כרגע"' : `onclick="selectMetricsCalc('${k}')"`}>${k.toUpperCase()}<span class="metrics-calc-sub"> · ${escapeHtml(calcMeta[k].replace(/\s*\([^)]*\)/, ''))}</span></button>`;
+  }).join('');
+  metricsActiveCalc = 'cmc';
+  selectMetricsCalc('cmc');
   document.getElementById('metrics-popup').classList.add('open');
 }
 
@@ -4971,40 +4941,37 @@ function metricSourceCell(m) {
 
 function renderMetricsTable(calc) {
   const rows = medicalMetrics.filter(m => (m.calc || []).includes(calc));
-  const uwCol = selectedRgCode
-    ? `<span style="font-weight:400;color:var(--text-light);font-size:10px;"> · ${escapeHtml(riskGroupNames[selectedRgCode] || selectedRgCode)}</span>`
-    : '';
-  const body = rows.map(m => {
-    const gi = medicalMetrics.indexOf(m);
-    const uwCell = selectedRgCode
-      ? itemUwCard('metric', String(gi), m)
-      : `<span class="metrics-src-none">בחר/י כיסוי בכותרת כדי לחתם</span>`;
-    return `
+  const body = rows.map(m => `
     <tr>
       <td class="metrics-name">${escapeHtml(m.name)}</td>
       <td class="ltr">${escapeHtml(m.value)}</td>
       <td>${escapeHtml(m.unit || '—')}</td>
       <td class="ltr">${escapeHtml(m.date || '—')}</td>
       <td>${metricSourceCell(m)}</td>
-      <td class="metrics-uw-cell">${uwCell}</td>
-    </tr>`;
-  }).join('');
+    </tr>`).join('');
 
   const table = rows.length ? `
-    <div style="overflow-x:auto;">
     <table class="metrics-table">
       <thead><tr>
-        <th>שם נתון</th><th>ערך</th><th>יחידת מדידה</th><th>תאריך מדידה</th><th>קישור למסמך מקור</th><th>חיתום${uwCol}</th>
+        <th>שם נתון</th><th>ערך</th><th>יחידת מדידה</th><th>תאריך מדידה</th><th>קישור למסמך מקור</th>
       </tr></thead>
       <tbody>${body}</tbody>
-    </table>
-    </div>`
+    </table>`
     : `<div class="metrics-empty">אין מדדים רלוונטיים למחשבון ${calc.toUpperCase()} — ניתן להוסיף מדד חדש למטה.</div>`;
+
+  // per-CALCULATOR underwriting (v1 only) — one decision for the whole calculator
+  const uwBlock = selectedRgCode
+    ? `<div class="metrics-uw-block">
+         <div class="metrics-uw-title">חיתום מחשבון ${calc.toUpperCase()} · ${escapeHtml(riskGroupNames[selectedRgCode] || selectedRgCode)}</div>
+         ${itemUwCard('calc', calc, calcUnderwriting[calc])}
+       </div>`
+    : `<div class="metrics-uw-block"><span class="metrics-src-none">בחר/י כיסוי בכותרת כדי לחתם את המחשבון</span></div>`;
 
   document.getElementById('metrics-table-wrap').innerHTML = `
     ${table}
+    ${uwBlock}
     <div class="metrics-add-bar">
-      <button class="submit-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
+      <button class="doc-action-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
       <span style="font-size:11px;color:var(--text-light);">בהוספת מדד ניתן לצרף גם קובץ מקור.</span>
     </div>`;
 }
@@ -5651,7 +5618,7 @@ function openDoc(key) {
       <div class="doc-excerpt">${d.excerpt}</div>
       <div class="doc-meta-row">${metaRow}</div>
     </div>
-    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
       <button class="doc-action-btn">הורד PDF</button>
       <button class="doc-action-btn">צפה במקור</button>
@@ -6041,6 +6008,25 @@ const calcMeta = {
   jvc:  'מחשבון ורידי הצוואר (JVC)',
   cc:   'מחשבון קליני כללי (CC)',
 };
+
+// Per-calculator underwriting findings (v1) — one underwriting decision per calculator,
+// aggregating into the coverage totals like a diagnosis. Each has its own explainability table.
+const calcUnderwriting = {};
+calcList.forEach(k => {
+  calcUnderwriting[k] = { isCalcUw: true, calcKey: k, code: k.toUpperCase(), name: calcMeta[k], loadingTableKey: 'lt-' + k, uw: {}, swiss: {} };
+  loadingTables['lt-' + k] = {
+    title: 'טבלת דירוג — ' + calcMeta[k],
+    meta: 'תוצאת המחשבון → תוספת חיתומית',
+    note: '* הדירוג נגזר מהמדדים שהוזנו למחשבון ' + k.toUpperCase() + '.',
+    cols: ['רמת סיכון', 'טווח ציון', 'תוספת רפואית'],
+    rows: [
+      { label: 'נמוך', vals: ['ציון תקין', 'ללא תוספת'], active: true },
+      { label: 'בינוני', vals: ['ציון גבולי', '+25%'] },
+      { label: 'גבוה', vals: ['ציון מוגבר', '+50%'] },
+      { label: 'גבוה מאוד', vals: ['ציון חריג', '+100% / הפניה'] },
+    ],
+  };
+});
 
 function buildGenericCalcs() {
   const host = document.getElementById('generic-calcs');

@@ -2133,9 +2133,10 @@
 
   /* ===== Medical metrics modal ===== */
   .metrics-calc-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
-  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--mig-blue); background:#fff; border:1.5px solid var(--mig-line); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
-  .metrics-calc-btn:hover { background:var(--bg-hover); border-color:var(--mig-blue); }
-  .metrics-calc-btn.active { background:var(--mig-blue); border-color:var(--mig-blue); color:#fff; }
+  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text); background:#fff; border:1.5px solid var(--border); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
+  .metrics-calc-btn:hover:not(:disabled) { background:#f2f3f5; border-color:var(--text-muted); }
+  .metrics-calc-btn.active { background:#e9eaec; border-color:var(--text-muted); color:var(--text); }
+  .metrics-calc-btn:disabled { opacity:.4; cursor:not-allowed; }
   .metrics-calc-sub { font-size:10px; font-weight:500; opacity:.75; }
   .metrics-table { width:100%; border-collapse:collapse; font-size:12px; }
   .metrics-table th, .metrics-table td { border:1px solid var(--border); padding:7px 9px; text-align:right; vertical-align:middle; }
@@ -2147,6 +2148,11 @@
   .metrics-src-none { font-size:11px; color:var(--text-light); }
   .metrics-empty { padding:22px; text-align:center; font-size:13px; color:var(--text-light); border:1px dashed var(--border); border-radius:var(--radius); background:#fafbfc; }
   .metrics-add-bar { display:flex; gap:8px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+  /* PDF/image source placeholder in the doc view */
+  .doc-file-ph { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; height:300px; border:2px dashed var(--border); border-radius:var(--radius); background:#fafbfc; color:var(--text-light); text-align:center; }
+  .doc-file-ph .ic { font-size:46px; line-height:1; }
+  .doc-file-ph .t { font-size:13px; font-weight:800; color:var(--text-muted); }
+  .doc-file-ph .s { font-size:11px; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -4009,7 +4015,7 @@ function openDocumentOriginal(i) {
     : '';
   document.getElementById('doc-popup-body').innerHTML = `
     ${reasonBlock}
-    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
       <button class="doc-action-btn">הורד PDF</button>
       <button class="doc-action-btn">צפה במקור בגודל מלא</button>
@@ -4858,10 +4864,13 @@ function openMetrics() {
   const p = patientsState[currentIdx];
   document.getElementById('metrics-popup-meta').textContent =
     `PROFILE-001 · ${p.name} · ת״ז ${p.id}`;
-  document.getElementById('metrics-calc-row').innerHTML = calcList.map(k =>
-    `<button class="metrics-calc-btn" id="mcalc-${k}" onclick="selectMetricsCalc('${k}')">${k.toUpperCase()}<span class="metrics-calc-sub"> · ${escapeHtml(calcMeta[k].replace(/\s*\([^)]*\)/, ''))}</span></button>`
-  ).join('');
-  selectMetricsCalc(metricsActiveCalc);
+  // only CMC is enabled for now — all other calculators are disabled
+  document.getElementById('metrics-calc-row').innerHTML = calcList.map(k => {
+    const disabled = k !== 'cmc';
+    return `<button class="metrics-calc-btn" id="mcalc-${k}" ${disabled ? 'disabled title="מחשבון זה אינו זמין כרגע"' : `onclick="selectMetricsCalc('${k}')"`}>${k.toUpperCase()}<span class="metrics-calc-sub"> · ${escapeHtml(calcMeta[k].replace(/\s*\([^)]*\)/, ''))}</span></button>`;
+  }).join('');
+  metricsActiveCalc = 'cmc';
+  selectMetricsCalc('cmc');
   document.getElementById('metrics-popup').classList.add('open');
 }
 
@@ -4903,7 +4912,7 @@ function renderMetricsTable(calc) {
   document.getElementById('metrics-table-wrap').innerHTML = `
     ${table}
     <div class="metrics-add-bar">
-      <button class="submit-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
+      <button class="doc-action-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
       <span style="font-size:11px;color:var(--text-light);">בהוספת מדד ניתן לצרף גם קובץ מקור.</span>
     </div>`;
 }
@@ -5558,7 +5567,7 @@ function openDoc(key) {
       <div class="doc-excerpt">${d.excerpt}</div>
       <div class="doc-meta-row">${metaRow}</div>
     </div>
-    <div class="doc-scan-placeholder">[ תמונה מוקטנת של המסמך הסרוק / PDF מקור ]</div>
+    <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
       <button class="doc-action-btn">הורד PDF</button>
       <button class="doc-action-btn">צפה במקור</button>
