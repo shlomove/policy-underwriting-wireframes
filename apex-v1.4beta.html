@@ -3653,13 +3653,13 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
     <div class="divider-v"></div>
+    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${overallReasons}</div></div>
+    <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested || '—'}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting || '—'}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${overallReasons}</div></div>
   `;
 }
 
@@ -3716,7 +3716,6 @@ function renderPrevDeclarations() {
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
           ${d.docKey ? `<button class="prev-decl-link" onclick="openDoc('${d.docKey}')">צפה בהצהרה המלאה ▸</button>` : ''}
           ${d.uploadedDoc ? `<button class="prev-decl-link" onclick="openUploadedSource('${d.uploadedDoc}')">פתח קובץ שהועלה</button>` : ''}
-          <button class="prev-decl-link" onclick="uploadPrevDeclSource(${di})">העלה קובץ מקור</button>
         </div>
       </div>
     </div>
@@ -3795,7 +3794,7 @@ function openDocsList() {
         </td>
         <td>${badge}</td>
         <td>${reasonCell}</td>
-        <td><div class="docs-table-actions">${openBtn}${uploadBtn}${markReadBtn}${manualBtn}</div></td>
+        <td><div class="docs-table-actions">${openBtn}${markReadBtn}</div></td>
       </tr>`;
   }).join('');
 
@@ -3966,11 +3965,8 @@ function buildCard(dx, idx) {
     <div class="timeline-item">
       <div class="tl-date">${item.date}</div>
       <div class="tl-dot"></div>
-      <div class="tl-text" ${item.doc ? `onclick="openDoc('${item.doc}')"` : 'style="text-decoration:none;cursor:default;"'}>${item.text}</div>
+      <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="פתח סיכום אירוע">${item.text}</div>
       <div class="tl-actions">
-        <button class="tl-mini-btn tl-info-btn" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" title="אינדיקציית אירוע — גיל, תאריך סיום, מס׳ תיק תביעה">ⓘ</button>
-        ${item.uploadedDoc ? `<button class="tl-mini-btn" onclick="event.stopPropagation();openUploadedSource('${item.uploadedDoc}')" title="פתח מסמך מקור שהועלה">📄</button>` : ''}
-        <button class="tl-mini-btn" onclick="event.stopPropagation();uploadEventSource(${idx}, ${ei})" title="העלה קובץ מקור">📎</button>
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
         <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
       </div>
@@ -4836,8 +4832,21 @@ function openEventInfo(dxIdx, evIdx) {
     ['מספר תיק תביעה', ev.claimId ? ev.claimId : 'אין מזהה תביעה'],
   ];
   document.getElementById('evinfo-popup-body').innerHTML =
-    `<div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>`;
+    `<div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
+     ${(ev.note || '').trim() ? `<div style="margin-top:10px;font-size:12px;line-height:1.6;"><b>הערה:</b> ${escapeHtml(ev.note)}</div>` : ''}
+     <div class="doc-actions" style="margin-top:14px;">
+       <button class="doc-action-btn" ${ev.doc ? `onclick="openDoc('${ev.doc}')"` : 'disabled title="אין קובץ מקור לאירוע זה"'}>📄 צפיה בקובץ מקור</button>
+       <button class="doc-action-btn" onclick="addEventNote(${dxIdx}, ${evIdx})">＋ הוסף הערה</button>
+     </div>`;
   document.getElementById('evinfo-popup').classList.add('open');
+}
+function addEventNote(dxIdx, evIdx) {
+  const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
+  if (!ev) return;
+  const n = prompt('הוסף/ערוך הערה לאירוע:', ev.note || '');
+  if (n === null) return;
+  ev.note = n.trim();
+  openEventInfo(dxIdx, evIdx);
 }
 
 // =====================================================================
