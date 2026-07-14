@@ -2126,6 +2126,28 @@
   .of-declare { font-size:11.5px; line-height:1.6; color:var(--text); background:#fafbfc; border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
   .of-note { font-size:11px; color:var(--text-muted); background:#fff8e8; border:1px solid #f0e0b0; border-radius:6px; padding:8px 10px; margin-top:8px; }
 
+  /* ===== Embedded original PDF/image inside modals ===== */
+  .doc-embed { width:100%; height:70vh; border:1px solid var(--border); border-radius:var(--radius); background:#f7f8fa; }
+  .doc-embed-img { width:100%; max-height:70vh; object-fit:contain; border:1px solid var(--border); border-radius:var(--radius); background:#fff; }
+  .doc-embed-note { font-size:11px; color:var(--text-light); font-style:italic; margin-bottom:10px; }
+
+  /* ===== Medical metrics modal ===== */
+  .metrics-calc-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--mig-blue); background:#fff; border:1.5px solid var(--mig-line); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
+  .metrics-calc-btn:hover { background:var(--bg-hover); border-color:var(--mig-blue); }
+  .metrics-calc-btn.active { background:var(--mig-blue); border-color:var(--mig-blue); color:#fff; }
+  .metrics-calc-sub { font-size:10px; font-weight:500; opacity:.75; }
+  .metrics-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .metrics-table th, .metrics-table td { border:1px solid var(--border); padding:7px 9px; text-align:right; vertical-align:middle; }
+  .metrics-table th { background:var(--mig-blue); color:#fff; font-weight:700; font-size:11px; white-space:nowrap; }
+  .metrics-table td.ltr { direction:ltr; }
+  .metrics-table tbody tr:hover { background:var(--bg-hover); }
+  .metrics-name { font-weight:700; color:var(--text); }
+  .metrics-src-link { font-family:inherit; font-size:11.5px; font-weight:700; color:var(--mig-blue); background:none; border:none; cursor:pointer; padding:0; text-decoration:underline; }
+  .metrics-src-none { font-size:11px; color:var(--text-light); }
+  .metrics-empty { padding:22px; text-align:center; font-size:13px; color:var(--text-light); border:1px dashed var(--border); border-radius:var(--radius); background:#fafbfc; }
+  .metrics-add-bar { display:flex; gap:8px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -2553,6 +2575,14 @@
 
     <div>
       <div class="section-head">
+        <div class="section-title">מדדים רפואיים</div>
+        <div class="feedback-btns" id="fb-metrics"></div>
+      </div>
+      <div id="metrics-section"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
         <div class="section-title">עיסוק ותחביבים</div>
         <div class="feedback-btns" id="fb-lifestyle"></div>
       </div>
@@ -2708,6 +2738,24 @@
       <button class="popup-close" onclick="closePopup('evinfo-popup')">✕ סגור</button>
     </div>
     <div class="popup-body" id="evinfo-popup-body"></div>
+  </div>
+</div>
+
+<!-- ===== MEDICAL METRICS POPUP ===== -->
+<div class="popup-overlay" id="metrics-popup">
+  <div class="popup-box" style="max-width:900px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">מדדים רפואיים</div>
+        <div class="popup-meta" id="metrics-popup-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('metrics-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <div style="font-size:12px;color:var(--text-light);margin-bottom:10px;">בחר/י מחשבון כדי להציג את המדדים הרלוונטיים לו:</div>
+      <div class="metrics-calc-row" id="metrics-calc-row"></div>
+      <div id="metrics-table-wrap"></div>
+    </div>
   </div>
 </div>
 
@@ -3222,6 +3270,20 @@ const docs = {
     metaItems: [{ label: 'סוג מסמך', val: 'סיכום מידע רפואי' }, { label: 'תאריך', val: '10.03.2024' }],
   },
 };
+
+// Medical metrics (per profile) — each metric is tagged with the calculators it feeds.
+// doc = source docKey (existing document) OR uploadedDoc set at creation time.
+const medicalMetrics = [
+  { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-004', name: 'לחץ דם',       value: '119/81', unit: 'mmHg', date: '10.03.2024', calc: ['cmc', 'cad', 'lvmc', 'cc'], doc: 'doc-sarc-4' },
+  { id: 'M-005', name: 'סטטוס עישון',  value: 'מעולם לא', unit: '—',   date: '10.03.2024', calc: ['cmc', 'cad'],              doc: 'doc-sarc-4' },
+  { id: 'M-006', name: 'סטורציה (SpO₂)', value: '98',   unit: '%',    date: '23.02.2016', calc: ['cc'],                      doc: 'doc-sarc-1' },
+  { id: 'M-007', name: 'FEV1',         value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+  { id: 'M-008', name: 'FVC',          value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+  { id: 'M-009', name: 'DLCO',         value: '91',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+];
 
 const healthDeclarations = [
   { docKey: 'doc-health-ronen', date: '10.03.2024' },
@@ -3997,6 +4059,7 @@ function buildCard(dx, idx) {
       <div class="tl-dot"></div>
       <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="פתח סיכום אירוע">${item.text}</div>
       <div class="tl-actions">
+        ${(item.uploadedDoc || item.doc) ? `<button class="tl-mini-btn" onclick="event.stopPropagation();${item.uploadedDoc ? `openUploadedSource('${item.uploadedDoc}')` : `openDoc('${item.doc}')`}" title="צפייה במסמך מקור">📄</button>` : ''}
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
         <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
       </div>
@@ -4017,6 +4080,7 @@ function buildCard(dx, idx) {
         ${tagHtml}
         <span class="dx-full-name">— ${dx.fullName}</span>
         <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
+          ${dx.uploadedDoc ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openUploadedSource('${dx.uploadedDoc}')" title="צפייה במסמך מקור">📄</button>` : ''}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editDx(${idx})" title="ערוך אבחנה">✏</button>
           <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
         </div>
@@ -4742,14 +4806,23 @@ function addDiagnosis() {
   const rgCodes = riskGroupsOf(p).map(rg => rg.riskGroupCode);
   const uw = {}, swiss = {};
   rgCodes.forEach(rg => { uw[rg] = _cell(rg, 'CLEAN'); swiss[rg] = _cell(rg, 'CLEAN'); });
-  p.diagnoses.push({
+  const newDx = {
     code: code.trim().toUpperCase(), fullName: full.trim(),
     source: 'MEDICAL', flag: null, loadingTableKey: null, timeline: [],
     requiredDocs: [], inDeclaration: true, missingStatus: null,
     swiss, uw,
-  });
+  };
+  p.diagnoses.push(newDx);
   renderDiagnoses();
   updateAgg();
+  // upload of a source document is allowed only at creation time
+  if (confirm('האם לצרף קובץ מקור לאבחנה החדשה?')) {
+    triggerSourceUpload(function (id) {
+      newDx.uploadedDoc = id;
+      renderDiagnoses();
+      openUploadedSource(id);
+    });
+  }
 }
 
 function editDx(idx) {
@@ -4767,6 +4840,100 @@ function deleteDiagnosis(idx) {
   patientsState[currentIdx].diagnoses.splice(idx, 1);
   renderDiagnoses();
   updateAgg();
+}
+
+// =====================================================================
+// MEDICAL METRICS (per profile) — modal with a table per calculator
+// =====================================================================
+let metricsActiveCalc = 'cmc';
+
+function renderMetricsSection() {
+  const wrap = document.getElementById('metrics-section');
+  if (!wrap) return;
+  wrap.innerHTML =
+    `<button class="health-decl-btn" style="margin-right:0;" onclick="openMetrics()">פתח טבלת מדדים רפואיים <span style="color:var(--text-light);">(${medicalMetrics.length} מדדים)</span></button>`;
+}
+
+function openMetrics() {
+  const p = patientsState[currentIdx];
+  document.getElementById('metrics-popup-meta').textContent =
+    `PROFILE-001 · ${p.name} · ת״ז ${p.id}`;
+  document.getElementById('metrics-calc-row').innerHTML = calcList.map(k =>
+    `<button class="metrics-calc-btn" id="mcalc-${k}" onclick="selectMetricsCalc('${k}')">${k.toUpperCase()}<span class="metrics-calc-sub"> · ${escapeHtml(calcMeta[k].replace(/\s*\([^)]*\)/, ''))}</span></button>`
+  ).join('');
+  selectMetricsCalc(metricsActiveCalc);
+  document.getElementById('metrics-popup').classList.add('open');
+}
+
+function selectMetricsCalc(calc) {
+  metricsActiveCalc = calc;
+  calcList.forEach(k => {
+    const b = document.getElementById('mcalc-' + k);
+    if (b) b.classList.toggle('active', k === calc);
+  });
+  renderMetricsTable(calc);
+}
+
+function metricSourceCell(m) {
+  if (m.uploadedDoc) return `<button class="metrics-src-link" onclick="openUploadedSource('${m.uploadedDoc}')">📄 צפייה במקור</button>`;
+  if (m.doc && docs[m.doc]) return `<button class="metrics-src-link" onclick="openDoc('${m.doc}')">📄 צפייה במקור</button>`;
+  return `<span class="metrics-src-none">אין מסמך מקור</span>`;
+}
+
+function renderMetricsTable(calc) {
+  const rows = medicalMetrics.filter(m => (m.calc || []).includes(calc));
+  const body = rows.map(m => `
+    <tr>
+      <td class="metrics-name">${escapeHtml(m.name)}</td>
+      <td class="ltr">${escapeHtml(m.value)}</td>
+      <td>${escapeHtml(m.unit || '—')}</td>
+      <td class="ltr">${escapeHtml(m.date || '—')}</td>
+      <td>${metricSourceCell(m)}</td>
+    </tr>`).join('');
+
+  const table = rows.length ? `
+    <table class="metrics-table">
+      <thead><tr>
+        <th>שם נתון</th><th>ערך</th><th>יחידת מדידה</th><th>תאריך מדידה</th><th>קישור למסמך מקור</th>
+      </tr></thead>
+      <tbody>${body}</tbody>
+    </table>`
+    : `<div class="metrics-empty">אין מדדים רלוונטיים למחשבון ${calc.toUpperCase()} — ניתן להוסיף מדד חדש למטה.</div>`;
+
+  document.getElementById('metrics-table-wrap').innerHTML = `
+    ${table}
+    <div class="metrics-add-bar">
+      <button class="submit-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
+      <span style="font-size:11px;color:var(--text-light);">בהוספת מדד ניתן לצרף גם קובץ מקור.</span>
+    </div>`;
+}
+
+function addMetric(calc) {
+  const name = prompt('שם הנתון (לדוגמה: כולסטרול LDL):');
+  if (!name || !name.trim()) return;
+  const value = prompt('ערך הנתון:');
+  if (value === null || !('' + value).trim()) return;
+  const unit = prompt('יחידת מדידה (לדוגמה: mg/dL):') || '—';
+  const date = prompt('תאריך מדידה (לדוגמה: 15/05/2024):') || '—';
+  const nextNum = medicalMetrics.reduce((mx, m) => {
+    const n = parseInt(('' + m.id).replace(/\D/g, '')) || 0; return Math.max(mx, n);
+  }, 0) + 1;
+  const metric = {
+    id: 'M-' + String(nextNum).padStart(3, '0'),
+    name: name.trim(), value: ('' + value).trim(), unit: unit.trim() || '—',
+    date: date.trim() || '—', calc: [calc], doc: null,
+  };
+  medicalMetrics.push(metric);
+  renderMetricsSection();
+  renderMetricsTable(calc);
+  // upload of a source document is allowed only at creation time
+  if (confirm('האם לצרף קובץ מקור למדד החדש?')) {
+    triggerSourceUpload(function (id) {
+      metric.uploadedDoc = id;
+      renderMetricsTable(calc);
+      openUploadedSource(id);
+    });
+  }
 }
 
 // ===== TEMPORARY LOADING (risk group) =====
@@ -4864,11 +5031,13 @@ function openEventInfo(dxIdx, evIdx) {
     ['תאריך סיום אירוע / טיפול', ev.endDate || '—'],
     ['מספר תיק תביעה', ev.claimId ? ev.claimId : 'אין מזהה תביעה'],
   ];
+  // an existing event always links to its source document — no upload here
+  // (uploading is available only when creating a new event / diagnosis / metric)
   const sourceBtn = ev.uploadedDoc
     ? `<button class="doc-action-btn" onclick="openUploadedSource('${ev.uploadedDoc}')">📄 צפייה במקור</button>`
     : (ev.doc
         ? `<button class="doc-action-btn" onclick="openDoc('${ev.doc}')">📄 צפייה במקור</button>`
-        : `<button class="doc-action-btn" onclick="uploadEventSource(${dxIdx}, ${evIdx})">📎 העלה מסמך מקור לאירוע</button>`);
+        : `<button class="doc-action-btn" disabled title="אין מסמך מקור לאירוע זה">אין מסמך מקור</button>`);
   document.getElementById('evinfo-popup-body').innerHTML =
     `<div class="ev-summary">${ev.text || '—'}</div>
      <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
@@ -5208,16 +5377,20 @@ function enrollmentFormHtml(p) {
   </div>`;
 }
 
+const ENROLLMENT_PDF = 'assets/enrollment-form-621.pdf';
+
 function openEnrollmentForm() {
   const p = patientsState[currentIdx];
   document.getElementById('enrollment-popup-meta').textContent =
     `${p.name} · ת״ז ${p.id}${p.policy ? ' · פוליסה ' + p.policy : ''}`;
   document.getElementById('enrollment-popup-body').innerHTML = `
-    <div class="hd-readonly-note">תצוגה לקריאה בלבד — שחזור של טופס ההצעה המקורי (טופס 621) כפי שנחתם על ידי המבוטח.</div>
-    ${enrollmentFormHtml(p)}
+    <div class="doc-embed-note">המסמך המקורי — טופס הצעה לביטוח חיים למשכנתא (טופס 621), משובץ להלן.</div>
+    <object class="doc-embed" data="${ENROLLMENT_PDF}#view=FitH" type="application/pdf">
+      <div class="metrics-empty">לא ניתן להציג את ה-PDF בדפדפן זה — ניתן להורידו או לפתוח אותו בכרטיסייה חדשה.</div>
+    </object>
     <div class="doc-actions" style="margin-top:12px;">
-      <button class="doc-action-btn">הורד PDF</button>
-      <button class="doc-action-btn">צפה בסריקת המקור בגודל מלא</button>
+      <a class="doc-action-btn" href="${ENROLLMENT_PDF}" download style="text-decoration:none;">הורד PDF</a>
+      <a class="doc-action-btn" href="${ENROLLMENT_PDF}" target="_blank" rel="noopener" style="text-decoration:none;">פתח בכרטיסייה חדשה</a>
     </div>`;
   document.getElementById('enrollment-popup').classList.add('open');
 }
@@ -5754,10 +5927,17 @@ function openHealthForm(idx) {
     </div>`;
 
   document.getElementById('hdform-popup-body').innerHTML = `
-    <div class="hd-readonly-note">תצוגה לקריאה בלבד — שחזור של הצהרת הבריאות המקורית (טופס 415) כפי שנחתמה על ידי המבוטח.</div>
-    ${form415Head}${headerTable}${bodySection}${footerSection}`;
+    <div class="doc-embed-note">המסמך המקורי — הצהרת בריאות חתומה (טופס 415), משובץ להלן.</div>
+    <object class="doc-embed" data="${HEALTH_DECL_PDF}#view=FitH" type="application/pdf">
+      <div class="metrics-empty">לא ניתן להציג את ה-PDF בדפדפן זה — ניתן להורידו או לפתוח אותו בכרטיסייה חדשה.</div>
+    </object>
+    <div class="doc-actions" style="margin-top:12px;">
+      <a class="doc-action-btn" href="${HEALTH_DECL_PDF}" download style="text-decoration:none;">הורד PDF</a>
+      <a class="doc-action-btn" href="${HEALTH_DECL_PDF}" target="_blank" rel="noopener" style="text-decoration:none;">פתח בכרטיסייה חדשה</a>
+    </div>`;
   document.getElementById('hdform-popup').classList.add('open');
 }
+const HEALTH_DECL_PDF = 'assets/health-declaration-415.pdf';
 
 // Close on overlay click
 document.querySelectorAll('.popup-overlay').forEach(el => {
@@ -6129,6 +6309,7 @@ function chooseProcess(id) {
   renderHeader();
   renderHealthBar();
   renderHealthDeclActions();
+  renderMetricsSection();
   renderCrossChecks();
   renderPrevDeclarations();
   renderLifestyle();
