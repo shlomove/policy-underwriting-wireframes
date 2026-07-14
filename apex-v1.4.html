@@ -1002,6 +1002,9 @@
     background: var(--bg-hover);
     border-color: var(--accent, #1976d2);
   }
+  .approval-action.disabled { opacity: .5; cursor: not-allowed; }
+  .approval-action.disabled:hover { background: var(--bg); border-color: var(--border); }
+  .approval-action.disabled .approval-action-sub { color: var(--error); }
   .approval-action-icon {
     width: 38px; height: 38px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -2876,11 +2879,11 @@
     </div>
     <div class="popup-body">
       <div class="approval-actions">
-        <button class="approval-action" onclick="runApproval('issue')">
+        <button class="approval-action" id="approval-issue-btn" onclick="runApproval('issue')">
           <span class="approval-action-icon ok"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="m9 14 2 2 4-4"/></svg></span>
           <span class="approval-action-text">
             <span class="approval-action-title">הפקת פוליסה</span>
-            <span class="approval-action-sub">אישור סופי והנפקת הפוליסה למבוטח</span>
+            <span class="approval-action-sub" id="approval-issue-sub">אישור סופי והנפקת הפוליסה למבוטח</span>
           </span>
         </button>
         <button class="approval-action" onclick="runApproval('missing')">
@@ -4059,9 +4062,7 @@ function openDocumentOriginal(i) {
     ${reasonBlock}
     <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
-      <button class="doc-action-btn">הורד PDF</button>
-      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
-      <button class="doc-action-btn">הוסף הערה</button>
+      <button class="doc-action-btn">פתח קובץ</button>
     </div>`;
   document.getElementById('doc-popup').classList.add('open');
 }
@@ -4783,15 +4784,13 @@ function unsavedCoverages(p) {
 function unsupportedCoverages(p) {
   return riskGroupsOf(p).filter(rg => !SUPPORTED_COVERAGES.includes(rg.riskGroupCode));
 }
+// production (הפקת פוליסה) is blocked until every coverage is underwritten;
+// other actions (missing-docs / notes letters) remain available on the next screen
+function productionBlockers(p) {
+  return [...unsavedCoverages(p), ...unsupportedCoverages(p)];
+}
 function proceedToApproval() {
-  const p = patientsState[currentIdx];
-  if (unsavedCoverages(p).length) return; // blocked — approve button is disabled and a note is shown
-  const unsupported = unsupportedCoverages(p);
-  if (unsupported.length) {
-    const el = document.getElementById('overview-error');
-    if (el) el.innerHTML = `⚠ לא ניתן להפיק פוליסה — לא בוצע חיתום לכיסוי <b>${unsupported.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}</b> (כיסוי לא נתמך במערכת).`;
-    return;
-  }
+  // always advance to the actions screen — only the "הפקת פוליסה" option itself is gated there
   closePopup('overview-popup');
   openApprovalPopup();
 }
@@ -4832,17 +4831,12 @@ function openUwOverview() {
   }).join('');
   const unsaved = unsavedCoverages(p);
   const warnBanner = unsaved.length
-    ? `<div class="ov-warn">⚠ לא ניתן להפיק פוליסה — הכיסויים הבאים טרם אושרו: <b>${unsaved.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}</b>.<br>יש ללחוץ «שמור» בסיכום כל כיסוי לפני שליחה לאישור.</div>`
+    ? `<div class="ov-warn">⚠ הכיסויים הבאים טרם אושרו: <b>${unsaved.map(rg => escapeHtml(rg.riskGroupName)).join(', ')}</b>.<br>ניתן להמשיך לשליחת חוסרים/הערות, אך הפקת הפוליסה תיחסם עד לאישור («שמור») כל הכיסויים.</div>`
     : '';
   document.getElementById('overview-meta').textContent = `מזהה תהליך ${p.processId} · ${p.name} · ת״ז ${p.id}`;
-  document.getElementById('overview-body').innerHTML = warnBanner + `<div class="ov-error" id="overview-error"></div>` + html;
+  document.getElementById('overview-body').innerHTML = warnBanner + html;
   const approveBtn = document.getElementById('overview-approve-btn');
-  if (approveBtn) {
-    approveBtn.disabled = unsaved.length > 0;
-    approveBtn.title = unsaved.length ? 'יש לאשר (לשמור) את כל הכיסויים לפני הפקת פוליסה' : '';
-    approveBtn.style.opacity = unsaved.length ? '.45' : '';
-    approveBtn.style.cursor = unsaved.length ? 'not-allowed' : '';
-  }
+  if (approveBtn) { approveBtn.disabled = false; approveBtn.title = ''; approveBtn.style.opacity = ''; approveBtn.style.cursor = ''; }
   document.getElementById('overview-popup').classList.add('open');
 }
 
@@ -5705,9 +5699,7 @@ function openDoc(key) {
     </div>
     <div class="doc-file-ph"><div class="ic">📄🖼</div><div class="t">קובץ PDF / תמונה</div><div class="s">תצוגה מקדימה של מסמך המקור הסרוק</div></div>
     <div class="doc-actions">
-      <button class="doc-action-btn">הורד PDF</button>
-      <button class="doc-action-btn">צפה במקור</button>
-      <button class="doc-action-btn">הוסף הערה</button>
+      <button class="doc-action-btn">פתח קובץ</button>
     </div>
   `;
   document.getElementById('doc-popup').classList.add('open');
@@ -5803,6 +5795,19 @@ function openApprovalPopup() {
   document.getElementById('approval-popup-meta').textContent =
     `מזהה תהליך ${p.processId} · ${p.name} · ${rgSummaryText(p)}` +
     (rejected ? ' · ⚠ מזהה התהליך בסטטוס דחייה' : '');
+  // gate the first option (הפקת פוליסה) — the rest (חוסרים / הערות letters) stay available
+  const blockers = productionBlockers(p);
+  const issueBtn = document.getElementById('approval-issue-btn');
+  const issueSub = document.getElementById('approval-issue-sub');
+  if (issueBtn) {
+    issueBtn.classList.toggle('disabled', blockers.length > 0);
+    issueBtn.title = blockers.length ? 'לא ניתן להפיק — לא בוצע חיתום מלא לכל הכיסויים' : '';
+  }
+  if (issueSub) {
+    issueSub.textContent = blockers.length
+      ? '⚠ לא ניתן להפיק — טרם בוצע חיתום לכיסוי: ' + blockers.map(rg => rg.riskGroupName).join(', ')
+      : 'אישור סופי והנפקת הפוליסה למבוטח';
+  }
   document.getElementById('approval-popup').classList.add('open');
 }
 
@@ -5811,6 +5816,7 @@ function runApproval(action) {
     issue: 'הפקת פוליסה',
     reinsurer: 'שליחה למבטח משנה',
   };
+  if (action === 'issue' && productionBlockers(patientsState[currentIdx]).length) return; // production gated
   closePopup('approval-popup');
   if (action === 'missing') { openApprovalMissingEmail(); return; }
   if (action === 'loadings') { openLoadingsLetter(); return; }
