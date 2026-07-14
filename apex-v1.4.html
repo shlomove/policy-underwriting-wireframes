@@ -1633,8 +1633,9 @@
     transition: background 0.12s;
   }
 
-  .calc-subtab:hover { background: var(--bg-hover); }
+  .calc-subtab:hover:not(:disabled) { background: var(--bg-hover); }
   .calc-subtab.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .calc-subtab:disabled { opacity: .4; cursor: not-allowed; }
 
   .calc-placeholder {
     border: 1.5px dashed var(--border);
@@ -2132,11 +2133,12 @@
   .doc-embed-note { font-size:11px; color:var(--text-light); font-style:italic; margin-bottom:10px; }
 
   /* ===== Medical metrics modal ===== */
-  .metrics-calc-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
-  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text); background:#fff; border:1.5px solid var(--border); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; }
+  .metrics-calc-row { display:flex; flex-wrap:nowrap; gap:6px; margin-bottom:14px; align-items:center; }
+  .metrics-calc-btn { font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text); background:#fff; border:1.5px solid var(--border); border-radius:999px; padding:7px 16px; cursor:pointer; transition:all .12s; white-space:nowrap; }
   .metrics-calc-btn:hover:not(:disabled) { background:#f2f3f5; border-color:var(--text-muted); }
   .metrics-calc-btn.active { background:#e9eaec; border-color:var(--text-muted); color:var(--text); }
-  .metrics-calc-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .metrics-calc-btn:disabled { opacity:.4; cursor:not-allowed; font-size:11px; padding:5px 11px; }
+  .metrics-calc-btn:disabled .metrics-calc-sub { display:none; }
   .metrics-calc-sub { font-size:10px; font-weight:500; opacity:.75; }
   .metrics-table { width:100%; border-collapse:collapse; font-size:12px; }
   .metrics-table th, .metrics-table td { border:1px solid var(--border); padding:7px 9px; text-align:right; vertical-align:middle; }
@@ -2159,6 +2161,7 @@
   .doc-file-ph .ic { font-size:46px; line-height:1; }
   .doc-file-ph .t { font-size:13px; font-weight:800; color:var(--text-muted); }
   .doc-file-ph .s { font-size:11px; }
+  .agent-text-box { font-size:13px; line-height:1.9; color:var(--text); background:#fafbfc; border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; white-space:pre-wrap; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -2660,11 +2663,11 @@
 
     <div class="calc-subtabs" id="calc-subtabs">
       <button class="calc-subtab active" onclick="switchCalc('cmc')"  id="calc-subtab-cmc">CMC</button>
-      <button class="calc-subtab"        onclick="switchCalc('ckd')"  id="calc-subtab-ckd">CKD</button>
-      <button class="calc-subtab"        onclick="switchCalc('cad')"  id="calc-subtab-cad">CAD</button>
-      <button class="calc-subtab"        onclick="switchCalc('lvmc')" id="calc-subtab-lvmc">LVMC</button>
-      <button class="calc-subtab"        onclick="switchCalc('jvc')"  id="calc-subtab-jvc">JVC</button>
-      <button class="calc-subtab"        onclick="switchCalc('cc')"   id="calc-subtab-cc">CC</button>
+      <button class="calc-subtab" disabled title="מחשבון זה אינו זמין כרגע" id="calc-subtab-ckd">CKD</button>
+      <button class="calc-subtab" disabled title="מחשבון זה אינו זמין כרגע" id="calc-subtab-cad">CAD</button>
+      <button class="calc-subtab" disabled title="מחשבון זה אינו זמין כרגע" id="calc-subtab-lvmc">LVMC</button>
+      <button class="calc-subtab" disabled title="מחשבון זה אינו זמין כרגע" id="calc-subtab-jvc">JVC</button>
+      <button class="calc-subtab" disabled title="מחשבון זה אינו זמין כרגע" id="calc-subtab-cc">CC</button>
     </div>
 
     <!-- CMC -->
@@ -3790,7 +3793,7 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום מבוקש${selRg ? ` <span style="font-weight:400;color:var(--text-light);">· ${escapeHtml(selRg.riskGroupName)}</span>` : ''}</div><div class="hd-value" style="font-size:12px;${selRg ? '' : 'color:var(--text-light);font-weight:400;'}">${selRg ? reqAmount : 'בחרו כיסוי לצפייה בסכום'}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${exiAmount}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;${selRg ? '' : 'color:var(--text-light);font-weight:400;'}">${selRg ? exiAmount : 'בחרו כיסוי לצפייה בסכום'}</div></div>
   `;
 }
 
@@ -4098,7 +4101,6 @@ function buildCard(dx, idx) {
       <div class="tl-dot"></div>
       <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="לחץ לפרטי האירוע וצפייה במקור">${item.text}</div>
       <div class="tl-actions">
-        ${(item.uploadedDoc || item.doc) ? `<button class="tl-mini-btn" onclick="event.stopPropagation();${item.uploadedDoc ? `openUploadedSource('${item.uploadedDoc}')` : `openDoc('${item.doc}')`}" title="צפייה במסמך מקור">📄</button>` : ''}
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
         <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
       </div>
@@ -5299,9 +5301,22 @@ function onLsSourceChange(key, val) {
   if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-' + key).textContent = '▼'; }
 }
 
+const LS_SOURCE_PDF = 'assets/enrollment-form-page1.pdf';
 function openLsSource(key) {
-  const src = patientsState[currentIdx].lifestyle[key].source;
-  if (src && docs[src]) openDoc(src);
+  const p = patientsState[currentIdx];
+  const kind = lifestyleLabels[key] || 'מקור';
+  document.getElementById('doc-popup-title').textContent = 'מסמך מקור — ' + kind;
+  document.getElementById('doc-popup-meta').textContent = p.name + ' · טופס הצטרפות (עמוד 1)';
+  document.getElementById('doc-popup-body').innerHTML = `
+    <div class="doc-embed-note">מסמך המקור — עמוד ראשון של טופס ההצטרפות.</div>
+    <object class="doc-embed" data="${LS_SOURCE_PDF}#view=FitH" type="application/pdf">
+      <div class="metrics-empty">לא ניתן להציג את ה-PDF בדפדפן זה — ניתן להורידו או לפתוח אותו בכרטיסייה חדשה.</div>
+    </object>
+    <div class="doc-actions" style="margin-top:12px;">
+      <a class="doc-action-btn" href="${LS_SOURCE_PDF}" download style="text-decoration:none;">הורד PDF</a>
+      <a class="doc-action-btn" href="${LS_SOURCE_PDF}" target="_blank" rel="noopener" style="text-decoration:none;">פתח בכרטיסייה חדשה</a>
+    </div>`;
+  document.getElementById('doc-popup').classList.add('open');
 }
 
 function editLifestyle(key) {
@@ -5456,27 +5471,15 @@ function openEnrollmentForm() {
 }
 
 function openAgentAgreement() {
-  const p = patientsState[currentIdx];
-  document.getElementById('agent-popup-meta').textContent =
-    `תנאי ההתקשרות מול הסוכן · ${p.policy || 'פוליסה'}`;
-  const point = (t, d) => `<li style="margin-bottom:8px;"><strong>${t}</strong> — ${d}</li>`;
+  document.getElementById('agent-popup-meta').textContent = 'טקסט מיובא ממערכת BPR';
   document.getElementById('agent-popup-body').innerHTML = `
-    <div class="doc-placeholder">
-      <div class="doc-placeholder-label">עיקרי ההסכם עם הסוכן</div>
-      <ul style="margin:6px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6;color:var(--text);">
-        ${point('הצהרת בריאות מקוצרת', 'הסוכן רשאי להחתים את המבוטח על הצהרת בריאות מקוצרת בעסקאות העומדות בתנאי הסף שנקבעו במסגרת ההסכם.')}
-        ${point('הטבות', 'הנחות ותנאים מועדפים מוסכמים לתיק זה (לרבות הטבת פרמיה והרחבות כיסוי) בהתאם לנספח ההטבות.')}
-        ${point('החרגות', 'רשימת ההחרגות והסייגים המוסכמים מראש שניתן להחילם ללא אישור פרטני נוסף.')}
-        ${point('סמכויות חיתום', 'גבולות הסמכות של הסוכן לאישור עסקאות (סכומי כיסוי, גילאים וסוגי מוצר) ללא הפניה לחיתום מרכזי.')}
-        ${point('עמלות ותגמול', 'מבנה העמלות, מקדמי התגמול ותנאי ההתחשבנות מול הסוכן.')}
-        ${point('חובות גילוי ונאותות', 'התחייבות הסוכן למסירת מידע מלא ומדויק ולקיום הליך מכירה נאות מול המבוטח.')}
-      </ul>
-    </div>
-    <div class="doc-scan-placeholder">[ העתק הסכם הסוכן החתום — PDF מקור ]</div>
-    <div class="doc-actions">
-      <button class="doc-action-btn">הורד PDF</button>
-      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
-    </div>`;
+    <div class="agent-text-box">לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית סד דו איוסמוד טמפור אינסידידונט וט לבורה אט דולורה מגנה אליקוא. וט אנים אד מינים ווניאם, קוויס נוסטרוד אקסרסיטיישן אולמקו לבוריס ניסי אוט אליקוויפ אקס אאה קונסקוואט.
+
+לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. נולה פקיליסי. סד אוט פרספיסיאטיס אונדה אומניס איסטה נאטוס אירור סיט וולופטאטם אקוסאנטיום דולורמקוה לאודנטיום, טוטאם רם אפריאם.
+
+דואיס אאוטה אירורה דולור אין רפרהנדריט אין וולופטאטה וליט אסה סילום דולורה אאו פוגיאט נולה פאריאטור. אקסספטאור סינט אוקאקאט קופידאטאט נון פרואידנט, סונט אין קולפא קווי אופיסיה דסרונט מולית אנים איד אסט לבורום.
+
+סד אוט פרספיסיאטיס אונדה אומניס איסטה נאטוס אירור סיט וולופטאטם אקוסאנטיום דולורמקוה לאודנטיום, טוטאם רם אפריאם, אקווה איפסא קוואה אב אילו אינוונטורה ווריטאטיס אט קוואסי ארכיטקטו באטאה ויטאה דיקטה סונט אקספליקאבו.</div>`;
   document.getElementById('agent-popup').classList.add('open');
 }
 
@@ -6287,8 +6290,13 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
 // LANDING PAGE — POLICY SEARCH
 // =====================================================================
 function submitLogin() {
-  // demo: any username / password is accepted
   const err = document.getElementById('login-error');
+  const user = (document.getElementById('login-user').value || '').trim();
+  const pass = (document.getElementById('login-pass').value || '').trim();
+  const showErr = (msg) => { if (err) { err.textContent = msg; err.classList.add('show'); } };
+  if (!user || !pass) { showErr('יש להזין שם משתמש וסיסמה'); return; }
+  // username must contain letters only — no digits or special characters
+  if (!/^[A-Za-z֐-׿ ]+$/.test(user)) { showErr('שם המשתמש יכול להכיל אותיות בלבד — ללא מספרים או תווים מיוחדים'); return; }
   if (err) err.classList.remove('show');
   document.getElementById('login').classList.add('hidden');
   const li = document.getElementById('landing-input');
