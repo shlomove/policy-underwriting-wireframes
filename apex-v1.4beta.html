@@ -2724,7 +2724,6 @@
         <div class="popup-meta" id="overview-meta"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button class="doc-action-btn" onclick="printOverview()">🖨 הדפס / ייצוא</button>
         <button class="popup-close" onclick="closePopup('overview-popup')">✕ סגור</button>
       </div>
     </div>
@@ -4547,8 +4546,6 @@ function openItemSummary(type, ref) {
   const code = selectedRgCode; const c = f.uw[code]; const sw = f.swiss[code];
   document.getElementById('dxsum-title').textContent = 'סיכום אבחנה — ' + findingCode(f) + ' · ' + (riskGroupNames[code] || code);
   document.getElementById('dxsum-meta').textContent = findingTitle(f);
-  const swissRec = swissHasContent(sw)
-    ? `<div class="uwm-swiss"><span class="uwm-swiss-lbl">מוצע מ-Swiss:</span> ${escapeHtml(cellSummary(sw))}${sw.freeText ? (' — ' + escapeHtml(sw.freeText)) : ''}</div>` : '';
   let tableHtml = '<div class="uw-summary-empty">אין טבלת Swiss זמינה לפריט זה.</div>';
   const t = loadingTables[f.loadingTableKey];
   if (t) {
@@ -4561,13 +4558,23 @@ function openItemSummary(type, ref) {
     tableHtml = `<div class="loading-table-wrap"><table class="loading-table"><thead><tr>${colH}</tr></thead><tbody>${rowsH}</tbody></table></div>${t.note ? `<div class="table-note">${escapeHtml(t.note)}</div>` : ''}`;
   }
   document.getElementById('dxsum-body').innerHTML = `
-    ${swissRec}
     <div class="itemuw-note-lbl" style="margin-bottom:6px;">טבלת התוספות כפי שהתקבלה מ-Swiss</div>
     ${tableHtml}
     <div class="dxsum-decided">תוספת שנקבעה בפועל (${escapeHtml(riskGroupNames[code] || code)}): <b>${escapeHtml(cellSummary(c))}</b></div>
     <label class="itemuw-note-lbl" style="margin-top:12px;">הערת חתם — מה בדיוק הוחלט ולמה ניתנה התוספת (רישום מלא)</label>
-    <textarea class="itemuw-note" rows="4" placeholder="פרט/י את ההחלטה החיתומית והנימוק — לרבות בסיס הדירוג מהטבלה, חומרה/איזון, וכל שינוי מהערך שהוצע" onchange="onItemSummaryNote('${type}','${ref}',this.value)">${escapeHtml(c.freeText || '')}</textarea>`;
+    <textarea id="dxsum-note" class="itemuw-note" rows="4" placeholder="פרט/י את ההחלטה החיתומית והנימוק — לרבות בסיס הדירוג מהטבלה, חומרה/איזון, וכל שינוי מהערך שהוצע">${escapeHtml(c.freeText || '')}</textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+      <button class="submit-btn" onclick="confirmItemSummary('${type}','${ref}')">אישור</button>
+      <span id="dxsum-status"></span>
+    </div>`;
   document.getElementById('dxsum-popup').classList.add('open');
+}
+function confirmItemSummary(type, ref) {
+  const f = _v14ref(type, ref); if (!f) return;
+  const ta = document.getElementById('dxsum-note');
+  f.uw[selectedRgCode].freeText = ta ? ta.value : '';
+  renderGroupSummary(); refreshItemCard(type, ref); updateAgg();
+  closePopup('dxsum-popup');
 }
 function onItemSummaryNote(type, ref, val) {
   const f = _v14ref(type, ref); if (!f) return;
@@ -4750,7 +4757,6 @@ function openUwOverview() {
   document.getElementById('overview-body').innerHTML = html;
   document.getElementById('overview-popup').classList.add('open');
 }
-function printOverview() { window.print(); }
 
 function updateAgg() {
   const p = patientsState[currentIdx];
