@@ -2235,8 +2235,10 @@
   .ev-info-grid { display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:13px; }
   .ev-info-grid .lbl { color:var(--text-light); font-weight:600; }
   .ev-info-grid .val { color:var(--text); }
-  .ev-summary { font-size:14px; font-weight:600; color:var(--text); text-align:center; background:#f5f8ff; border:1px solid var(--mig-line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; line-height:1.55; }
-  .ev-source-row { display:flex; justify-content:center; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .ev-summary { font-size:14px; font-weight:500; color:var(--text); direction:rtl; text-align:right; background:#f5f8ff; border:1px solid var(--mig-line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; line-height:1.75; }
+  .ev-source-row { display:flex; justify-content:flex-start; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .ev-edit-inp { width:100%; font-family:inherit; font-size:13px; border:1px solid var(--border); border-radius:5px; padding:5px 8px; box-sizing:border-box; direction:rtl; text-align:right; }
+  .ev-edit-summary { width:100%; font-family:inherit; font-size:14px; border:1px solid var(--mig-line); border-radius:var(--radius); padding:12px 14px; box-sizing:border-box; direction:rtl; text-align:right; line-height:1.7; margin-bottom:14px; resize:vertical; }
 
   /* Underwriting explainability inside the source-table popup */
   .uw-explain-block { margin-top:16px; border-top:1px solid var(--border); padding-top:12px; }
@@ -2988,7 +2990,7 @@
           </div>
           <div class="form-field">
             <label class="form-label">תוספת פרומיל (‰)</label>
-            <input type="number" class="form-input" id="temp-permille" min="0" max="100" step="0.5" placeholder="0">
+            <input type="number" class="form-input" id="temp-permille" min="0" max="100" step="1" placeholder="0">
           </div>
         </div>
         <div class="form-field">
@@ -3052,7 +3054,7 @@
           </div>
           <div class="form-field">
             <label class="form-label">תוספת פרומיל (‰)</label>
-            <input type="number" class="form-input" id="uwtemp-permille" min="0" step="0.5" placeholder="0">
+            <input type="number" class="form-input" id="uwtemp-permille" min="0" step="1" placeholder="0">
           </div>
         </div>
         <div class="form-field">
@@ -3611,13 +3613,13 @@ function rgUwRow(rg) {
     </div>
     <div class="rguw-controls">
       <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+rg.uwPercent || 0}" onchange="onRgChange('${code}','uwPercent',this.value)"><span>%</span></label>
-      <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+rg.uwPermille || 0}" onchange="onRgChange('${code}','uwPermille',this.value)"><span>‰</span></label>
+      <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="1" value="${+rg.uwPermille || 0}" onchange="onRgChange('${code}','uwPermille',this.value)"><span>‰</span></label>
       <button class="uwi-temp" onclick="openRgTemp('${code}')">⏱ ${escapeHtml(rgTempLabel(rg))}</button>
     </div>
     <label class="rguw-lbl">הערות חיתום</label>
     <textarea class="rguw-text" placeholder="פירוט התוספות פר אבחנה, החרגות ונימוקים — ניתן להדביק את הטבלה מ-Swiss" onchange="onRgChange('${code}','detailText',this.value)">${escapeHtml(rg.detailText || '')}</textarea>
     <div class="rguw-cancel-row">
-      <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="5" value="${+rg.cancellingAddition || 0}" onchange="onRgChange('${code}','cancellingAddition',this.value)"><span>%</span></label>
+      <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="25" value="${+rg.cancellingAddition || 0}" onchange="onRgChange('${code}','cancellingAddition',this.value)"><span>%</span></label>
       <input type="text" class="rguw-cancel-reason" placeholder="נימוק לתוספת מתבטלת" value="${escapeHtml(rg.cancellingReason || '')}" onchange="onRgChange('${code}','cancellingReason',this.value)">
     </div>
   </div>`;
@@ -3630,7 +3632,8 @@ function onRgChange(code, field, val) {
   if (field === 'detailText') { rg.detailText = val; return; }
   if (field === 'cancellingReason') { rg.cancellingReason = val; return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
-  if (field === 'uwPercent') n = Math.round(n / 25) * 25;
+  if (field === 'uwPercent' || field === 'cancellingAddition') n = Math.round(n / 25) * 25;
+  else if (field === 'uwPermille') n = Math.round(n);
   rg[field] = n;
   renderRgUnderwriting();
   updateAgg();
@@ -4295,7 +4298,7 @@ function uwmRow(f, rg) {
   <div class="uwm-row ${rejected ? 'rejected' : ''}" id="uwm-row-${code}" title="${escapeHtml(policiesTitle)}">
     <span class="uwm-row-name">${escapeHtml(rg.riskGroupName)}${multi ? `<span class="uwm-maslul">(${rg.policies.length} מסלולים)</span>` : ''}</span>
     <label class="uwm-inp-wrap">תוספת ${num('medicalAdditionPercent', c.medicalAdditionPercent, 25)} <span>%</span></label>
-    <label class="uwm-inp-wrap">פרומיל ${num('medicalAdditionPermille', c.medicalAdditionPermille, 0.5)} <span>‰</span></label>
+    <label class="uwm-inp-wrap">פרומיל ${num('medicalAdditionPermille', c.medicalAdditionPermille, 1)} <span>‰</span></label>
     <button class="uwm-mini-btn" onclick="openUwTemp('${code}')">⏱ ${escapeHtml(tempLabel(c))}</button>
     <button class="uwm-mini-btn" onclick="openDxSummaryRg('${code}')">סיכום אבחנה ▸</button>
     <span class="uwm-row-total ${totalCls}" id="uwm-total-${code}">${escapeHtml(summary)}</span>
@@ -4317,7 +4320,7 @@ function onUwCellChange(code, field, val) {
     c[field] = val;
   } else {
     let n = parseFloat(val) || 0; if (n < 0) n = 0;
-    if (/Percent$/.test(field)) n = Math.round(n / 25) * 25;
+    if (/Percent$/.test(field)) n = Math.round(n / 25) * 25; else n = Math.round(n);
     c[field] = n;
     const el = document.querySelector(`#uwm-row-${code} input[onchange*="'${field}'"]`);
     if (el) el.value = n;
@@ -4389,7 +4392,7 @@ function confirmUwTemp() {
   const f = uwFindingByRef(uwCtx); if (!f || !uwTempRg) return;
   const c = f.uw[uwTempRg];
   c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 25) * 25);
-  c.temporaryAdditionPermille = Math.max(0, parseFloat(document.getElementById('uwtemp-permille').value) || 0);
+  c.temporaryAdditionPermille = Math.max(0, Math.round(parseFloat(document.getElementById('uwtemp-permille').value) || 0));
   c.temporaryUntil = document.getElementById('uwtemp-until').value;
   recomputeDecision(c);
   closePopup('uwtemp-popup');
@@ -4490,8 +4493,8 @@ function itemUwCard(type, ref, f) {
   const exclBtn = showExcl
     ? `<button class="itemuw-btn${exclCount ? ' has' : ''}" onclick="openExclusion('${type}','${ref}')">החרגה${exclCount ? ` (${exclCount})` : ''}</button>` : '';
   return `<div class="itemuw" id="itemuw-${type}-${ref}" onclick="event.stopPropagation()">
-    <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="5" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
-    <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
+    <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" min="0" step="25" value="${+c.medicalAdditionPercent || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPercent',this.value)"><span>%</span></label>
+    <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="1" value="${+c.medicalAdditionPermille || 0}" onchange="onItemUw('${type}','${ref}','medicalAdditionPermille',this.value)"><span>‰</span></label>
     <button class="itemuw-btn" onclick="openItemSummary('${type}','${ref}')">סיכום אבחנה ▸</button>
     <button class="itemuw-btn" onclick="openItemTemp('${type}','${ref}')">⏱ ${escapeHtml(tempLabel(c))}</button>
     ${exclBtn}
@@ -4590,7 +4593,7 @@ function onItemUw(type, ref, field, val) {
   const f = _v14ref(type, ref); if (!f) return;
   const c = f.uw[selectedRgCode];
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
-  if (/Percent$/.test(field)) n = Math.round(n / 5) * 5;
+  if (/Percent$/.test(field)) n = Math.round(n / 25) * 25; else n = Math.round(n);
   c[field] = n; recomputeDecision(c);
   refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
@@ -4613,8 +4616,8 @@ function confirmItemTemp() {
   const { type, ref } = itemTempCtx;
   const f = _v14ref(type, ref); if (!f) return;
   const c = f.uw[selectedRgCode];
-  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 5) * 5);
-  c.temporaryAdditionPermille = Math.max(0, parseFloat(document.getElementById('uwtemp-permille').value) || 0);
+  c.temporaryAdditionPercent = Math.max(0, Math.round((parseFloat(document.getElementById('uwtemp-pct').value) || 0) / 25) * 25);
+  c.temporaryAdditionPermille = Math.max(0, Math.round(parseFloat(document.getElementById('uwtemp-permille').value) || 0));
   c.temporaryUntil = document.getElementById('uwtemp-until').value; c.signed = true; recomputeDecision(c);
   closePopup('uwtemp-popup'); refreshItemCard(type, ref); renderGroupSummary(); updateAgg();
 }
@@ -4668,17 +4671,16 @@ function renderGroupSummary() {
   }).join('') : '<div class="uw-summary-empty">טרם נחתמו פריטים בקבוצת סיכון זו</div>';
   const cancelPct = +rg.cancelPct || 0, cancelPer = +rg.cancelPermille || 0;
   const finalPct = Math.max(0, t.pct - cancelPct), finalPer = Math.max(0, t.per - cancelPer);
-  const savedBadge = rg.savedStatus ? `<span class="gs-saved">✓ נשמר · ${escapeHtml(rg.riskGroupName)}</span>` : '';
   const reasonReq = (cancelPct || cancelPer) && !(rg.cancelReason || '').trim();
   wrap.innerHTML = `
     <div class="gs-card">
-      <div class="gs-head">סיכום קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b> ${savedBadge}</div>
+      <div class="gs-head">סיכום קבוצת סיכון: <b>${escapeHtml(rg.riskGroupName)}</b></div>
       <div class="gs-lines">${lines}</div>
       <div class="gs-row gs-total"><span>סך תוספות (אדיטיבי)</span><span class="gs-total-val">${fmtNum(t.pct)}%${t.per ? (' · ' + fmtPermille(t.per)) : ''}</span></div>
       <div class="gs-cancel">
         <div class="gs-cancel-fields">
-          <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="5" value="${cancelPct}" onchange="onGroupCancel('pct',this.value)"><span>%</span></label>
-          <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="0.5" value="${cancelPer}" onchange="onGroupCancel('per',this.value)"><span>‰</span></label>
+          <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" min="0" step="25" value="${cancelPct}" onchange="onGroupCancel('pct',this.value)"><span>%</span></label>
+          <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" min="0" step="1" value="${cancelPer}" onchange="onGroupCancel('per',this.value)"><span>‰</span></label>
         </div>
         <input type="text" class="gs-cancel-reason ${reasonReq ? 'req' : ''}" placeholder="הסבר לתוספת מתבטלת (חובה)" value="${escapeHtml(rg.cancelReason || '')}" onchange="onGroupCancel('reason',this.value)">
       </div>
@@ -4695,7 +4697,7 @@ function onGroupCancel(which, val) {
   const rg = _grp(); if (!rg) return;
   if (which === 'reason') { rg.cancelReason = val; rg.savedStatus = false; renderGroupSummary(); return; }
   let n = parseFloat(val) || 0; if (n < 0) n = 0;
-  if (which === 'pct') rg.cancelPct = Math.round(n / 5) * 5; else rg.cancelPermille = n;
+  if (which === 'pct') rg.cancelPct = Math.round(n / 25) * 25; else rg.cancelPermille = Math.round(n);
   rg.savedStatus = false; renderGroupSummary(); updateAgg();
 }
 function onGroupNotes(val) { const rg = _grp(); if (rg) { rg.groupNotes = val; rg.savedStatus = false; } }
@@ -4977,8 +4979,8 @@ function openTempLoading(idx) {
 function confirmTempLoading() {
   const dx = patientsState[currentIdx].diagnoses[tempCtx];
   if (!dx) return;
-  const pct = Math.max(0, parseFloat(document.getElementById('temp-pct').value) || 0);
-  const permille = Math.max(0, parseFloat(document.getElementById('temp-permille').value) || 0);
+  const pct = Math.max(0, Math.round((parseFloat(document.getElementById('temp-pct').value) || 0) / 25) * 25);
+  const permille = Math.max(0, Math.round(parseFloat(document.getElementById('temp-permille').value) || 0));
   const until = document.getElementById('temp-until').value;
   dx.tempLoading = { pct, permille, until };
   closePopup('temp-popup');
@@ -5031,22 +5033,43 @@ function deleteEvent(dxIdx, evIdx) {
 
 function _evYear(s) { const m = ('' + (s || '')).match(/(\d{4})/); return m ? parseInt(m[1]) : null; }
 
-function openEventInfo(dxIdx, evIdx) {
+let evInfoCtx = null;
+function openEventInfo(dxIdx, evIdx, edit) {
   const p = patientsState[currentIdx];
   const dx = p.diagnoses[dxIdx];
   const ev = dx.timeline[evIdx];
   if (!ev) return;
-  let age = ev.age;
-  if (age == null) {
+  evInfoCtx = { dxIdx, evIdx };
+  let ageAtEvent = ev.age;
+  if (ageAtEvent == null) {
     const by = _evYear(p.birthDate), ey = _evYear(ev.date);
-    if (by && ey) age = ey - by;
+    if (by && ey) ageAtEvent = ey - by;
   }
   document.getElementById('evinfo-popup-meta').textContent = dx.code + ' · ' + (ev.date || '—');
+
+  if (edit) {
+    const inp = (label, id, val) => `<div class="lbl">${label}</div><div class="val"><input id="${id}" class="ev-edit-inp" value="${escapeHtml(val == null ? '' : ('' + val))}"></div>`;
+    document.getElementById('evinfo-popup-body').innerHTML =
+      `<textarea id="ev-edit-text" class="ev-edit-summary" rows="3">${escapeHtml(ev.text || '')}</textarea>
+       <div class="ev-info-grid">
+         ${inp('גיל הלקוח', 'ev-edit-page', p.age)}
+         ${inp('תאריך האירוע', 'ev-edit-date', ev.date)}
+         ${inp('גיל הלקוח בזמן האירוע', 'ev-edit-ageatevent', (ageAtEvent != null && ageAtEvent !== '') ? ageAtEvent : '')}
+         ${inp('תאריך סיום אירוע / טיפול', 'ev-edit-enddate', ev.endDate)}
+       </div>
+       <div class="ev-source-row">
+         <button class="submit-btn" onclick="saveEventInfo()">שמור</button>
+         <button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx})">ביטול</button>
+       </div>`;
+    document.getElementById('evinfo-popup').classList.add('open');
+    return;
+  }
+
   const rows = [
+    ['גיל הלקוח', (p.age != null && p.age !== '') ? p.age : '—'],
     ['תאריך האירוע', ev.date || '—'],
-    ['גיל הלקוח בזמן האירוע', (age != null && age !== '') ? age : '—'],
+    ['גיל הלקוח בזמן האירוע', (ageAtEvent != null && ageAtEvent !== '') ? ageAtEvent : '—'],
     ['תאריך סיום אירוע / טיפול', ev.endDate || '—'],
-    ['מספר תיק תביעה', ev.claimId ? ev.claimId : 'אין מזהה תביעה'],
   ];
   // an existing event always links to its source document — no upload here
   // (uploading is available only when creating a new event / diagnosis / metric)
@@ -5056,11 +5079,27 @@ function openEventInfo(dxIdx, evIdx) {
         ? `<button class="doc-action-btn" onclick="openDoc('${ev.doc}')">📄 צפייה במקור</button>`
         : `<button class="doc-action-btn" disabled title="אין מסמך מקור לאירוע זה">אין מסמך מקור</button>`);
   document.getElementById('evinfo-popup-body').innerHTML =
-    `<div class="ev-summary">${ev.text || '—'}</div>
+    `<div class="ev-summary">${escapeHtml(ev.text || '—')}</div>
      <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
      ${(ev.note || '').trim() ? `<div style="margin-top:10px;font-size:12px;line-height:1.6;"><b>הערה:</b> ${escapeHtml(ev.note)}</div>` : ''}
-     <div class="ev-source-row" style="gap:8px;">${sourceBtn}<button class="doc-action-btn" onclick="addEventNote(${dxIdx}, ${evIdx})">＋ הוסף הערה</button></div>`;
+     <div class="ev-source-row">${sourceBtn}<button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx}, true)">✎ עריכה</button><button class="doc-action-btn" onclick="addEventNote(${dxIdx}, ${evIdx})">＋ הוסף הערה</button></div>`;
   document.getElementById('evinfo-popup').classList.add('open');
+}
+function saveEventInfo() {
+  if (!evInfoCtx) return;
+  const { dxIdx, evIdx } = evInfoCtx;
+  const p = patientsState[currentIdx];
+  const ev = p.diagnoses[dxIdx].timeline[evIdx];
+  if (!ev) return;
+  const v = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  ev.text = v('ev-edit-text');
+  ev.date = v('ev-edit-date') || '—';
+  const at = v('ev-edit-ageatevent'); ev.age = at === '' ? null : (parseInt(at) || at);
+  ev.endDate = v('ev-edit-enddate');
+  const pageAge = v('ev-edit-page');
+  if (pageAge !== '') { p.age = parseInt(pageAge) || p.age; renderHeader(); }
+  renderDiagnoses();
+  openEventInfo(dxIdx, evIdx);
 }
 function addEventNote(dxIdx, evIdx) {
   const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
@@ -6302,13 +6341,11 @@ function openProcessList() {
         </button>`;
     }
     return `
-      <button class="proc-row proc-row-disabled proc-row-col" onclick="unsupportedProcess('${pr.processId}')">
-        <div class="proc-row-main">
-          <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
-          <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
-          <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
-        </div>
-        <div class="proc-note-warn" id="proc-warn-${pr.processId}">⚠ תהליך לא נתמך במערכת</div>
+      <button class="proc-row proc-row-disabled" onclick="unsupportedProcess('${pr.processId}')">
+        <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
+        <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+        <span class="proc-note-warn" id="proc-warn-${pr.processId}">⚠ תהליך לא נתמך במערכת</span>
+        <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
       </button>`;
   }).join('');
   document.getElementById('proc-popup').classList.add('open');
