@@ -3781,10 +3781,6 @@ function openDocsList() {
     const markReadBtn = failedRow
       ? `<button class="docs-action-sm" id="markread-btn-${i}" onclick="markDocRead(${i})">✓ שנה סטטוס ל״נקרא״</button>`
       : '';
-    const manualBtn = failedRow
-      ? `<button class="docs-action-sm primary" id="manual-btn-${i}" onclick="markManualUnderwriting(${i})">⤷ המשך לחיתום ידני</button>`
-      : '';
-    const uploadBtn = `<button class="docs-action-sm" onclick="uploadDocSource(${i})">📎 העלה קובץ מקור</button>`;
 
     return `
       <tr class="${failedRow ? 'row-failed' : ''}">
@@ -3811,8 +3807,7 @@ function openDocsList() {
       <tbody>${rows}</tbody>
     </table>
     <div class="docs-popup-note">
-      מסמכים שנכשלו בקריאה האוטומטית אינם נכללים בחישוב התוספות עד להשלמת קריאה ידנית.
-      ניתן לפתוח את המסמך המקורי ולהעביר אותו לזרימת חיתום ידני.
+      מסמכים שנכשלו בקריאה האוטומטית מסומנים בהתאם. ניתן לפתוח את המסמך המקורי לצפייה.
     </div>`;
   document.getElementById('docs-popup').classList.add('open');
 }
