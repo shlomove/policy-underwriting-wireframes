@@ -2094,6 +2094,38 @@
   .hd-sign-caption { font-size: 11px; color: var(--text-muted); }
   .hd-readonly-note { font-size: 11px; color: var(--text-light); font-style: italic; margin-bottom: 12px; }
 
+  /* ===== Official-form reconstruction (enrollment / declaration) ===== */
+  .of-doc { border:1px solid var(--mig-line); border-radius:var(--radius); background:#fff; }
+  .of-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:14px 16px; border-bottom:2px solid var(--mig-blue); background:linear-gradient(180deg,#f5f8ff,#fff); }
+  .of-brand { display:flex; align-items:center; gap:10px; }
+  .of-logo { width:34px; height:34px; border-radius:7px; background:var(--mig-blue); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; }
+  .of-brand-name { font-size:13px; font-weight:800; color:var(--mig-blue); line-height:1.3; }
+  .of-brand-sub { font-size:10.5px; color:var(--text-light); }
+  .of-title { text-align:left; }
+  .of-title-main { font-size:15px; font-weight:800; color:var(--text); }
+  .of-title-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .of-formno { display:inline-block; margin-top:4px; font-size:11px; font-weight:800; color:#fff; background:var(--mig-blue); border-radius:6px; padding:2px 8px; }
+  .of-instruction { font-size:10.5px; color:var(--text-light); padding:6px 16px; border-bottom:1px solid var(--border); background:#fafbfc; }
+  .of-body { padding:14px 16px; }
+  .of-sec { margin-bottom:16px; }
+  .of-sec-title { font-size:12.5px; font-weight:800; color:var(--mig-blue); background:#eef3fc; border-inline-start:3px solid var(--mig-blue); padding:5px 10px; border-radius:5px; margin-bottom:8px; }
+  .of-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+  .of-cell { border:1px solid var(--border); border-radius:6px; padding:5px 9px; background:#fff; }
+  .of-cell-lbl { font-size:9.5px; color:var(--text-light); font-weight:600; margin-bottom:2px; }
+  .of-cell-val { font-size:12px; color:var(--text); font-weight:600; min-height:15px; }
+  .of-cell-val.ltr { direction:ltr; text-align:right; }
+  .of-table { width:100%; border-collapse:collapse; font-size:11.5px; }
+  .of-table th, .of-table td { border:1px solid var(--border); padding:5px 8px; text-align:right; }
+  .of-table th { background:var(--mig-blue); color:#fff; font-weight:700; font-size:10.5px; }
+  .of-table td.ltr { direction:ltr; }
+  .of-check { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text); margin-inline-end:14px; }
+  .of-box { width:13px; height:13px; border:1.5px solid var(--text-muted); border-radius:3px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:var(--mig-blue); font-weight:800; }
+  .of-box.on { background:#eef3fc; border-color:var(--mig-blue); }
+  .of-terms { margin:0; padding-inline-start:18px; font-size:11px; line-height:1.6; color:var(--text-muted); }
+  .of-terms li { margin-bottom:5px; }
+  .of-declare { font-size:11.5px; line-height:1.6; color:var(--text); background:#fafbfc; border:1px solid var(--border); border-radius:6px; padding:10px 12px; }
+  .of-note { font-size:11px; color:var(--text-muted); background:#fff8e8; border:1px solid #f0e0b0; border-radius:6px; padding:8px 10px; margin-top:8px; }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -2172,6 +2204,8 @@
   .ev-info-grid { display:grid; grid-template-columns:auto 1fr; gap:8px 14px; font-size:13px; }
   .ev-info-grid .lbl { color:var(--text-light); font-weight:600; }
   .ev-info-grid .val { color:var(--text); }
+  .ev-summary { font-size:14px; font-weight:600; color:var(--text); text-align:center; background:#f5f8ff; border:1px solid var(--mig-line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; line-height:1.55; }
+  .ev-source-row { display:flex; justify-content:center; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
 
   /* Underwriting explainability inside the source-table popup */
   .uw-explain-block { margin-top:16px; border-top:1px solid var(--border); padding-top:12px; }
@@ -2403,8 +2437,11 @@
   .proc-rg { font-size:10.5px; font-weight:700; border:1px solid var(--mig-line); border-radius:999px; padding:2px 8px; color:var(--text-muted); background:#fff; white-space:nowrap; }
   .proc-row-disabled { cursor:not-allowed; opacity:.8; }
   .proc-row-disabled:hover { background:#fdf4f4; border-color:#e3a8ab; }
-  .proc-note-warn { color:var(--error); font-weight:700; transition:background .15s; }
-  .proc-note-warn.flash { background:#fdecec; border:1px solid #e3a8ab; border-radius:var(--radius); padding:3px 8px; }
+  /* unsupported-process flag lives INSIDE the process bubble */
+  .proc-row-col { flex-direction:column; align-items:stretch; gap:8px; }
+  .proc-row-main { display:flex; align-items:center; gap:12px; width:100%; }
+  .proc-note-warn { color:var(--error); font-weight:700; transition:background .15s; font-size:12px; display:flex; align-items:center; gap:6px; background:#fdecec; border:1px solid #f0c4c6; border-radius:var(--radius); padding:5px 9px; }
+  .proc-note-warn.flash { background:#fbdada; border-color:#e3a8ab; }
 
   /* ===== Migdal full-colour theme (lo-fi grayscale lifted) ===== */
   :root {
@@ -3657,8 +3694,6 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום מבוקש</div><div class="hd-value" style="font-size:12px;">${p.sumRequested || '—'}</div></div>
-    <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting || '—'}</div></div>
   `;
 }
@@ -4779,12 +4814,16 @@ function addEvent(dxIdx) {
   if (date === null) return;
   const text = prompt('תיאור האירוע הרפואי:');
   if (!text || !text.trim()) return;
-  patientsState[currentIdx].diagnoses[dxIdx].timeline.push({
-    date: (date || '').trim() || '—', text: text.trim(), doc: null,
-  });
+  const timeline = patientsState[currentIdx].diagnoses[dxIdx].timeline;
+  timeline.push({ date: (date || '').trim() || '—', text: text.trim(), doc: null });
+  const newIdx = timeline.length - 1;
   renderDiagnoses();
   const tl = document.getElementById('tl-' + dxIdx);
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+  // offer to attach an original source file explaining the new event
+  if (confirm('האם לצרף קובץ מקור שמסביר את האירוע?')) {
+    uploadEventSource(dxIdx, newIdx);
+  }
 }
 
 function editEvent(dxIdx, evIdx) {
@@ -4820,19 +4859,21 @@ function openEventInfo(dxIdx, evIdx) {
   }
   document.getElementById('evinfo-popup-meta').textContent = dx.code + ' · ' + (ev.date || '—');
   const rows = [
-    ['אירוע', ev.text || '—'],
     ['תאריך האירוע', ev.date || '—'],
     ['גיל הלקוח בזמן האירוע', (age != null && age !== '') ? age : '—'],
     ['תאריך סיום אירוע / טיפול', ev.endDate || '—'],
     ['מספר תיק תביעה', ev.claimId ? ev.claimId : 'אין מזהה תביעה'],
   ];
+  const sourceBtn = ev.uploadedDoc
+    ? `<button class="doc-action-btn" onclick="openUploadedSource('${ev.uploadedDoc}')">📄 צפייה במקור</button>`
+    : (ev.doc
+        ? `<button class="doc-action-btn" onclick="openDoc('${ev.doc}')">📄 צפייה במקור</button>`
+        : `<button class="doc-action-btn" onclick="uploadEventSource(${dxIdx}, ${evIdx})">📎 העלה מסמך מקור לאירוע</button>`);
   document.getElementById('evinfo-popup-body').innerHTML =
-    `<div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
+    `<div class="ev-summary">${ev.text || '—'}</div>
+     <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
      ${(ev.note || '').trim() ? `<div style="margin-top:10px;font-size:12px;line-height:1.6;"><b>הערה:</b> ${escapeHtml(ev.note)}</div>` : ''}
-     <div class="doc-actions" style="margin-top:14px;">
-       <button class="doc-action-btn" ${ev.doc ? `onclick="openDoc('${ev.doc}')"` : 'disabled title="אין קובץ מקור לאירוע זה"'}>📄 צפיה בקובץ מקור</button>
-       <button class="doc-action-btn" onclick="addEventNote(${dxIdx}, ${evIdx})">＋ הוסף הערה</button>
-     </div>`;
+     <div class="ev-source-row" style="gap:8px;">${sourceBtn}<button class="doc-action-btn" onclick="addEventNote(${dxIdx}, ${evIdx})">＋ הוסף הערה</button></div>`;
   document.getElementById('evinfo-popup').classList.add('open');
 }
 function addEventNote(dxIdx, evIdx) {
@@ -5055,33 +5096,128 @@ function addHobby() {
 // =====================================================================
 // HEADER DOCUMENTS (enrollment form / agent agreement)
 // =====================================================================
+function enrollmentFormHtml(p) {
+  const nameParts = ('' + (p.name || '')).trim().split(' ');
+  const first = nameParts.slice(0, -1).join(' ') || nameParts[0] || '—';
+  const last = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '—';
+  const fin = p.financial || {};
+  const loanAmount = fin.amount ? fmtMoney(fin.amount) : (p.sumRequested || '—');
+  const cell = (l, v, ltr) => `<div class="of-cell"><div class="of-cell-lbl">${l}</div><div class="of-cell-val${ltr ? ' ltr' : ''}">${v || '—'}</div></div>`;
+  const chk = (label, on) => `<span class="of-check"><span class="of-box${on ? ' on' : ''}">${on ? '✓' : ''}</span>${label}</span>`;
+  return `
+  <div class="of-doc">
+    <div class="of-head">
+      <div class="of-brand">
+        <div class="of-logo">מ</div>
+        <div>
+          <div class="of-brand-name">מגדל חברה לביטוח בע״מ</div>
+          <div class="of-brand-sub">קוד מסמך 157 · מהדורה 11.2025</div>
+        </div>
+      </div>
+      <div class="of-title">
+        <div class="of-title-main">הצעה לביטוח — ביטוח חיים למשכנתא</div>
+        <div class="of-title-sub">הטופס מיועד לנשים ולגברים כאחד</div>
+        <span class="of-formno">טופס מספר 621</span>
+      </div>
+    </div>
+    <div class="of-instruction">יש למלא את הטופס בעט בלבד ולא בעיפרון · כל המונחים בהצעה זו יפורשו כהגדרתם בתנאים הכלליים של הפוליסה.</div>
+    <div class="of-body">
+
+      <div class="of-sec">
+        <div class="of-grid">
+          ${cell('מספר פוליסה', p.policy, true)}
+          ${cell('תאריך תחילת הביטוח', '01/08/2026', true)}
+          ${cell('מספר הסכם', 'S-4470', true)}
+          ${cell('שם הסוכן', 'סוכנות אלפא ביטוח')}
+          ${cell('מספר סוכן', '5521', true)}
+          ${cell('שם המפקח', 'ד. לוי')}
+        </div>
+      </div>
+
+      <div class="of-sec">
+        <div class="of-sec-title">א. פרטי המועמד לביטוח ולבעלות על הפוליסה</div>
+        <div class="of-grid">
+          ${cell('מספר תעודת זהות', p.id, true)}
+          ${cell('שם משפחה', last)}
+          ${cell('שם פרטי', first)}
+          ${cell('תאריך לידה', p.birthDate, true)}
+          ${cell('מין', p.gender)}
+          ${cell('מצב משפחתי', 'נשוי/אה')}
+          ${cell('מקצוע / עיסוק', p.profession || 'שכיר')}
+          ${cell('טלפון נייד', '050-0000000', true)}
+          ${cell('דואר אלקטרוני', 'client@example.com', true)}
+          ${cell('כתובת מגורים', 'רחוב הדקל 12, תל אביב')}
+        </div>
+        <div style="margin-top:9px;font-size:11.5px;">
+          המשכנתא הינה לרכישת דירה יחידה כהגדרתה בחוק מיסוי מקרקעין:
+          ${chk('כן', true)} ${chk('לא', false)}
+        </div>
+      </div>
+
+      <div class="of-sec">
+        <div class="of-sec-title">ב. מוטבים</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:7px;">המלווה (הבנק) רשום כמוטב בלתי חוזר בסכום השווה ליתרת ההלוואה המובטחת; יתר תגמולי הביטוח משולמים למוטבים שלהלן.</div>
+        <table class="of-table">
+          <thead><tr><th>מספר תעודת זהות</th><th>שם משפחה</th><th>שם פרטי</th><th>תאריך לידה</th><th>קרבה למבוטח</th><th>החלק היחסי (%)</th></tr></thead>
+          <tbody>
+            <tr><td class="ltr">${p.id}</td><td>${last}</td><td>בן/בת זוג</td><td class="ltr">—</td><td>בן/בת זוג</td><td>100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="of-sec">
+        <div class="of-sec-title">ג. פירוט מאפייני ההלוואות המבוטחות ופירוט נתוני הביטוח בגינן</div>
+        <div class="of-grid" style="margin-bottom:8px;">
+          ${cell('שם המלווה', 'בנק לאומי לישראל')}
+          ${cell('מספר בנק', '10', true)}
+          ${cell('מספר סניף', '800', true)}
+        </div>
+        <table class="of-table">
+          <thead><tr><th>מספר הלוואה</th><th>סכום הלוואה מובטח</th><th>ריבית שנתית</th><th>סוג הצמדה</th><th>מועד סיום הביטוח</th><th>סוג ההלוואה</th></tr></thead>
+          <tbody>
+            <tr><td class="ltr">1</td><td class="ltr">${loanAmount}</td><td class="ltr">4.9%</td><td>צמוד מדד</td><td class="ltr">08/2051</td><td>החזר קרן וריבית (שפיצר)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="of-sec">
+        <div class="of-sec-title">ד. הבהרות ותנאים נוספים</div>
+        <ol class="of-terms">
+          <li>תקופת הביטוח תחל במועד הנקוב בדף פרטי הביטוח, לפי המבוקש בטופס הצעה זה, ולאחר שהתקבל אמצעי תשלום המאפשר את גביית דמי הביטוח.</li>
+          <li>סכום הביטוח הראשוני ייקבע על פי סכום ההלוואה המובטחת כמצוין לעיל עבור כל הלוואה בנפרד, וישתנה כמפורט בדף פרטי הביטוח.</li>
+          <li>הפרמיה תיקבע בהתאם לגיל המבוטח, מין, סוג ההלוואה ותנאי הקבלה לביטוח שנקבעו עבורו.</li>
+          <li>תשומת ליבך: סכום הביטוח המעודכן אינו בהכרח תואם את יתרת ההלוואה בפועל, וייתכן פער (חיובי או שלילי) בכל נקודת זמן בחיי ההלוואה.</li>
+        </ol>
+      </div>
+
+      <div class="of-sec">
+        <div class="of-sec-title">ה. הצהרות המועמד לביטוח וחתימה</div>
+        <div class="of-declare">
+          אני הח״מ מצהיר/ה ומאשר/ת כי כל התשובות והפרטים שמסרתי בהצעה זו ובהצהרת הבריאות מלאים, נכונים וכנים, וכי הם משמשים בסיס להתקשרות בחוזה הביטוח. ידוע לי כי אי-מסירת מידע מהותי עלולה להשפיע על תשלום תגמולי הביטוח, ואני מתחייב/ת להודיע לחברה על כל שינוי במידע שמסרתי.
+        </div>
+        <div class="hd-sign-row" style="margin-top:12px;">
+          <div class="hd-sign-box">
+            <div class="hd-sign-label">חתימת המועמד לביטוח — ${p.name}</div>
+            <div class="hd-sign-line"></div>
+            <div class="hd-sign-caption">ת״ז: ${p.id} · תאריך: 12/07/2026</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+}
+
 function openEnrollmentForm() {
   const p = patientsState[currentIdx];
   document.getElementById('enrollment-popup-meta').textContent =
     `${p.name} · ת״ז ${p.id}${p.policy ? ' · פוליסה ' + p.policy : ''}`;
-  const row = (l, v) => `<div class="doc-meta-item">${l}: <span>${v || '—'}</span></div>`;
   document.getElementById('enrollment-popup-body').innerHTML = `
-    <div class="doc-placeholder">
-      <div class="doc-placeholder-label">טופס הצטרפות לביטוח — APEX</div>
-      <div class="doc-meta-row" style="flex-wrap:wrap;gap:8px 18px;">
-        ${row('שם מלא', p.name)}${row('ת״ז', p.id)}${row('תאריך לידה', p.birthDate)}${row('מין', p.gender)}
-        ${row('סוג מוצר', p.policyType)}${row('סכום מבוקש', p.sumRequested)}${row('סכום קיים', p.sumExisting)}${row('סטטוס עישון', p.smokingStatus)}
-      </div>
-    </div>
-    <div class="doc-placeholder" style="margin-top:10px;">
-      <div class="doc-placeholder-label">פרטי המוצר וההצהרות</div>
-      <div class="doc-excerpt" style="line-height:1.7;">
-        • מסלול: ${p.policyType}.<br>
-        • הצהרת בריאות: מצורפת וחתומה דיגיטלית על ידי המבוטח.<br>
-        • הסכמת המבוטח לאיסוף ועיבוד מידע רפואי לצורך חיתום — נחתמה.<br>
-        • ייפוי כוח לקבלת מידע רפואי מגופים מטפלים — נחתם.<br>
-        • אמצעי תשלום והוראת קבע — מולאו בטופס המקורי.
-      </div>
-    </div>
-    <div class="doc-scan-placeholder">[ תמונה מוקטנת של טופס ההצטרפות הסרוק / PDF מקור ]</div>
-    <div class="doc-actions">
+    <div class="hd-readonly-note">תצוגה לקריאה בלבד — שחזור של טופס ההצעה המקורי (טופס 621) כפי שנחתם על ידי המבוטח.</div>
+    ${enrollmentFormHtml(p)}
+    <div class="doc-actions" style="margin-top:12px;">
       <button class="doc-action-btn">הורד PDF</button>
-      <button class="doc-action-btn">צפה במקור בגודל מלא</button>
+      <button class="doc-action-btn">צפה בסריקת המקור בגודל מלא</button>
     </div>`;
   document.getElementById('enrollment-popup').classList.add('open');
 }
@@ -5493,6 +5629,26 @@ function openHealthForm(idx) {
 
   const ins = form.insureds;
 
+  // --- Official form-415 header banner (matches the signed Migdal declaration) ---
+  const form415Head = `
+    <div class="of-head" style="border-radius:var(--radius) var(--radius) 0 0;">
+      <div class="of-brand">
+        <div class="of-logo">מ</div>
+        <div>
+          <div class="of-brand-name">מגדל חברה לביטוח בע״מ</div>
+          <div class="of-brand-sub">קוד מסמך · מהדורה 02.2026</div>
+        </div>
+      </div>
+      <div class="of-title">
+        <div class="of-title-main">הצהרת בריאות</div>
+        <div class="of-title-sub">מיועדת לסכומי ביטוח למקרה פטירה עד 2,000,000 ש״ח</div>
+        <span class="of-formno">טופס מספר 415</span>
+      </div>
+    </div>
+    <div class="of-instruction" style="border:1px solid var(--border);border-top:0;border-radius:0 0 var(--radius) var(--radius);margin-bottom:14px;">
+      מספר פוליסה ${p.policy || '—'} · שם הסוכן: סוכנות אלפא ביטוח · מספר סוכן 5521 · הטופס מיועד לנשים ולגברים כאחד · יש למלא את הטופס בעט בלבד ולא בעיפרון.
+    </div>`;
+
   // --- Header: insured details table ---
   const insuredRows = ins.map((m, i) => `
     <tr>
@@ -5598,8 +5754,8 @@ function openHealthForm(idx) {
     </div>`;
 
   document.getElementById('hdform-popup-body').innerHTML = `
-    <div class="hd-readonly-note">תצוגה לקריאה בלבד — הסימונים משקפים את הערכים מהטופס המקורי החתום.</div>
-    ${headerTable}${bodySection}${footerSection}`;
+    <div class="hd-readonly-note">תצוגה לקריאה בלבד — שחזור של הצהרת הבריאות המקורית (טופס 415) כפי שנחתמה על ידי המבוטח.</div>
+    ${form415Head}${headerTable}${bodySection}${footerSection}`;
   document.getElementById('hdform-popup').classList.add('open');
 }
 
@@ -5943,12 +6099,14 @@ function openProcessList() {
         </button>`;
     }
     return `
-      <button class="proc-row proc-row-disabled" onclick="unsupportedProcess('${pr.processId}')">
-        <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
-        <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
-        <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
-      </button>
-      <div class="proc-note proc-note-warn" id="proc-warn-${pr.processId}" style="margin:-4px 4px 11px;">⚠ תהליך לא נתמך במערכת</div>`;
+      <button class="proc-row proc-row-disabled proc-row-col" onclick="unsupportedProcess('${pr.processId}')">
+        <div class="proc-row-main">
+          <span class="proc-id" style="color:var(--text-light);">${pr.processId}</span>
+          <span class="proc-type">${requestTypeLabel(pr.requestType)}</span>
+          <span class="proc-meta" style="margin-right:auto;">נפתח: ${fmtDateTime(pr.date)}</span>
+        </div>
+        <div class="proc-note-warn" id="proc-warn-${pr.processId}">⚠ תהליך לא נתמך במערכת</div>
+      </button>`;
   }).join('');
   document.getElementById('proc-popup').classList.add('open');
 }
