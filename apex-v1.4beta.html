@@ -2509,9 +2509,7 @@
         <div class="feedback-btns" id="fb-health"></div>
       </div>
       <div class="health-section-wrap">
-        <div id="health-bar" class="health-bar"></div>
         <div id="health-decl-actions"></div>
-        <div id="cross-checks"></div>
         <div id="prev-declarations"></div>
       </div>
     </div>
@@ -2614,6 +2612,30 @@
   <div class="footer-item">
     <span class="footer-label">מבוטח:</span>
     <span class="footer-status" id="footer-name">כהן יעל</span>
+  </div>
+  <div class="footer-actions">
+    <button class="footer-submit-btn" onclick="openBetaFeedback()">אישור ▸</button>
+  </div>
+</div>
+
+<!-- ===== BETA FEEDBACK POPUP ===== -->
+<div class="popup-overlay" id="beta-feedback-popup">
+  <div class="popup-box" style="max-width:460px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">ספר לנו על השימוש במערכת</div>
+        <div class="popup-meta">המשוב שלך יעזור לנו לשפר את המערכת</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('beta-feedback-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">המשוב שלך</span>
+      <textarea class="fb-textarea" id="beta-fb-text" placeholder="ספר/י לנו על החוויה, מה עבד טוב ומה ניתן לשפר…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="submitBetaFeedback()">אישור</button>
+        <button class="btn-secondary" onclick="closePopup('beta-feedback-popup')">ביטול</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3644,6 +3666,7 @@ function renderHeader() {
 function renderHealthBar() {
   const p = patientsState[currentIdx];
   const bar = document.getElementById('health-bar');
+  if (!bar) return;   // beta: health-status line removed (only the "view declaration" button kept)
   if (p.healthStatus === 'clean') {
     bar.innerHTML = `<span class="status-dot dot-green"></span><span class="health-status-text">הצהרת בריאות נקייה</span><span class="health-detail">— לא הוצהרו מחלות</span>`;
   } else if (p.healthStatus === 'declared') {
@@ -3954,16 +3977,10 @@ function buildCard(dx, idx) {
     </div>
   `).join('');
 
-  // ----- status tags: anomaly / pending / missing -----
-  const missingCount = (dx.requiredDocs || []).filter(d => !d.received).length;
+  // beta: no missing-docs ("חוסרים") tag; keep only the not-in-declaration anomaly flag
   let tagHtml = '';
   if (dx.inDeclaration === false) {
     tagHtml += `<span class="dx-tag dx-tag-anomaly" title="אבחנה שזוהתה במסמכים ואינה מופיעה בהצהרת הבריאות">⚠ אבחנה לא בהצהרה</span>`;
-  }
-  if (dx.missingStatus) {
-    tagHtml += `<span class="dx-tag dx-tag-pending" title="נשלחה בקשה ללקוח">⏳ ממתין להשלמת מסמכים · ${dx.missingStatus.sentDate}</span>`;
-  } else if (missingCount > 0) {
-    tagHtml += `<span class="dx-tag dx-tag-missing" onclick="event.stopPropagation();openMissingDocs(${idx})" title="לחץ לרשימת המסמכים הנדרשים">חוסרים (${missingCount})</span>`;
   }
 
   return `
@@ -5298,6 +5315,16 @@ function setDxSummary(idx, val) {
 
 function closePopup(id) {
   document.getElementById(id).classList.remove('open');
+}
+
+// ----- beta: "ספר לנו על השימוש במערכת" feedback -----
+function openBetaFeedback() {
+  const t = document.getElementById('beta-fb-text'); if (t) t.value = '';
+  document.getElementById('beta-feedback-popup').classList.add('open');
+}
+function submitBetaFeedback() {
+  closePopup('beta-feedback-popup');
+  alert('תודה! המשוב שלך נשלח.');
 }
 
 // ===== NO-UNDERWRITING (לא נדרש חיתום ריסק) =====
