@@ -2575,18 +2575,18 @@
 
     <div>
       <div class="section-head">
-        <div class="section-title">מדדים רפואיים</div>
-        <div class="feedback-btns" id="fb-metrics"></div>
-      </div>
-      <div id="metrics-section"></div>
-    </div>
-
-    <div>
-      <div class="section-head">
         <div class="section-title">עיסוק ותחביבים</div>
         <div class="feedback-btns" id="fb-lifestyle"></div>
       </div>
       <div class="diagnoses-list" id="lifestyle-list"></div>
+    </div>
+
+    <div>
+      <div class="section-head">
+        <div class="section-title">מדדים רפואיים</div>
+        <div class="feedback-btns" id="fb-metrics"></div>
+      </div>
+      <div id="metrics-section"></div>
     </div>
 
     <div>
@@ -3754,9 +3754,9 @@ function renderHeader() {
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${overallReasons}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">קבוצות סיכון</div><div class="tags-row">${rgTagsHtml}</div></div>
+    <div class="hd-field"><div class="hd-label">כיסויים</div><div class="tags-row">${rgTagsHtml}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;">${p.sumExisting || '—'}</div></div>
+    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;color:var(--text-light);font-weight:400;">—</div></div>
   `;
 }
 
