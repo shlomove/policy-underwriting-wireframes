@@ -4005,12 +4005,14 @@ function openUploadedSource(id) {
 }
 
 function uploadEventSource(dxIdx, evIdx) {
+  const fromModal = document.getElementById('evinfo-popup') && document.getElementById('evinfo-popup').classList.contains('open');
   triggerSourceUpload(function (id) {
     patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx].uploadedDoc = id;
     renderDiagnoses();
     const tl = document.getElementById('tl-' + dxIdx);
     if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
-    openUploadedSource(id);
+    // if uploaded from the event modal — refresh it so the source link updates; otherwise show the file
+    if (fromModal) openEventInfo(dxIdx, evIdx); else openUploadedSource(id);
   });
 }
 
@@ -5171,7 +5173,7 @@ function openEventInfo(dxIdx, evIdx, edit) {
   document.getElementById('evinfo-popup-body').innerHTML =
     `<div class="ev-summary">${escapeHtml(ev.text || '—')}</div>
      <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
-     <div class="ev-source-row">${sourceBtn}<button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx}, true)">✎ עריכה</button></div>`;
+     <div class="ev-source-row">${sourceBtn}<button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx}, true)">✎ עריכה</button><button class="doc-action-btn" onclick="uploadEventSource(${dxIdx}, ${evIdx})">📎 העלה מסמך</button></div>`;
   document.getElementById('evinfo-popup').classList.add('open');
 }
 function saveEventInfo() {
