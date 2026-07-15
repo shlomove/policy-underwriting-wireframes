@@ -23,7 +23,7 @@
     document.getElementById('left-panel').style.display = 'none';
     [...rp().children].forEach((c, i) => { if (i !== idx) c.style.setProperty('display', 'none', 'important'); });
     // the financial section re-shows itself on coverage select — force-hide unless it is the target
-    if (idx !== 3) { const f = document.getElementById('financial-section'); if (f) f.style.setProperty('display', 'none', 'important'); }
+    if (idx !== 2) { const f = document.getElementById('financial-section'); if (f) f.style.setProperty('display', 'none', 'important'); }
     document.getElementById('body').style.padding = '10px';
   }
   // replace an embedded PDF <object> with a clean placeholder (headless can't render PDF)
@@ -56,8 +56,8 @@
     header() { bypass(); selectCoverage('RISK'); document.getElementById('body').style.display = 'none'; document.getElementById('footer').style.display = 'none'; },
     'sec-health'() { section(0); },
     'sec-lifestyle'() { selectCoverage('RISK'); toggleLs('occupation'); section(1); },
-    'sec-metrics'() { section(2); },
-    'sec-financial'() { selectCoverage('RISK'); renderFinancial && renderFinancial(); section(3); },
+    'sec-financial'() { selectCoverage('RISK'); renderFinancial && renderFinancial(); section(2); },
+    'sec-metrics'() { section(3); },
     'sec-diagnoses'() { selectCoverage('RISK'); toggleTl(0); section(4); },
     'sec-coverage-uw'() { selectCoverage('RISK'); saveGroup(); section(6); },
     'sec-documents'() { section(5); },
