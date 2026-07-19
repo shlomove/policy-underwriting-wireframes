@@ -1498,6 +1498,21 @@
 
   .fb-textarea:focus { outline: none; border-color: var(--mig-blue); box-shadow: var(--sh-focus); }
 
+  .fb-input, .fb-select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    direction: rtl;
+    color: var(--text);
+    background: #fff;
+    box-sizing: border-box;
+  }
+  .fb-select { cursor: pointer; }
+  .fb-input:focus, .fb-select:focus { outline: none; border-color: var(--mig-blue); box-shadow: var(--sh-focus); }
+
   /* ===== LANDING PAGE / LOGIN ===== */
   #landing, #login {
     position: fixed;
@@ -3111,6 +3126,31 @@
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="saveNoUnderwriting()">שמירה</button>
         <button class="btn-secondary" onclick="closePopup('nouw-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD MEDICAL EVENT POPUP ===== -->
+<div class="popup-overlay" id="addev-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הוספת אירוע רפואי</div>
+        <div class="popup-meta" id="addev-meta">הוספת אירוע חדש לציר הזמן של האבחנה</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('addev-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">תאריך האירוע</span>
+      <input type="text" class="fb-input" id="addev-date" placeholder="לדוגמה: 03/2024" style="margin-bottom:14px;">
+      <span class="fb-field-label">תקציר האירוע</span>
+      <textarea class="fb-textarea" id="addev-text" placeholder="תאר/י את האירוע הרפואי בקצרה..." style="margin-bottom:14px;"></textarea>
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="addev-doc"></select>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveAddEvent()">הוספה</button>
+        <button class="btn-secondary" onclick="closePopup('addev-popup')">ביטול</button>
       </div>
     </div>
   </div>
@@ -4991,21 +5031,39 @@ function clearTempLoading() {
 }
 
 // ===== MEDICAL EVENTS (timeline) CRUD =====
+let addEvCtx = null;
 function addEvent(dxIdx) {
-  const date = prompt('תאריך האירוע (לדוגמה: 03/2024):');
-  if (date === null) return;
-  const text = prompt('תיאור האירוע הרפואי:');
-  if (!text || !text.trim()) return;
+  addEvCtx = { dxIdx };
+  document.getElementById('addev-date').value = '';
+  document.getElementById('addev-text').value = '';
+  const dx = patientsState[currentIdx].diagnoses[dxIdx];
+  document.getElementById('addev-meta').textContent = 'הוספת אירוע חדש — ' + (dx ? dx.code : '');
+  // populate the document dropdown from the patient's document list (closed list)
+  const docsList = patientDocuments[currentIdx] || [];
+  const opts = ['<option value="">— ללא מסמך מקור —</option>']
+    .concat(docsList.map((d, i) =>
+      `<option value="${i}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`));
+  document.getElementById('addev-doc').innerHTML = opts.join('');
+  document.getElementById('addev-popup').classList.add('open');
+}
+function saveAddEvent() {
+  if (!addEvCtx) return;
+  const { dxIdx } = addEvCtx;
+  const date = document.getElementById('addev-date').value.trim();
+  const text = document.getElementById('addev-text').value.trim();
+  if (!text) { alert('יש להזין תקציר לאירוע.'); return; }
+  const docSel = document.getElementById('addev-doc').value;
+  let doc = null;
+  if (docSel !== '') {
+    const d = (patientDocuments[currentIdx] || [])[parseInt(docSel)];
+    if (d && d.docKey) doc = d.docKey;
+  }
   const timeline = patientsState[currentIdx].diagnoses[dxIdx].timeline;
-  timeline.push({ date: (date || '').trim() || '—', text: text.trim(), doc: null });
-  const newIdx = timeline.length - 1;
+  timeline.push({ date: date || '—', text: text, doc: doc });
+  closePopup('addev-popup');
   renderDiagnoses();
   const tl = document.getElementById('tl-' + dxIdx);
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
-  // offer to attach an original source file explaining the new event
-  if (confirm('האם לצרף קובץ מקור שמסביר את האירוע?')) {
-    uploadEventSource(dxIdx, newIdx);
-  }
 }
 
 function editEvent(dxIdx, evIdx) {
