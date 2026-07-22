@@ -1501,6 +1501,21 @@
 
   .fb-textarea:focus { outline: none; border-color: var(--mig-blue); box-shadow: var(--sh-focus); }
 
+  .fb-input, .fb-select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    direction: rtl;
+    color: var(--text);
+    background: #fff;
+    box-sizing: border-box;
+  }
+  .fb-select { cursor: pointer; }
+  .fb-input:focus, .fb-select:focus { outline: none; border-color: var(--mig-blue); box-shadow: var(--sh-focus); }
+
   /* ===== LANDING PAGE / LOGIN ===== */
   #landing, #login {
     position: fixed;
@@ -3149,6 +3164,91 @@
   </div>
 </div>
 
+<!-- ===== ADD MEDICAL EVENT POPUP ===== -->
+<div class="popup-overlay" id="addev-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הוספת אירוע רפואי</div>
+        <div class="popup-meta" id="addev-meta">הוספת אירוע חדש לציר הזמן של האבחנה</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('addev-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">תאריך האירוע</span>
+      <input type="text" class="fb-input" id="addev-date" placeholder="לדוגמה: 03/2024" style="margin-bottom:14px;">
+      <span class="fb-field-label">תקציר האירוע</span>
+      <textarea class="fb-textarea" id="addev-text" placeholder="תאר/י את האירוע הרפואי בקצרה..." style="margin-bottom:14px;"></textarea>
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="addev-doc"></select>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveAddEvent()">הוספה</button>
+        <button class="btn-secondary" onclick="closePopup('addev-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD MEDICAL METRIC POPUP ===== -->
+<div class="popup-overlay" id="addmetric-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הוספת מדד רפואי</div>
+        <div class="popup-meta" id="addmetric-meta">הוספת מדד חדש לטבלת המדדים</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('addmetric-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">שם נתון</span>
+      <input type="text" class="fb-input" id="addmetric-name" placeholder="לדוגמה: כולסטרול LDL" style="margin-bottom:14px;">
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <span class="fb-field-label">ערך</span>
+          <input type="text" class="fb-input" id="addmetric-value" placeholder="לדוגמה: 130">
+        </div>
+        <div style="flex:1;">
+          <span class="fb-field-label">יחידת מדידה</span>
+          <input type="text" class="fb-input" id="addmetric-unit" placeholder="לדוגמה: mg/dL">
+        </div>
+      </div>
+      <span class="fb-field-label">תאריך מדידה</span>
+      <input type="text" class="fb-input" id="addmetric-date" placeholder="לדוגמה: 15/05/2024" style="margin-bottom:14px;">
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="addmetric-doc"></select>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveAddMetric()">הוספה</button>
+        <button class="btn-secondary" onclick="closePopup('addmetric-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD DIAGNOSIS POPUP ===== -->
+<div class="popup-overlay" id="adddx-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הוספת אבחנה רפואית</div>
+        <div class="popup-meta">הוספת אבחנה חדשה לרשימת האבחנות</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('adddx-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">קוד אבחנה</span>
+      <input type="text" class="fb-input" id="adddx-code" placeholder="לדוגמה: HTN, ASTHMA" style="margin-bottom:14px;">
+      <span class="fb-field-label">שם מלא של האבחנה</span>
+      <input type="text" class="fb-input" id="adddx-full" placeholder="לדוגמה: יתר לחץ דם" style="margin-bottom:14px;">
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="adddx-doc"></select>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveAddDiagnosis()">הוספה</button>
+        <button class="btn-secondary" onclick="closePopup('adddx-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // =====================================================================
 // DATA
@@ -4137,7 +4237,8 @@ function buildCard(dx, idx) {
         <span class="dx-full-name">— ${dx.fullName}</span>
         <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
           ${itemUwCard('dx', String(idx), dx)}
-          ${dx.uploadedDoc ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openUploadedSource('${dx.uploadedDoc}')" title="צפייה במסמך מקור">📄</button>` : ''}
+          ${dx.uploadedDoc ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openUploadedSource('${dx.uploadedDoc}')" title="צפייה במסמך מקור">📄</button>`
+            : (dx.doc && docs[dx.doc] ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openDoc('${dx.doc}')" title="צפייה במסמך מקור">📄</button>` : '')}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editDx(${idx})" title="ערוך אבחנה">✏</button>
           <button class="dx-del-btn" onclick="event.stopPropagation();deleteDiagnosis(${idx})" title="מחק אבחנה">🗑</button>
         </div>
@@ -4896,31 +4997,46 @@ function updateAgg() {
   }
 }
 
+// populate a <select> with the closed list of the patient's documents
+function fillDocSelect(selectId) {
+  const docsList = patientDocuments[currentIdx] || [];
+  const opts = ['<option value="">— ללא מסמך מקור —</option>']
+    .concat(docsList.map((d, i) =>
+      `<option value="${i}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`));
+  document.getElementById(selectId).innerHTML = opts.join('');
+}
+// resolve the selected document's source key (only docs that have a viewable source)
+function selectedDocKey(selectId) {
+  const v = document.getElementById(selectId).value;
+  if (v === '') return null;
+  const d = (patientDocuments[currentIdx] || [])[parseInt(v)];
+  return (d && d.docKey) ? d.docKey : null;
+}
+
 function addDiagnosis() {
-  const code = prompt('קוד אבחנה (לדוגמה: HTN, ASTHMA):');
-  if (!code || !code.trim()) return;
-  const full = prompt('שם מלא של האבחנה:') || code;
+  document.getElementById('adddx-code').value = '';
+  document.getElementById('adddx-full').value = '';
+  fillDocSelect('adddx-doc');
+  document.getElementById('adddx-popup').classList.add('open');
+}
+function saveAddDiagnosis() {
+  const code = document.getElementById('adddx-code').value.trim();
+  if (!code) { alert('יש להזין קוד אבחנה.'); return; }
+  const full = document.getElementById('adddx-full').value.trim() || code;
   const p = patientsState[currentIdx];
   const rgCodes = riskGroupsOf(p).map(rg => rg.riskGroupCode);
   const uw = {}, swiss = {};
   rgCodes.forEach(rg => { uw[rg] = _cell(rg, 'CLEAN'); swiss[rg] = _cell(rg, 'CLEAN'); });
   const newDx = {
-    code: code.trim().toUpperCase(), fullName: full.trim(),
+    code: code.toUpperCase(), fullName: full,
     source: 'MEDICAL', flag: null, loadingTableKey: null, timeline: [],
     requiredDocs: [], inDeclaration: true, missingStatus: null,
-    swiss, uw,
+    swiss, uw, doc: selectedDocKey('adddx-doc'),
   };
   p.diagnoses.push(newDx);
+  closePopup('adddx-popup');
   renderDiagnoses();
   updateAgg();
-  // upload of a source document is allowed only at creation time
-  if (confirm('האם לצרף קובץ מקור לאבחנה החדשה?')) {
-    triggerSourceUpload(function (id) {
-      newDx.uploadedDoc = id;
-      renderDiagnoses();
-      openUploadedSource(id);
-    });
-  }
 }
 
 function editDx(idx) {
@@ -5019,32 +5135,38 @@ function renderMetricsTable(calc) {
     </div>`;
 }
 
+let addMetricCtx = null;
 function addMetric(calc) {
-  const name = prompt('שם הנתון (לדוגמה: כולסטרול LDL):');
-  if (!name || !name.trim()) return;
-  const value = prompt('ערך הנתון:');
-  if (value === null || !('' + value).trim()) return;
-  const unit = prompt('יחידת מדידה (לדוגמה: mg/dL):') || '—';
-  const date = prompt('תאריך מדידה (לדוגמה: 15/05/2024):') || '—';
+  addMetricCtx = { calc };
+  document.getElementById('addmetric-name').value = '';
+  document.getElementById('addmetric-value').value = '';
+  document.getElementById('addmetric-unit').value = '';
+  document.getElementById('addmetric-date').value = '';
+  document.getElementById('addmetric-meta').textContent = 'הוספת מדד חדש למחשבון ' + calc.toUpperCase();
+  fillDocSelect('addmetric-doc');
+  document.getElementById('addmetric-popup').classList.add('open');
+}
+function saveAddMetric() {
+  if (!addMetricCtx) return;
+  const calc = addMetricCtx.calc;
+  const name = document.getElementById('addmetric-name').value.trim();
+  if (!name) { alert('יש להזין שם נתון.'); return; }
+  const value = document.getElementById('addmetric-value').value.trim();
+  if (!value) { alert('יש להזין ערך.'); return; }
+  const unit = document.getElementById('addmetric-unit').value.trim() || '—';
+  const date = document.getElementById('addmetric-date').value.trim() || '—';
   const nextNum = medicalMetrics.reduce((mx, m) => {
     const n = parseInt(('' + m.id).replace(/\D/g, '')) || 0; return Math.max(mx, n);
   }, 0) + 1;
   const metric = {
     id: 'M-' + String(nextNum).padStart(3, '0'),
-    name: name.trim(), value: ('' + value).trim(), unit: unit.trim() || '—',
-    date: date.trim() || '—', calc: [calc], doc: null,
+    name: name, value: value, unit: unit,
+    date: date, calc: [calc], doc: selectedDocKey('addmetric-doc'),
   };
   medicalMetrics.push(metric);
+  closePopup('addmetric-popup');
   renderMetricsSection();
   renderMetricsTable(calc);
-  // upload of a source document is allowed only at creation time
-  if (confirm('האם לצרף קובץ מקור למדד החדש?')) {
-    triggerSourceUpload(function (id) {
-      metric.uploadedDoc = id;
-      renderMetricsTable(calc);
-      openUploadedSource(id);
-    });
-  }
 }
 
 // ===== TEMPORARY LOADING (risk group) =====
@@ -5087,21 +5209,28 @@ function clearTempLoading() {
 }
 
 // ===== MEDICAL EVENTS (timeline) CRUD =====
+let addEvCtx = null;
 function addEvent(dxIdx) {
-  const date = prompt('תאריך האירוע (לדוגמה: 03/2024):');
-  if (date === null) return;
-  const text = prompt('תיאור האירוע הרפואי:');
-  if (!text || !text.trim()) return;
+  addEvCtx = { dxIdx };
+  document.getElementById('addev-date').value = '';
+  document.getElementById('addev-text').value = '';
+  const dx = patientsState[currentIdx].diagnoses[dxIdx];
+  document.getElementById('addev-meta').textContent = 'הוספת אירוע חדש — ' + (dx ? dx.code : '');
+  fillDocSelect('addev-doc');
+  document.getElementById('addev-popup').classList.add('open');
+}
+function saveAddEvent() {
+  if (!addEvCtx) return;
+  const { dxIdx } = addEvCtx;
+  const date = document.getElementById('addev-date').value.trim();
+  const text = document.getElementById('addev-text').value.trim();
+  if (!text) { alert('יש להזין תקציר לאירוע.'); return; }
   const timeline = patientsState[currentIdx].diagnoses[dxIdx].timeline;
-  timeline.push({ date: (date || '').trim() || '—', text: text.trim(), doc: null });
-  const newIdx = timeline.length - 1;
+  timeline.push({ date: date || '—', text: text, doc: selectedDocKey('addev-doc') });
+  closePopup('addev-popup');
   renderDiagnoses();
   const tl = document.getElementById('tl-' + dxIdx);
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
-  // offer to attach an original source file explaining the new event
-  if (confirm('האם לצרף קובץ מקור שמסביר את האירוע?')) {
-    uploadEventSource(dxIdx, newIdx);
-  }
 }
 
 function editEvent(dxIdx, evIdx) {
