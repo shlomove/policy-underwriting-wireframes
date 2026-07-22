@@ -3249,6 +3249,96 @@
   </div>
 </div>
 
+<!-- ===== EDIT DIAGNOSIS POPUP ===== -->
+<div class="popup-overlay" id="editdx-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">עריכת אבחנה רפואית</div>
+        <div class="popup-meta">עדכון פרטי האבחנה</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('editdx-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">קוד אבחנה</span>
+      <input type="text" class="fb-input" id="editdx-code" style="margin-bottom:14px;">
+      <span class="fb-field-label">שם מלא של האבחנה</span>
+      <input type="text" class="fb-input" id="editdx-full">
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveEditDx()">שמירה</button>
+        <button class="btn-secondary" onclick="closePopup('editdx-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT MEDICAL EVENT POPUP ===== -->
+<div class="popup-overlay" id="editev-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">עריכת אירוע רפואי</div>
+        <div class="popup-meta" id="editev-meta">עדכון פרטי האירוע</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('editev-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">תאריך האירוע</span>
+      <input type="text" class="fb-input" id="editev-date" placeholder="לדוגמה: 03/2024" style="margin-bottom:14px;">
+      <span class="fb-field-label">תקציר האירוע</span>
+      <textarea class="fb-textarea" id="editev-text" style="margin-bottom:14px;"></textarea>
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="editev-doc"></select>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveEditEvent()">שמירה</button>
+        <button class="btn-secondary" onclick="closePopup('editev-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT LIFESTYLE (occupation / hobbies) POPUP ===== -->
+<div class="popup-overlay" id="editls-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title" id="editls-title">עריכה</div>
+        <div class="popup-meta" id="editls-meta">עדכון הפרטים</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('editls-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label" id="editls-label">תיאור</span>
+      <textarea class="fb-textarea" id="editls-text"></textarea>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveEditLifestyle()">שמירה</button>
+        <button class="btn-secondary" onclick="closePopup('editls-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD HOBBY POPUP ===== -->
+<div class="popup-overlay" id="addhobby-popup">
+  <div class="popup-box" style="max-width:480px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">הוספת תחביב</div>
+        <div class="popup-meta">הוספת תחביב חדש לרשימת התחביבים</div>
+      </div>
+      <button class="popup-close" onclick="closePopup('addhobby-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">תחביב חדש</span>
+      <input type="text" class="fb-input" id="addhobby-text" placeholder="לדוגמה: צלילה ספורטיבית">
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="submit-btn" onclick="saveAddHobby()">הוספה</button>
+        <button class="btn-secondary" onclick="closePopup('addhobby-popup')">ביטול</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // =====================================================================
 // DATA
@@ -5009,6 +5099,7 @@ function fillDocSelect(selectId) {
 function selectedDocKey(selectId) {
   const v = document.getElementById(selectId).value;
   if (v === '') return null;
+  if (v.indexOf('k:') === 0) return v.slice(2);
   const d = (patientDocuments[currentIdx] || [])[parseInt(v)];
   return (d && d.docKey) ? d.docKey : null;
 }
@@ -5039,12 +5130,39 @@ function saveAddDiagnosis() {
   updateAgg();
 }
 
+// preselect a document dropdown by source key; preserve a linked source that isn't in the list
+function selectDocByKey(selectId, docKey) {
+  const sel = document.getElementById(selectId);
+  sel.value = '';
+  if (!docKey) return;
+  const list = patientDocuments[currentIdx] || [];
+  const i = list.findIndex(d => d.docKey === docKey);
+  if (i >= 0) { sel.value = String(i); return; }
+  if (typeof docs !== 'undefined' && docs[docKey]) {
+    const opt = document.createElement('option');
+    opt.value = 'k:' + docKey;
+    opt.textContent = (docs[docKey].title || docKey) + ' (מקור מקושר)';
+    sel.appendChild(opt);
+    sel.value = 'k:' + docKey;
+  }
+}
+
+let editDxCtx = null;
 function editDx(idx) {
+  editDxCtx = idx;
   const dx = patientsState[currentIdx].diagnoses[idx];
-  const nc = prompt('קוד אבחנה:', dx.code);
-  if (nc !== null && nc.trim()) dx.code = nc.trim().toUpperCase();
-  const nf = prompt('שם מלא:', dx.fullName);
-  if (nf !== null && nf.trim()) dx.fullName = nf.trim();
+  document.getElementById('editdx-code').value = dx.code || '';
+  document.getElementById('editdx-full').value = dx.fullName || '';
+  document.getElementById('editdx-popup').classList.add('open');
+}
+function saveEditDx() {
+  if (editDxCtx == null) return;
+  const dx = patientsState[currentIdx].diagnoses[editDxCtx];
+  const code = document.getElementById('editdx-code').value.trim();
+  if (!code) { alert('יש להזין קוד אבחנה.'); return; }
+  dx.code = code.toUpperCase();
+  dx.fullName = document.getElementById('editdx-full').value.trim() || dx.code;
+  closePopup('editdx-popup');
   renderDiagnoses();
 }
 
@@ -5233,12 +5351,30 @@ function saveAddEvent() {
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
 }
 
+let editEvCtx = null;
 function editEvent(dxIdx, evIdx) {
+  editEvCtx = { dxIdx, evIdx };
   const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
-  const nd = prompt('תאריך האירוע:', ev.date);
-  if (nd !== null && nd.trim()) ev.date = nd.trim();
-  const nt = prompt('תיאור האירוע:', ev.text);
-  if (nt !== null && nt.trim()) ev.text = nt.trim();
+  const dx = patientsState[currentIdx].diagnoses[dxIdx];
+  document.getElementById('editev-meta').textContent = 'עריכת אירוע — ' + (dx ? dx.code : '');
+  document.getElementById('editev-date').value = (ev.date && ev.date !== '—') ? ev.date : '';
+  document.getElementById('editev-text').value = ev.text || '';
+  fillDocSelect('editev-doc');
+  selectDocByKey('editev-doc', ev.doc);
+  document.getElementById('editev-popup').classList.add('open');
+}
+function saveEditEvent() {
+  if (!editEvCtx) return;
+  const { dxIdx, evIdx } = editEvCtx;
+  const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
+  const text = document.getElementById('editev-text').value.trim();
+  if (!text) { alert('יש להזין תקציר לאירוע.'); return; }
+  ev.date = document.getElementById('editev-date').value.trim() || '—';
+  ev.text = text;
+  const dk = selectedDocKey('editev-doc');
+  ev.doc = dk;
+  if (dk) ev.uploadedDoc = null;
+  closePopup('editev-popup');
   renderDiagnoses();
   const tl = document.getElementById('tl-' + dxIdx);
   if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
@@ -5526,19 +5662,36 @@ function openLsSource(key) {
   document.getElementById('doc-popup').classList.add('open');
 }
 
+let editLsCtx = null;
 function editLifestyle(key) {
+  editLsCtx = key;
   const item = patientsState[currentIdx].lifestyle[key];
-  const nv = prompt('תיאור ' + lifestyleLabels[key] + ':', item.value);
-  if (nv !== null) item.value = nv.trim() || '—';
+  const label = lifestyleLabels[key] || '';
+  document.getElementById('editls-title').textContent = 'עריכת ' + label;
+  document.getElementById('editls-meta').textContent = 'עדכון תיאור ' + label;
+  document.getElementById('editls-label').textContent = 'תיאור ' + label;
+  document.getElementById('editls-text').value = (item.value && item.value !== '—') ? item.value : '';
+  document.getElementById('editls-popup').classList.add('open');
+}
+function saveEditLifestyle() {
+  if (!editLsCtx) return;
+  const item = patientsState[currentIdx].lifestyle[editLsCtx];
+  item.value = document.getElementById('editls-text').value.trim() || '—';
+  closePopup('editls-popup');
   renderLifestyle();
 }
 
 function addHobby() {
+  document.getElementById('addhobby-text').value = '';
+  document.getElementById('addhobby-popup').classList.add('open');
+}
+function saveAddHobby() {
+  const nh = document.getElementById('addhobby-text').value.trim();
+  if (!nh) { alert('יש להזין תחביב.'); return; }
   const item = patientsState[currentIdx].lifestyle.profession;
-  const nh = prompt('הוסף תחביב חדש:');
-  if (nh === null || !nh.trim()) return;
   const cur = (item.value && item.value !== '—' && !/לא נמצא/.test(item.value)) ? item.value : '';
-  item.value = cur ? (cur + '; ' + nh.trim()) : nh.trim();
+  item.value = cur ? (cur + '; ' + nh) : nh;
+  closePopup('addhobby-popup');
   renderLifestyle();
   const tl = document.getElementById('ls-tl-profession');
   if (tl) { tl.classList.add('open'); document.getElementById('ls-toggle-profession').textContent = '▼'; }
