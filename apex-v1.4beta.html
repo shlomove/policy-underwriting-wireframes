@@ -3990,9 +3990,10 @@ function renderCrossChecks() {
   const wrap = document.getElementById('cross-checks');
   if (!wrap) return;
   const flags = patientsState[currentIdx].crossCheckFlags || [];
-  wrap.innerHTML = flags.map(fl =>
-    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check —</b> ${escapeHtml(fl.text)}</span></div>`
-  ).join('');
+  if (!flags.length) { wrap.innerHTML = ''; return; }
+  const joined = flags.map(fl => escapeHtml(fl.text)).join(' · ');
+  wrap.innerHTML =
+    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check —</b> ${joined}</span></div>`;
 }
 
 function renderPrevDeclarations() {

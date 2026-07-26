@@ -2578,14 +2578,14 @@
   <div class="header-top">
     <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">V1.4</span></div>
     <div class="id-search-wrap">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז (111 / 222)"
-        oninput="filterIds(this.value)" onkeydown="if(event.key==='Enter')headerIdSearch(this.value)" autocomplete="off">
+      <input type="text" class="id-search" id="id-search" placeholder="הקש/י ת״ז ו-Enter (111 / 222)"
+        onkeydown="if(event.key==='Enter')headerIdSearch(this.value)" autocomplete="off">
       <span class="id-search-icon">⌕</span>
     </div>
     <div class="id-tabs-row" id="id-tabs-row">
       <div class="header-label" style="margin-left:8px;">בחירת ת״ז:</div>
       <div class="id-tab active" onclick="switchId(0)" id="id-tab-0">046262002 — רונן קדישב</div>
-      <div class="id-tab" onclick="switchId(1)" id="id-tab-1">034112391 — אמיר וסר</div>
+      <div class="id-tab" onclick="switchId(1)" id="id-tab-1" style="display:none;">034112391 — אמיר וסר</div>
       <div class="id-no-results" id="id-no-results" style="display:none;">לא נמצאו מבוטחים תואמים</div>
     </div>
     <div class="policy-badge" id="process-badge" style="margin-right:auto;">מזהה תהליך <span id="process-badge-id">—</span></div>
@@ -4498,7 +4498,11 @@ let fbContext = { key: null, stars: 0 };
 function switchId(idx) {
   currentIdx = idx;
   medicalMetrics = medicalMetricsByPatient[idx] || [];
-  document.querySelectorAll('.id-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  // show only the active insured — the two profiles are unrelated, never shown side by side
+  document.querySelectorAll('.id-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+    t.style.display = (i === idx) ? '' : 'none';
+  });
   renderHeader();
   renderHealthBar();
   renderHealthDeclActions();
@@ -4525,6 +4529,8 @@ function resolvePatientIdx(val) {
 function headerIdSearch(val) {
   const idx = resolvePatientIdx((val || '').trim());
   if (idx < 0) return;
+  const s = document.getElementById('id-search'); if (s) s.value = '';
+  const nr = document.getElementById('id-no-results'); if (nr) nr.style.display = 'none';
   switchId(idx);
   openProcessList();
 }
@@ -4651,9 +4657,10 @@ function renderCrossChecks() {
   const wrap = document.getElementById('cross-checks');
   if (!wrap) return;
   const flags = patientsState[currentIdx].crossCheckFlags || [];
-  wrap.innerHTML = flags.map(fl =>
-    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check —</b> ${escapeHtml(fl.text)}</span></div>`
-  ).join('');
+  if (!flags.length) { wrap.innerHTML = ''; return; }
+  const joined = flags.map(fl => escapeHtml(fl.text)).join(' · ');
+  wrap.innerHTML =
+    `<div class="xcheck-flag"><span class="xci">⚠</span><span><b>Cross-check —</b> ${joined}</span></div>`;
 }
 
 function renderPrevDeclarations() {
