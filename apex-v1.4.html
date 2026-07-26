@@ -2578,13 +2578,14 @@
   <div class="header-top">
     <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">V1.4</span></div>
     <div class="id-search-wrap">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז"
-        oninput="filterIds(this.value)" autocomplete="off">
+      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז (111 / 222)"
+        oninput="filterIds(this.value)" onkeydown="if(event.key==='Enter')headerIdSearch(this.value)" autocomplete="off">
       <span class="id-search-icon">⌕</span>
     </div>
     <div class="id-tabs-row" id="id-tabs-row">
       <div class="header-label" style="margin-left:8px;">בחירת ת״ז:</div>
       <div class="id-tab active" onclick="switchId(0)" id="id-tab-0">046262002 — רונן קדישב</div>
+      <div class="id-tab" onclick="switchId(1)" id="id-tab-1">034112391 — אמיר וסר</div>
       <div class="id-no-results" id="id-no-results" style="display:none;">לא נמצאו מבוטחים תואמים</div>
     </div>
     <div class="policy-badge" id="process-badge" style="margin-right:auto;">מזהה תהליך <span id="process-badge-id">—</span></div>
@@ -3460,6 +3461,230 @@ const patients = [
       },
     ],
   },
+  {
+    id: '034112391', name: 'אמיר וסר', age: 48, weight: 115, height: 171, bmi: 39.3,
+    birthDate: '16/08/1977', gender: 'זכר', smokingStatus: 'מעולם לא',
+    processId: 'PRC-2026-00222',
+    requestType: 'HAFAKA',
+    requestOpenDate: '2026-07-20T10:00:00',
+    clerkNotesToUnderwriter: 'בקשת ביטוח חיים למשכנתא. תיק רפואי מורכב (17 אבחנות) — הצהרת הבריאות סומנה "לא" ברוב הסעיפים; לבדיקת חתם.',
+    policy: 'POL-2026-00222',
+    policyType: 'ביטוח חיים למשכנתא', sumRequested: '1,800,000 ₪', sumExisting: '0 ₪',
+    financial: { purpose: 'mortgage', amount: 1800000 },
+    reasons: ['שאלון רפואי', 'תיק רפואי מורכב'],
+    email: 'amir.waser@example.com',
+    healthStatus: 'declared',
+    healthDeclarationStatus: 'NOT_CLEAN',
+    healthDetail: 'תיק מורכב: דלקת תאית מנתקת של הקרקפת (בטיפול ביולוגי), מיאלופתיה צווארית לאחר ניתוח, פיברומיאלגיה חמורה עם שימוש אופיואידי כרוני, השמנה Class II, אי-נקיטת שתן ועוד — 17 אבחנות.',
+    riskGroups: [
+      { riskGroupCode: 'MORTGAGE', riskGroupName: 'ביטוח משכנתא',
+        policies: [
+          { policyNumber: 'POL-2026-00221', productType: 'ביטוח חיים למשכנתא' },
+        ],
+        requestedAmount: 1800000, existingAmount: 0,
+        reasons: ['שאלון רפואי'] },
+    ],
+    crossCheckFlags: [
+      { type: 'DECL_MISMATCH', text: 'רוב האבחנות אינן מופיעות בהצהרת הבריאות — כל סעיפי ההיסטוריה הרפואית סומנו "לא"' },
+      { type: 'DOB_MISMATCH', text: 'בטופס הצעה אחד נרשם תאריך לידה 09/08/1983 (של בת הזוג) — המקור הרפואי קובע 16/08/1977' },
+    ],
+    diagnoses: [
+      {
+        code: 'DISSECTING CELLULITIS', fullName: 'דלקת תאית מנתקת של הקרקפת (Dissecting Cellulitis) — DISSECTING CELLULITIS OF SCALP; FOLLICULITIS DECALVANS',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '24/05/2013', text: 'סדרת ביקורי משפחה 2013 לפוליקוליטיס חמור של הקרקפת; הפניות חוזרות לעור בשיבא; אנטיביוטיקה ממושכת (Rifampicin+Dalacin-C+Resprim)', doc: 'doc-mz-F67' },
+          { date: '02/02/2022', text: 'ביקור עור (ד"ר הלפרין, כללית): FOLLICULITIS DECALVANS של הקרקפת, נגעים גדולים ומצולקים; מרשם MINOCYCLINE 100mg', doc: 'doc-mz-F68' },
+          { date: '11/05/2025', text: 'טופס חלב"ג (רופא עור): טיפול ב-Clindamycin + Rifampicin + עירוי בגין dissecting cellulitis של הקרקפת', doc: 'doc-mz-F29' },
+          { date: '13/07/2025', text: 'סיכום ייעוץ עור: DISSECTING CELLULITIS; התחלת CURATANE/איזוטרטינואין 20–30mg', doc: 'doc-mz-F18' },
+          { date: '14/07/2025', text: 'טופס תביעה 783 + הודעת תשלום מגדל בגין ביקור עור 13/07/2025 (~1200₪, שולם 876.82₪)', doc: 'doc-mz-F19' },
+          { date: '03/08/2025', text: 'LIVER ENZYMES ELEVATED תחת טיפול איזוטרטינואין; מעקב תפקודי כבד', doc: 'doc-mz-F67' },
+          { date: '07/12/2025', text: 'סיכום עור (ד"ר לנדוב): תכנון Adalimumab/Humira; סקר טרום-ביולוגי HIV/LDH/צילום חזה; ברקע BPH', doc: 'doc-mz-F24' },
+          { date: '07/12/2025', text: 'טופס תביעה 783 + הודעת תשלום מגדל בגין ביקור עור 07/12/2025 (~1200₪, שולם 887.92₪)', doc: 'doc-mz-F25' },
+          { date: '18/12/2025', text: 'פנל מלא + סרולוגיה: HIV/HBV/HCV שליליים; QuantiFERON-TB שלילי (0.03) 23/03/2026 — סקר טרום-טיפול ביולוגי', doc: 'doc-mz-F67' },
+          { date: '06/05/2026', text: 'כללית — בקשה לאישור HYRIMOZ (אדלימומאב ביוסימילר) 40mg; "הבקשה לתרופה נדחתה"', doc: 'doc-mz-F67' },
+          { date: '24/05/2026', text: 'טופס תביעה 756 לתרופת HYRIMOZ (2500₪, אישור מראש); אירוע ביטוח 03/05/2026; מגדל בבירור התביעה', doc: 'doc-mz-F64' },
+          { date: '08/06/2026', text: 'מגדל — המחאת תשלום/המשך בירור לתביעת HYRIMOZ; אירוע ביטוח 03/05/2026; דיון חיתומי פנימי (אימיילים 06–07/2026)', doc: 'doc-mz-F50' }
+        ],
+      },
+      {
+        code: 'CERVICAL MYELOPATHY', fullName: 'מחלת דיסק צווארי עם מיאלופתיה (C3-C7) — INTERVERTEBRAL DISC DISORDER WITH MYELOPATHY, CERVICAL',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25, freeText: 'מיאלופתיה צווארית לאחר ניתוח — סיכון תפקודי/נוירולוגי' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25 }) ],
+        timeline: [
+          { date: '23/12/2012', text: 'MRI עמוד שדרה מותני (מוזכר בסיכומים; רמות L4-L5, L5)', doc: 'doc-mz-F67' },
+          { date: '10/11/2020', text: 'CT/הדמיית צוואר: קומפלקס אוסטאופיטים C3-C4 עד C6-C7, נגעי דיסק; בסיס לאבחנת מחלת דיסק צווארי עם מיאלופתיה', doc: 'doc-mz-F67' },
+          { date: '26/11/2020', text: 'MRI עמוד שדרה צווארי — נגעי דיסק ולחץ על חוט השדרה (C4-C5, C5-C6); שימש בסיס לניתוח', doc: 'doc-mz-F67' },
+          { date: '14/03/2021', text: 'בדיקה נוירולוגית אחרי ניתוח: מיאלופתיה צווארית, ספסטיות רגל שמאל, קלונוס אכילס שמאל, רפלקס פיקה מוגבר שמאל; החל Lyrica 75mg x2', doc: 'doc-mz-F67' },
+          { date: '08/12/2022', text: 'חוות דעת ניתוחית/אורתופדית לעמוד שדרה (מוזכרת בסיכומי כללית)', doc: 'doc-mz-F67' },
+          { date: '23/12/2024', text: 'הפניה ל-MRI צוואר חוזר (CERVICALGIA) + הפניה ל-MRI ראש (מעקב)', doc: 'doc-mz-F67' },
+          { date: '17/03/2025', text: 'הפניה לבדיקה נוירולוגית (במסגרת מעקב מיאלופתיה/כאב)', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'S/P CERVICAL LAMINECTOMY', fullName: 'מצב אחרי ניתוח עמוד שדרה צווארי (למינקטומי) — STATUS POST CERVICAL LAMINECTOMY',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '23/12/2020', text: 'אשפוז וניתוח עמוד שדרה צווארי (כריתת קשת/למינקטומי) בהרצליה מדיקל סנטר; שחרור רפואי + סיכום דוח ניתוח; מס\' קבלה 10285363', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'FIBROMYALGIA', fullName: 'פיברומיאלגיה — חמורה — FIBROMYALGIA (SEVERE)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50, freeText: 'פיברומיאלגיה חמורה עם שימוש אופיואידי כרוני' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50 }) ],
+        timeline: [
+          { date: '04/07/2022', text: 'FIBROMYALGIA נרשמת ברשימת הבעיות; בסיס לטיפול כאב כרוני', doc: 'doc-mz-F67' },
+          { date: '19/08/2024', text: 'סיכום ייעוץ מרפאת כאב (כללית): FIBROMYALGIA, MYELOPATHY CERVICAL, OBESITY, CARPAL TUNNEL; טיפול אופיואידי כרוני + Gabapentin/Lyrica/Zolpidem', doc: 'doc-mz-F14' },
+          { date: '19/09/2024', text: 'מכתב ראומטולוגיה בכתב יד: SEVERE FIBROMYALGIA; S/P CERVICAL OPERATION; פתולוגיה מותנית', doc: 'doc-mz-F13' },
+          { date: '05/10/2025', text: 'מכתב ראומטולוגיה בכתב יד: Fibromyalgia – severe; Viepax 37.5→75mg; המלצות CBT + Tai Chi', doc: 'doc-mz-F67' },
+          { date: '05/10/2025', text: 'טופס תביעה 783 + הודעת תשלום מגדל בגין ייעוץ 05/10/2025 (~1600₪, שולם 888.77₪)', doc: 'doc-mz-F21' }
+        ],
+      },
+      {
+        code: 'CHRONIC PAIN', fullName: 'תסמונת כאב כרוני — CHRONIC PAIN',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25, freeText: 'כאב כרוני — טיפול אופיואידי/קנאביס מתמשך' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25 }) ],
+        timeline: [
+          { date: '17/07/2020', text: 'COVID-19 — טיפול בית/בידוד (coronavirus home care)', doc: 'doc-mz-F67' },
+          { date: '25/04/2021', text: 'מרשם Percocet 5/325mg (אוקסיקודון+פרצטמול) לכאב כרוני; תחילת טיפול אופיואידי מתמשך', doc: 'doc-mz-F67' },
+          { date: '21/09/2022', text: 'הערכת מצב תפקודי/סיעודי: פגיעה תפקודית קלה (עזרה קלה בהלבשה/ניידות); ראייה ושמיעה תקינים; איש קשר בן/בת זוג', doc: 'doc-mz-F67' },
+          { date: '04/12/2023', text: 'מרשם BUTRANS 5mg מדבקה (בופרנורפין) לכאב; בהמשך הסלמה ל-10/15/20mg', doc: 'doc-mz-F67' },
+          { date: '24/03/2024', text: 'טפסי תביעה 763 + הודעות תשלום מגדל: 24/03/2024 (150₪), 30/04/2024 (151.28₪), 13/10/2024 (480₪), 23/02/2025 (120₪)', doc: 'doc-mz-F06' },
+          { date: '27/05/2024', text: 'מרשם Pregabalin 50→75→150mg לכאב נוירופתי/גב; המשך לאורך 2024–2026', doc: 'doc-mz-F67' },
+          { date: '20/09/2024', text: 'ביופסיית רקמה (LEM/קוד 150500) — אתר ותוצאה אינם מפורטים במסמכים שנכללו', doc: 'doc-mz-F67' },
+          { date: '18/12/2025', text: 'בדיקות דם תקופתיות 2013–2026: כימיה, ליפידים, תפקודי כבד, ספירת דם, HbA1c, ויטמינים (ראה טבלת מדדים)', doc: 'doc-mz-F67' },
+          { date: '25/12/2025', text: 'טופס תביעה 783 + הודעת תשלום מגדל בגין טיפול 25/12/2025 (900₪, שולם 720₪)', doc: 'doc-mz-F26' },
+          { date: '18/06/2026', text: 'ביקור טלרפואה — המשך מעקב וטיפול תרופתי כרוני', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'CARPAL TUNNEL', fullName: 'תסמונת התעלה הקרפלית — דו-צדדית, מצב אחרי ניתוח מימין — CARPAL TUNNEL SYNDROME (BILATERAL, S/P RIGHT RELEASE)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '20/05/2015', text: 'בוצע EMG שאישר תסמונת התעלה הקרפלית דו-צדדית (ימין+שמאל); החל מעקב/טיפול', doc: 'doc-mz-F67' },
+          { date: '15/04/2019', text: 'בוצע ניתוח שחרור התעלה הקרפלית מימין (CARPAL TUNNEL RELEASE RT); מעקב אחרי-ניתוחי עם CRP', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'URINARY INCONTINENCE', fullName: 'אי-נקיטת שתן / שלפוחית נוירוגנית — URINARY INCONTINENCE / URINARY FREQUENCY',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '18/08/2021', text: 'אולטרסאונד שלפוחית/דרכי שתן — ללא ממצא פתולוגי', doc: 'doc-mz-F67' },
+          { date: '18/02/2024', text: 'אבחון URINARY INCONTINENCE; התחלת Fesoterodine (Toviaz) 8mg + Betmiga (mirabegron) 25/50mg', doc: 'doc-mz-F67' },
+          { date: '26/12/2025', text: 'מכתב נוירולוגיה: מצב אחרי CERVICAL LAMINECTOMY; PERMANENT URINARY INCONTINENCE; ORGANIC IMPOTENCE; Toviaz+Betmiga; שקילת AUS/נוירוסטימולציה סקרלית/male sling', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'ERECTILE DYSFUNCTION', fullName: 'אין-אונות / הפרעת זקפה — IMPOTENCE (PSYCHOGENIC / ORGANIC) / ERECTILE DYSFUNCTION',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '25/08/2021', text: 'מרשם Viagra 100mg מתמשך בגין הפרעת זקפה/אין-אונות', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'OBESITY', fullName: 'השמנה (Class II) — OBESITY (BMI >30)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50, freeText: 'השמנה Class II (BMI ~39) — מגמת עלייה' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50 }) ],
+        timeline: [
+          { date: '10/04/2022', text: 'מרשם Saxenda/NovoPen (ליראגלוטיד) בגין השמנה; בהמשך Wegovy ואז Mounjaro', doc: 'doc-mz-F67' },
+          { date: '08/11/2022', text: 'הצהרת בריאות בהצעה לביטוח: גובה 170, משקל 100, BMI ~34.6, לא מעשן; תשובת "כן" יחידה לשאלת תרופות/מעקב (ללא פירוט)', doc: 'doc-mz-F70' },
+          { date: '09/02/2025', text: 'אבחנת DIABETES MELLITUS מופיעה ברשומת ביקור; מטופל ב-GLP-1; HbA1c נותר תקין (5.0–5.5%) — ראה מדדים', doc: 'doc-mz-F67' },
+          { date: '05/02/2026', text: 'מרשם MOUNJARO 2.5mg (טירזפטיד) להשמנה; הסלמה ל-5mg (04/03) ו-15mg (05/2026)', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'DEPRESSION / ANXIETY', fullName: 'דיכאון/חרדה — הפרעת הסתגלות — CHRONIC DEPRESSION / ANXIETY AND DEPRESSION / ADJUSTMENT DI…',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25, freeText: 'דיכאון/חרדה — הפרעת הסתגלות בטיפול תרופתי' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 25 }) ],
+        timeline: [
+          { date: '26/04/2021', text: 'מרשם Cymbalta 30mg (דולוקסטין) — כאב/דיכאון', doc: 'doc-mz-F67' },
+          { date: '04/02/2024', text: 'מרשם Escitalopram 10mg (SSRI) — חרדה/דיכאון', doc: 'doc-mz-F67' },
+          { date: '17/02/2025', text: 'מילוי שאלון 13\' בריאות הנפש (מגדל); רוב הפריטים "לא"; אזכור נכות ("65%" — חלקי)', doc: 'doc-mz-F15' }
+        ],
+      },
+      {
+        code: 'LUMBAR DISC', fullName: 'מחלת דיסק מותני / כאב גב תחתון — LUMBAR DISC DISEASE / LOW BACK PAIN / BACKACHE',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '20/04/2021', text: 'MRI מותני 20/04/2021 + EMG; נגעי דיסק מותני; רדיקולופתיה', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'BPH', fullName: 'שגשוג שפיר של הערמונית (BPH) — BENIGN PROSTATIC HYPERPLASIA (BPH)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '28/10/2020', text: 'בדיקות PSA חוזרות תקינות (0.30–0.45 ng/ml) ברקע BPH', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'SEBACEOUS CYST', fullName: 'כיסת חלב (מצב אחרי ניתוח) — SEBACEOUS CYST / EPIDERMAL CYST (S/P OPERATION)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '16/11/2017', text: 'סדרת ביקורי עור 2017–2018 לכיסת חלב/אפידרמלית; טיפול Roaccutane/Curatane 20–40mg עם מעקב תפקודי כבד', doc: 'doc-mz-F67' },
+          { date: '22/11/2017', text: 'כיסת חלב — טיפול כירורגי (BOIL OPER) 11–22/11/2017; טיפול מתמשך ב-Roaccutane/Curatane 20mg עם מעקב תפקודי כבד', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'SHOULDER SYNDROME', fullName: 'תסמונת כתף / שרוול מסובב — SHOULDER SYMPTOMS / ROTATOR CUFF SYNDROME',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '18/09/2019', text: 'ROTATOR CUFF SYNDROME; הפניה לכירורג כתף; טיפול ב-Tramadol + Rokacet Plus', doc: 'doc-mz-F67' },
+          { date: '10/05/2026', text: 'ביקור רפואה ראשונית: KNEE SYMPTOMS/COMPLAINTS; מרשם דיקלופנק (Feiofenac 150mg)', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'GAIT / DISABILITY', fullName: 'הפרעת הליכה ונפילות (משנית למיאלופתיה) + סטטוס נכות — GAIT PROBLEM / FALLS RECURRENT / DISABILITY',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50, freeText: 'הפרעת הליכה/נפילות + סטטוס נכות (~65%)' }) ],
+        underwritingResults: [ _cell('MORTGAGE', 'LOADING', { medicalAdditionPercent: 50 }) ],
+        timeline: [
+          { date: '10/09/2023', text: 'פציעה: CONTUSION KNEE AND LOWER LEG + HEMARTHROSIS NON-TRAUMATIC (ביקור תאונה)', doc: 'doc-mz-F67' },
+          { date: '01/12/2025', text: 'מכתב פרופ\' צבי לידר לוועדה רפואית; מגבלה תפקודית של עמוד השדרה; מצוין "65%"', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'MEDICAL CANNABIS', fullName: 'קנאביס רפואי (לכאב כרוני) — CANNABIS USE (MEDICAL)',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '20/05/2024', text: 'מרשם CANNABIS FLOWERS T10/C2 (קנאביס רפואי) לכאב כרוני', doc: 'doc-mz-F67' }
+        ],
+      },
+      {
+        code: 'VITAMIN D DEFICIENCY', fullName: 'חוסר/אי-ספיקת ויטמין D — VITAMIN D DEFICIENCY',
+        source: 'MEDICAL', flag: null, loadingTableKey: null,
+        swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+        timeline: [
+          { date: '01/11/2020', text: 'VITAMIN D DEFICIENCY נרשם; התחלת תוסף ויטמין D3; ערכים נמוכים חוזרים', doc: 'doc-mz-F67' }
+        ],
+      }
+],
+  },
 ];
 
 const docs = {
@@ -3498,11 +3723,237 @@ const docs = {
     excerpt: `סיכום מידע רפואי 03/2024: Current Diagnoses — <span class="doc-highlight">SARCOIDOSIS ST 2</span>, <span class="doc-highlight">HEARING COMPLAINTS</span>. עישון: <span class="doc-highlight">מעולם לא</span>. גובה 183, משקל 79, BMI 23.6, ל״ד 119/81. בדיקת HIV שלילית. עיסוק: מפעיל ציוד כבד.`,
     metaItems: [{ label: 'סוג מסמך', val: 'סיכום מידע רפואי' }, { label: 'תאריך', val: '10.03.2024' }],
   },
+  'doc-mz-F01': {
+    title: 'הצהרת בריאות טופס 415', meta: 'השלמת סוכן | 13/03/2022',
+    excerpt: `הצהרת בריאות טופס 415, מגדל, חתום 13/03/2022. ת.ז. 034112391, שם אמיר, אב נונה, מין זכר. כל שאלות ההיסטוריה הרפואית סומנו "לא". תיבת גובה/משקל חלקית (כ-170/110). שדה עישון לא קריא בבירור.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '13/03/2022' }],
+  },
+  'doc-mz-F03': {
+    title: 'הצהרת בריאות טופס 415', meta: 'השלמת סוכן | 13/03/2022',
+    excerpt: `הצהרת בריאות טופס 415, חתום 13/03/2022, ת.ז. 037749389, שם אלית, מין נקבה — בת זוגו של הלקוח. אינו הלקוח.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '13/03/2022' }],
+  },
+  'doc-mz-F04': {
+    title: 'הצהרת בריאות טופס 415', meta: 'השלמת סוכן | —',
+    excerpt: `הצהרת בריאות טופס 415, ת.ז. 037749389, אלית נונה — בת הזוג (גרסה/עותק סרוק נוסף של הצהרת בת הזוג).`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '—' }],
+  },
+  'doc-mz-F05': {
+    title: 'הצעה לביטוח בריאות טופס 170', meta: 'השלמת סוכן | 08/11/2022',
+    excerpt: `הצעה לביטוח בריאות טופס 170, מגדל, משפחתי, חתום 08/11/2022, תחילת ביטוח 01/12/2022. עמ\' 1 כולל את אמיר (ת.ז. 034112391) כבן זוג ואת אלית כמציעה ראשית + 3 ילדים. הצהרת הבריאות בעמ\' 2–3 שייכת לאלית (לא ללקוח). חסר עמ\' 6 מתוך 6.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '08/11/2022' }],
+  },
+  'doc-mz-F06': {
+    title: 'טופס תביעה 763', meta: 'תביעות | 24/03/2024',
+    excerpt: `טופס תביעה 763, אמיר וסר ת.ז. 034112391, פוליסה 22423994. טיפול 24/03/2024, סכום 150₪, חתום 26/03/2024. ללא אבחנה רשומה. בעמ\' 3 הופיעו ת.לידה ודוא"ל של בת הזוג (elit833) — נתוני קשר משותפים.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '24/03/2024' }],
+  },
+  'doc-mz-F07': {
+    title: 'טופס תביעה 763', meta: 'תביעות | 30/04/2024',
+    excerpt: `טופס תביעה 763, אמיר וסר ת.ז. 034112391, פוליסה 22423994. טיפול 30/04/2024, סכום 150₪, חתום 09/05/2024. ללא אבחנה רשומה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '30/04/2024' }],
+  },
+  'doc-mz-F10': {
+    title: 'טופס תביעה 763', meta: 'תביעות | 13/10/2024',
+    excerpt: `טופס תביעה 763, אמיר וסר ת.ז. 034112391, פוליסה 22423994. טיפול 13/10/2024, סכום 600₪, חתום 13/10/2024. ללא אבחנה רשומה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '13/10/2024' }],
+  },
+  'doc-mz-F11': {
+    title: 'הצהרת בריאות טופס 415 לסכום גבוה', meta: 'השלמת סוכן | 13/02/2025',
+    excerpt: `הצהרת בריאות טופס 415 לסכום גבוה, מגדל, חתום 13/02/2025, סוכן ניר שמאי. טופס דו-אישי: עמודה 1 = אלית (037749389), עמודה 2 = אמיר (034112391, זכר). גובה/משקל אמיר לפי מיקום עמודה ~175/90. ייתכן סימון "כן" בתחתית הרשת — לא קריא בבירור. עמ\' 7–8 מתוך 10 (השאר חסר).`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '13/02/2025' }],
+  },
+  'doc-mz-F13': {
+    title: 'מכתב ראומטולוגיה בכתב יד', meta: 'מסמכים רפואיים | 19/09/2024',
+    excerpt: `מכתב ראומטולוגיה בכתב יד, פרופ\' רפאל סגל, 19/09/2024. אבחנות: SEVERE FIBROMYALGIA; S/P CERVICAL OPERATION; פתולוגיה מותנית. ללא ת.ז. במכתב; שיוך לפי שם + התאמת אבחנות.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '19/09/2024' }],
+  },
+  'doc-mz-F14': {
+    title: 'סיכום ייעוץ מרפאת כאב (כללית)', meta: 'מסמכים רפואיים | 19/08/2024',
+    excerpt: `סיכום ייעוץ מרפאת כאב (כללית), ד"ר ג\'ני פרנקל, 19/08/2024. אבחנות: FIBROMYALGIA; MYELOPATHY CERVICAL; OBESITY; CARPAL TUNNEL S. שימוש כרוני באופיואידים (Percocet/Tramadol/Butrans) + Gabapentin/Lyrica/Zolpidem. הפניות MRI צוואר/מותני, EMG.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '19/08/2024' }],
+  },
+  'doc-mz-F15': {
+    title: 'שאלון להשלמת פרטים רפואיים — שאלון 13\' בריאות הנפש (מגדל)', meta: 'השלמת סוכן | 17/02/2025',
+    excerpt: `שאלון להשלמת פרטים רפואיים — שאלון 13\' בריאות הנפש (מגדל), חתום דיגיטלית 17/02/2025. אמיר ת.ז. 034112391. רוב פריטי הנפש סומנו "לא"; מצוין נכות ("65%" — קריאה חלקית). חתימה אלקטרונית דוא"ל elit833.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '17/02/2025' }],
+  },
+  'doc-mz-F17': {
+    title: 'טופס תביעה 763', meta: 'תביעות | 23/02/2025',
+    excerpt: `טופס תביעה 763, אמיר וסר ת.ז. 034112391, פוליסה 22423994. טיפול 23/02/2025, סכום 150₪, חתום 26/02/2025. ללא אבחנה רשומה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '23/02/2025' }],
+  },
+  'doc-mz-F18': {
+    title: 'סיכום ייעוץ עור', meta: 'מסמכים רפואיים | 13/07/2025',
+    excerpt: `סיכום ייעוץ עור, ד"ר לנדוב חן, ביקור 13/07/2025. אבחנה: DISSECTING CELLULITIS של הקרקפת. מרשם CURATANE 30MG (איזוטרטינואין). גיל 47.10.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '13/07/2025' }],
+  },
+  'doc-mz-F19': {
+    title: 'טופס תביעה 783', meta: 'תביעות | 13/07/2025',
+    excerpt: `טופס תביעה 783, אמיר ת.ז. 034112391, פוליסה 22423994. טיפול 13/07/2025 (מקושר לביקור עור לנדוב), סכום ~1200₪, חתום 14/07/2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '13/07/2025' }],
+  },
+  'doc-mz-F20': {
+    title: 'מכתב ראומטולוגיה בכתב יד', meta: 'מסמכים רפואיים | 05/10/2025',
+    excerpt: `מכתב ראומטולוגיה בכתב יד, פרופ\' דן בוסקילה, ~05/10/2025. אבחנה: Fibromyalgia – severe. תרופה Viepax/Vielpax 37.5→75mg. המלצות CBT + Tai Chi. גוף המכתב בכתב יד חלקית קריא.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '05/10/2025' }],
+  },
+  'doc-mz-F21': {
+    title: 'טופס תביעה 783', meta: 'תביעות | 05/10/2025',
+    excerpt: `טופס תביעה 783, אמיר ת.ז. 034112391, פוליסה 22423994. טיפול 05/10/2025 (מקושר לביקור ראומטולוגיה בוסקילה), סכום ~1600₪, חתום 05/10/2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '05/10/2025' }],
+  },
+  'doc-mz-F22': {
+    title: 'מכתב מומחה עמוד שדרה', meta: 'מסמכים רפואיים | 01/12/2025',
+    excerpt: `מכתב מומחה עמוד שדרה, פרופ\' צבי לידר, לוועדה רפואית, 01/12/2025. רקע: מחלת/ניתוח עמוד שדרה צווארי; מגבלה תפקודית; מצוין "65%" והפניות לאירועים 2022–2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '01/12/2025' }],
+  },
+  'doc-mz-F23': {
+    title: 'טופס תביעה 783', meta: 'תביעות | 12/10/2025',
+    excerpt: `טופס תביעה 783, אמיר ת.ז. 034112391, פוליסה 22423994. טיפול 12/10/2025, סכום 150₪, חתום 12/10/2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '12/10/2025' }],
+  },
+  'doc-mz-F24': {
+    title: 'סיכום ייעוץ עור', meta: 'מסמכים רפואיים | 07/12/2025',
+    excerpt: `סיכום ייעוץ עור, ד"ר לנדוב חן, ביקור 07/12/2025. אבחנות: DISSECTING CELLULITIS; ברקע BPH. תכנון טיפול ביולוגי אנטי-TNF (Adalimumab/Humira) עם סקר טרום-טיפולי HIV/LDH/צילום חזה. גיל 48.3.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '07/12/2025' }],
+  },
+  'doc-mz-F25': {
+    title: 'טופס תביעה 783', meta: 'תביעות | 07/12/2025',
+    excerpt: `טופס תביעה 783, אמיר ת.ז. 034112391, פוליסה 22423994. טיפול 07/12/2025 (מקושר לביקור עור לנדוב), סכום ~1200₪, חתום 07/12/2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '07/12/2025' }],
+  },
+  'doc-mz-F26': {
+    title: 'טופס תביעה 783', meta: 'תביעות | 25/12/2025',
+    excerpt: `טופס תביעה 783, אמיר ת.ז. 034112391, פוליסה 22423994. טיפול 25/12/2025, סכום 900₪, חתום 28/12/2025.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '25/12/2025' }],
+  },
+  'doc-mz-F27': {
+    title: 'מכתב נוירולוגיה', meta: 'מסמכים רפואיים | 26/12/2025',
+    excerpt: `מכתב נוירולוגיה, ד"ר מריוס גיא, 26/12/2025. אבחנות: מצב אחרי CERVICAL LAMINECTOMY (2019–2020); PERMANENT URINARY INCONTINENCE; ERECTILE DYSFUNCTION / ORGANIC IMPOTENCE; מיאלופתיה צווארית C2-C3. תרופות Toviaz, Betmiga. שקילת AUS / נוירוסטימולציה סקרלית / male sling.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '26/12/2025' }],
+  },
+  'doc-mz-F28': {
+    title: 'מכתב מומחית עור ד"ר לנדוב חני (כללית) 03/05/2026 + 11 עמ\'…', meta: 'מסמכים רפואיים | 03/05/2026',
+    excerpt: `מכתב מומחית עור ד"ר לנדוב חני (כללית) 03/05/2026 + 11 עמ\' תוצאות מעבדה כללית. אבחנות: DISSECTING CELLULITIS; BPH; תכנון ADALIMUMAB/Humira. סקר זיהומי שלילי (HIV/HBV/HCV/QuantiFERON-TB). ערכי מעבדה מלאים 12/2025 (ליפידים, כבד, ויטמין D, ספירת דם).`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '03/05/2026' }],
+  },
+  'doc-mz-F29': {
+    title: 'טופס חלב"ג (מגדל) בכתב יד רופא עור', meta: 'מסמכים רפואיים | 11/05/2025',
+    excerpt: `טופס חלב"ג (מגדל) בכתב יד רופא עור, ~11/05/2025. אבחנה: Dissecting Cellulitis of Scalp. טיפול שניתן: Clindamycin + Rifampicin + עירוי. שם/ת.ז. חלקית קריאים; שיוך לפי שם והתאמת אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '11/05/2025' }],
+  },
+  'doc-mz-F38': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 05/06/2024',
+    excerpt: `הודעת תשלום מגדל, 05/06/2024. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12245087808. שירות 30/04/2024, שולם 151.28₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '05/06/2024' }],
+  },
+  'doc-mz-F39': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 13/10/2024',
+    excerpt: `הודעת תשלום מגדל, 13/10/2024. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12245175743. שירות 13/10/2024, שולם 480₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '13/10/2024' }],
+  },
+  'doc-mz-F41': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 26/02/2025',
+    excerpt: `הודעת תשלום מגדל, 26/02/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255023910. שירות 23/02/2025 (רופא מומחה), שולם 120₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '26/02/2025' }],
+  },
+  'doc-mz-F43': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 14/07/2025',
+    excerpt: `הודעת תשלום מגדל, 14/07/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255127366. שירות 13/07/2025 (רופא מומחה), שולם 876.82₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '14/07/2025' }],
+  },
+  'doc-mz-F45': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 05/10/2025',
+    excerpt: `הודעת תשלום מגדל, 05/10/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255176800. שירות 05/10/2025 (הוצאת מרפאה), שולם 888.77₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '05/10/2025' }],
+  },
+  'doc-mz-F46': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 12/10/2025',
+    excerpt: `הודעת תשלום מגדל, 12/10/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255179336. שירות 12/10/2025, שולם 120₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '12/10/2025' }],
+  },
+  'doc-mz-F47': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 07/12/2025',
+    excerpt: `הודעת תשלום מגדל, 07/12/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255219380. שירות 07/12/2025 (רופא מומחה, אמבולט), שולם 887.92₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '07/12/2025' }],
+  },
+  'doc-mz-F48': {
+    title: 'הודעת תשלום מגדל', meta: 'תביעות | 28/12/2025',
+    excerpt: `הודעת תשלום מגדל, 28/12/2025. אמיר נונה ת.ז. 034112391, פוליסה 22423994, תביעה 12255234730. שירות 25/12/2025 (אמבולט), שולם 720₪. ללא אבחנה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '28/12/2025' }],
+  },
+  'doc-mz-F50': {
+    title: 'מכתב מגדל — המחאת תשלום לתובע (תביעת בריאות)', meta: 'תביעות | 08/06/2026',
+    excerpt: `מכתב מגדל — המחאת תשלום לתובע (תביעת בריאות), 08/06/2026 + חוברת כללי בירור תביעות. תביעה 12260011285, פוליסה 22423994. נושא: טיפול בתרופה HYRIMOZ. אירוע 03/05/2026.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '08/06/2026' }],
+  },
+  'doc-mz-F51': {
+    title: 'מכתב מגדל — הודעת המשך בירור', meta: 'תביעות | 05/07/2026',
+    excerpt: `מכתב מגדל — הודעת המשך בירור, 05/07/2026. תביעה 12260011285, אירוע 03/05/2026 (עדיין בבירור).`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '05/07/2026' }],
+  },
+  'doc-mz-F54': {
+    title: 'כללית — בקשות לאישורי תרופות חריגות', meta: 'מסמכים רפואיים | 24/05/2026',
+    excerpt: `כללית — בקשות לאישורי תרופות חריגות, הודפס 24/05/2026. אמיר נונה ת.ז. 034112391. בקשה 06/05/2026 ל-HYRIMOZ PREF PEN 40MG/0.8ML — "הבקשה לתרופה נדחתה".`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '24/05/2026' }],
+  },
+  'doc-mz-F59': {
+    title: 'בנק לאומי — אישור בעלות בחשבון (משותף)', meta: 'תביעות | 24/05/2026',
+    excerpt: `בנק לאומי — אישור בעלות בחשבון (משותף), 24/05/2026. בעלים: אמיר נונה (034112391) + אלית נונה (037749389). חשבון 51089707, סניף 934. מסמך פיננסי — ללא תוכן רפואי; כולל גם את בת הזוג.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '24/05/2026' }],
+  },
+  'doc-mz-F61': {
+    title: 'אימייל פנימי מגדל (אלינו שרנסקי', meta: 'תביעות | 07/06/2026',
+    excerpt: `אימייל פנימי מגדל (אלינו שרנסקי, חיתום), 07/06/2026. נושא: נונה אמיר 034112391. אזכור אבחנות: DISSECTING CELLULITIS, BPH; תרופה HYRIMOZ; דיון חיתומי; אזכור תאריך 12.2022.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '07/06/2026' }],
+  },
+  'doc-mz-F63': {
+    title: 'אימייל פנימי מגדל (אלינו שרנסקי)', meta: 'תביעות | 23/07/2026',
+    excerpt: `אימייל פנימי מגדל (אלינו שרנסקי), 23/07/2026 — העברת 3 קבצי PDF תומכי תביעה. נושא: נונה אמיר 034112391. ללא תוכן קליני בגוף ההודעה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '23/07/2026' }],
+  },
+  'doc-mz-F64': {
+    title: 'טופס תביעה 756 (תרופות)', meta: 'תביעות | 24/05/2026',
+    excerpt: `טופס תביעה 756 (תרופות), מגדל, 24/05/2026. אמיר נונה 034112391, קופ"ח כללית, פוליסה 22423994. תרופה: HYRIMOZ PEN 40MG/0.8ML, 2500₪, בקשה לאישור מראש. חתום בהליך אינטרנטי.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'תביעות' }, { label: 'תאריך', val: '24/05/2026' }],
+  },
+  'doc-mz-F66': {
+    title: 'דוח רפואי כללית "מור" — רשומה אורכית (25 עמ\'', meta: 'מסמכים רפואיים | —',
+    excerpt: `דוח רפואי כללית "מור" — רשומה אורכית (25 עמ\', 1999–2026): יומן ביקורי מומחים והזמנות בדיקות (ללא ערכים מספריים). אורתופדיה/עמ"ש, עור, נוירולוגיה, מרפאת כאב, פיזיותרפיה, PSA, סרולוגיה. רשומות ילוד ונשים 2006–2007 = בת הזוג (הוחרגו). טבלאות מסובבות — OCR חלקי.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '—' }],
+  },
+  'doc-mz-F67': {
+    title: 'דוח רפואי כללית "מור" — רשומה כרונולוגית מלאה (281 עמ\')', meta: 'מסמכים רפואיים | 23/12/2020',
+    excerpt: `דוח רפואי כללית "מור" — רשומה כרונולוגית מלאה (281 עמ\'), הודפס 07/2026, מכסה ~2006–2026. מקור הליבה של הפרופיל: כלל האבחנות, האירועים, המדדים והתרופות. כולל רשימת בעיות (עמ\' 239/264), אשפוז/ניתוח הרצליה מדיקל סנטר 23/12/2020, טבלאות מעבדה וסימנים חיוניים. רשומות גינקולוגיה 2006–2007 המתויקות תחת ת.ז. אמיר שייכות לבת ה…`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '23/12/2020' }],
+  },
+  'doc-mz-F68': {
+    title: 'דוח רפואי כללית "מור" — מכתב מלווה + רשומת עור (6 עמ\')', meta: 'מסמכים רפואיים | 12/07/2026',
+    excerpt: `דוח רפואי כללית "מור" — מכתב מלווה + רשומת עור (6 עמ\'), הודפס 12/07/2026. ביקור 02/02/2022: FOLLICULITIS / FOLLICULITIS DECALVANS של הקרקפת; מרשם MINOCYCLINE 100MG. רופאת משפחה ד"ר שליאחוב אלה.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'מסמכים רפואיים' }, { label: 'תאריך', val: '12/07/2026' }],
+  },
+  'doc-mz-F70': {
+    title: 'הצעה לביטוח בריאות טופס 170', meta: 'השלמת סוכן | 08/11/2022',
+    excerpt: `הצעה לביטוח בריאות טופס 170, מגדל, משפחתי, חתום 08/11/2022. אמיר (034112391, בן זוג): גובה 170, משקל 100, BMI ~34.6, לא מעשן, תשובת "כן" יחידה לשאלת תרופות קבועות/מעקב (ללא פירוט). מציעה ראשית אלית + 3 ילדים. חסר עמ\' 6/6.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '08/11/2022' }],
+  },
+  'doc-mz-F71': {
+    title: 'ויתור על סודיות רפואית טופס 106', meta: 'השלמת סוכן | 05/07/2026',
+    excerpt: `ויתור על סודיות רפואית טופס 106, מגדל, חתום 05/07/2026. נונה אמיר ת.ז. 034112391, קופ"ח כללית, טל\' 0504498633, עד: איציק כהן. מסמך הסכמה — ללא תוכן רפואי.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '05/07/2026' }],
+  },
+  'doc-mz-F72': {
+    title: 'ויתור על סודיות רפואית טופס 106', meta: 'השלמת סוכן | 15/06/2026',
+    excerpt: `ויתור על סודיות רפואית טופס 106, מגדל, חתום 15/06/2026. נונה אמיר ת.ז. 034112391, קופ"ח כללית, טל\' 0504416246, עד: איציק כהן. מסמך הסכמה — ללא תוכן רפואי.`,
+    metaItems: [{ label: 'סוג מסמך', val: 'השלמת סוכן' }, { label: 'תאריך', val: '15/06/2026' }],
+  }
 };
 
 // Medical metrics (per profile) — each metric is tagged with the calculators it feeds.
 // doc = source docKey (existing document) OR uploadedDoc set at creation time.
-const medicalMetrics = [
+const medicalMetricsByPatient = [
+  [
   { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
   { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
   { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
@@ -3512,13 +3963,62 @@ const medicalMetrics = [
   { id: 'M-007', name: 'FEV1',         value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
   { id: 'M-008', name: 'FVC',          value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
   { id: 'M-009', name: 'DLCO',         value: '91',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
+  ],
+  [
+  { id: 'MZ-001', name: 'גובה', value: '175', unit: 'ס"מ', date: '26/08/2020', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-002', name: 'גובה', value: '170', unit: 'ס"מ', date: '18/02/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-003', name: 'גובה', value: '171', unit: 'ס"מ', date: '05/02/2026', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-004', name: 'גובה', value: '170', unit: 'ס"מ', date: '08/11/2022', calc: ['cmc'], doc: 'doc-mz-F70' },
+  { id: 'MZ-005', name: 'משקל', value: '100', unit: 'ק"ג', date: '15/09/2013', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-006', name: 'משקל', value: '109', unit: 'ק"ג', date: '26/08/2020', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-007', name: 'משקל', value: '110', unit: 'ק"ג', date: '06/03/2022', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-008', name: 'משקל', value: '112', unit: 'ק"ג', date: '18/02/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-009', name: 'משקל', value: '115', unit: 'ק"ג', date: '05/02/2026', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-010', name: 'משקל', value: '100', unit: 'ק"ג', date: '08/11/2022', calc: ['cmc'], doc: 'doc-mz-F70' },
+  { id: 'MZ-011', name: 'BMI', value: '33.41', unit: 'kg/m²', date: '15/09/2013', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-012', name: 'BMI', value: '35.59', unit: 'kg/m²', date: '26/08/2020', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-013', name: 'BMI', value: '38.06', unit: 'kg/m²', date: '18/02/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-014', name: 'BMI', value: '39.33', unit: 'kg/m²', date: '05/02/2026', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-015', name: 'לחץ דם', value: '120/80', unit: 'mmHg', date: '26/08/2020', calc: ['cad', 'cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-016', name: 'לחץ דם', value: '130/82', unit: 'mmHg', date: '05/02/2026', calc: ['cad', 'cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-017', name: 'דופק', value: '72', unit: 'לדקה', date: '26/08/2020', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-018', name: 'דופק', value: '94', unit: 'לדקה', date: '10/05/2026', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-019', name: 'גלוקוז בצום', value: '89', unit: 'mg/dL', date: '08/02/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-020', name: 'גלוקוז בצום', value: '90', unit: 'mg/dL', date: '22/08/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-021', name: 'HbA1c', value: '5.3', unit: '%', date: '10/12/2020', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-022', name: 'HbA1c', value: '5.4', unit: '%', date: '22/08/2024', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-023', name: 'HbA1c', value: '5.5', unit: '%', date: '18/12/2025', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-024', name: 'קריאטינין', value: '0.77', unit: 'mg/dL', date: '18/12/2025', calc: ['ckd'], doc: 'doc-mz-F67' },
+  { id: 'MZ-025', name: 'eGFR', value: '107.05', unit: 'mL/min/1.73m²', date: '05/02/2026', calc: ['ckd'], doc: 'doc-mz-F67' },
+  { id: 'MZ-026', name: 'כולסטרול כולל', value: '190', unit: 'mg/dL', date: '28/10/2020', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-027', name: 'LDL כולסטרול (מחושב)', value: '96.8', unit: 'mg/dL', date: '28/10/2020', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-028', name: 'HDL כולסטרול', value: '30', unit: 'mg/dL', date: '08/02/2024', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-029', name: 'טריגליצרידים', value: '210', unit: 'mg/dL', date: '08/02/2024', calc: ['cad'], doc: 'doc-mz-F67' },
+  { id: 'MZ-030', name: 'ALT (GPT)', value: '66', unit: 'U/L', date: '07/08/2025', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-031', name: 'AST (GOT)', value: '47', unit: 'U/L', date: '07/08/2025', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-032', name: 'חומצה אורית', value: '7.7', unit: 'mg/dL', date: '08/02/2024', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-033', name: 'ויטמין D (25-OH)', value: '34.5', unit: 'nmol/L', date: '08/02/2024', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-034', name: 'ויטמין D (25-OH)', value: '58.2', unit: 'nmol/L', date: '28/10/2020', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-035', name: 'המוגלובין (Hb)', value: '15.4', unit: 'g/dL', date: '18/12/2025', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-036', name: 'טסיות דם (PLT)', value: '264', unit: '10³/µL', date: '18/12/2025', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-037', name: 'CRP', value: '0.73', unit: 'mg/dL', date: '11/01/2022', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-038', name: 'PSA', value: '0.45', unit: 'ng/mL', date: '25/09/2017', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-039', name: 'QuantiFERON-TB', value: '0.03 (שלילי)', unit: 'IU/mL', date: '23/03/2026', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-040', name: 'HIV Ag/Ab; HBsAg; HCV Ab', value: 'שלילי (כולם)', unit: '—', date: '18/12/2025', calc: ['cc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-041', name: 'סטטוס עישון', value: 'לא מעשן — "מעולם לא"', unit: '—', date: '07/08/2025', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-042', name: 'תרופות קבועות (משמעות חיתומית)', value: 'אופיואידים: Oxycodone/Percocet + מדבקות…', unit: '—', date: 'עדכני 2024–2026', calc: ['cmc'], doc: 'doc-mz-F67' },
+  { id: 'MZ-043', name: 'אחוז נכות', value: 'מצוין "65%" (קריאה חלקית) במכתב מומחה ע…', unit: '%', date: '2023–2025', calc: ['cc'], doc: 'doc-mz-F15' }
+],
 ];
+let medicalMetrics = medicalMetricsByPatient[0];
 
 const healthDeclarations = [
   { docKey: 'doc-health-ronen', date: '10.03.2024' },
+  { docKey: 'doc-mz-F01', date: '13.03.2022' },
 ];
 
 const previousDeclarations = [
+  [],
   [],
 ];
 
@@ -3532,6 +4032,80 @@ const patientDocuments = [
     { name: 'HeartTrends — בדיקת לב', type: 'בדיקה', date: '27.02.2024', status: 'ok' },
     { name: 'מסמך סרוק — איכות ירודה', type: 'סריקה', date: '—', status: 'failed', failReason: 'איכות מקור ירודה — לא ניתן לחילוץ רפואי אמין (OCR נכשל).' },
     { name: 'אחזור ביטוח חיים — אימג׳ (מסמך חיתום)', type: 'מסמך חיתום', date: '19.05.2026', status: 'failed', failReason: 'מסמך מייל/חיתום — אינו מקור רפואי ראשוני; לא שימש לחילוץ אבחנה או אירוע.' },
+  ],
+  [
+      { name: 'הצהרת בריאות טופס 415', type: 'השלמת סוכן', date: '13/03/2022', status: 'ok', docKey: 'doc-mz-F01' },
+      { name: 'עותק כפול מדויק של קובץ F01 (הצהרת בריאות…', type: 'השלמת סוכן', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F01; לא שימש שוב לחילוץ' },
+      { name: 'הצהרת בריאות טופס 415', type: 'השלמת סוכן', date: '13/03/2022', status: 'failed', wrongId: true, failReason: 'שייך לבת הזוג (ת.ז. 037749389) ולא ללקוח' },
+      { name: 'הצהרת בריאות טופס 415', type: 'השלמת סוכן', date: '—', status: 'failed', wrongId: true, failReason: 'שייך לבת הזוג (ת.ז. 037749389) ולא ללקוח' },
+      { name: 'הצעה לביטוח בריאות טופס 170', type: 'השלמת סוכן', date: '08/11/2022', status: 'ok', docKey: 'doc-mz-F05' },
+      { name: 'טופס תביעה 763', type: 'תביעות', date: '24/03/2024', status: 'ok', docKey: 'doc-mz-F06' },
+      { name: 'טופס תביעה 763', type: 'תביעות', date: '30/04/2024', status: 'ok', docKey: 'doc-mz-F07' },
+      { name: 'עותק כפול מדויק של קובץ F07 (טופס תביעה החזר…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F07; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F07 (טופס תביעה החזר…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F07; לא שימש שוב לחילוץ' },
+      { name: 'טופס תביעה 763', type: 'תביעות', date: '13/10/2024', status: 'ok', docKey: 'doc-mz-F10' },
+      { name: 'הצהרת בריאות טופס 415 לסכום גבוה', type: 'השלמת סוכן', date: '13/02/2025', status: 'ok', docKey: 'doc-mz-F11' },
+      { name: 'עותק כפול מדויק של קובץ F11 (הצהרת בריאות…', type: 'השלמת סוכן', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F11; לא שימש שוב לחילוץ' },
+      { name: 'מכתב ראומטולוגיה בכתב יד', type: 'מסמכים רפואיים', date: '19/09/2024', status: 'ok', docKey: 'doc-mz-F13' },
+      { name: 'סיכום ייעוץ מרפאת כאב (כללית)', type: 'מסמכים רפואיים', date: '19/08/2024', status: 'ok', docKey: 'doc-mz-F14' },
+      { name: 'שאלון להשלמת פרטים רפואיים — שאלון 13\' בריאות…', type: 'השלמת סוכן', date: '17/02/2025', status: 'ok', docKey: 'doc-mz-F15' },
+      { name: 'עותק כפול מדויק של קובץ F15 (שאלון 13\' —…', type: 'השלמת סוכן', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F15; לא שימש שוב לחילוץ' },
+      { name: 'טופס תביעה 763', type: 'תביעות', date: '23/02/2025', status: 'ok', docKey: 'doc-mz-F17' },
+      { name: 'סיכום ייעוץ עור', type: 'מסמכים רפואיים', date: '13/07/2025', status: 'ok', docKey: 'doc-mz-F18' },
+      { name: 'טופס תביעה 783', type: 'תביעות', date: '13/07/2025', status: 'ok', docKey: 'doc-mz-F19' },
+      { name: 'מכתב ראומטולוגיה בכתב יד', type: 'מסמכים רפואיים', date: '05/10/2025', status: 'ok', docKey: 'doc-mz-F20' },
+      { name: 'טופס תביעה 783', type: 'תביעות', date: '05/10/2025', status: 'ok', docKey: 'doc-mz-F21' },
+      { name: 'מכתב מומחה עמוד שדרה', type: 'מסמכים רפואיים', date: '01/12/2025', status: 'ok', docKey: 'doc-mz-F22' },
+      { name: 'טופס תביעה 783', type: 'תביעות', date: '12/10/2025', status: 'ok', docKey: 'doc-mz-F23' },
+      { name: 'סיכום ייעוץ עור', type: 'מסמכים רפואיים', date: '07/12/2025', status: 'ok', docKey: 'doc-mz-F24' },
+      { name: 'טופס תביעה 783', type: 'תביעות', date: '07/12/2025', status: 'ok', docKey: 'doc-mz-F25' },
+      { name: 'טופס תביעה 783', type: 'תביעות', date: '25/12/2025', status: 'ok', docKey: 'doc-mz-F26' },
+      { name: 'מכתב נוירולוגיה', type: 'מסמכים רפואיים', date: '26/12/2025', status: 'ok', docKey: 'doc-mz-F27' },
+      { name: 'מכתב מומחית עור ד"ר לנדוב חני (כללית)…', type: 'מסמכים רפואיים', date: '03/05/2026', status: 'ok', docKey: 'doc-mz-F28' },
+      { name: 'טופס חלב"ג (מגדל) בכתב יד רופא עור', type: 'מסמכים רפואיים', date: '11/05/2025', status: 'ok', docKey: 'doc-mz-F29' },
+      { name: 'עותק כפול מדויק של קובץ F28 (מכתב מומחית עור…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F28; לא שימש שוב לחילוץ' },
+      { name: 'פתק בכתב יד (~16/02/2025). שם אמיר וסר + ת.ז.…', type: 'מסמכים רפואיים', date: '16/02/2025', status: 'failed', failReason: 'כתב יד לא קריא; לא ניתן לחלץ תוכן רפואי מהימן' },
+      { name: 'עותק כפול מדויק של קובץ F14 (סיכום ייעוץ…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F14; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F14 (סיכום ייעוץ…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F14; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F13 (מכתב ראומטולוגיה…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F13; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F13 (מכתב ראומטולוגיה…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F13; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F15 (שאלון 13\' —…', type: 'השלמת סוכן', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F15; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F15 (שאלון 13\' —…', type: 'השלמת סוכן', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F15; לא שימש שוב לחילוץ' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '05/06/2024', status: 'ok', docKey: 'doc-mz-F38' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '13/10/2024', status: 'ok', docKey: 'doc-mz-F39' },
+      { name: 'עותק כפול מדויק של קובץ F39 (הודעת…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F39; לא שימש שוב לחילוץ' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '26/02/2025', status: 'ok', docKey: 'doc-mz-F41' },
+      { name: 'עותק כפול מדויק של קובץ F41 (הודעת…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F41; לא שימש שוב לחילוץ' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '14/07/2025', status: 'ok', docKey: 'doc-mz-F43' },
+      { name: 'עותק כפול מדויק של קובץ F43 (הודעת…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F43; לא שימש שוב לחילוץ' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '05/10/2025', status: 'ok', docKey: 'doc-mz-F45' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '12/10/2025', status: 'ok', docKey: 'doc-mz-F46' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '07/12/2025', status: 'ok', docKey: 'doc-mz-F47' },
+      { name: 'הודעת תשלום מגדל', type: 'תביעות', date: '28/12/2025', status: 'ok', docKey: 'doc-mz-F48' },
+      { name: 'עותק כפול מדויק של קובץ F48 (הודעת…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F48; לא שימש שוב לחילוץ' },
+      { name: 'מכתב מגדל — המחאת תשלום לתובע (תביעת בריאות)', type: 'תביעות', date: '08/06/2026', status: 'ok', docKey: 'doc-mz-F50' },
+      { name: 'מכתב מגדל — הודעת המשך בירור', type: 'תביעות', date: '05/07/2026', status: 'ok', docKey: 'doc-mz-F51' },
+      { name: 'עותק כפול מדויק של קובץ F28 (מכתב מומחית עור…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F28; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F28 (מכתב מומחית עור…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F28; לא שימש שוב לחילוץ' },
+      { name: 'כללית — בקשות לאישורי תרופות חריגות', type: 'מסמכים רפואיים', date: '24/05/2026', status: 'ok', docKey: 'doc-mz-F54' },
+      { name: 'עותק כפול מדויק של קובץ F29 (טופס חלב"ג —…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F29; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F29 (טופס חלב"ג —…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F29; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F28 (מכתב מומחית עור…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F28; לא שימש שוב לחילוץ' },
+      { name: 'עותק כפול מדויק של קובץ F28 (מכתב מומחית עור…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F28; לא שימש שוב לחילוץ' },
+      { name: 'בנק לאומי — אישור בעלות בחשבון (משותף)', type: 'תביעות', date: '24/05/2026', status: 'ok', docKey: 'doc-mz-F59' },
+      { name: 'עותק כפול מדויק של קובץ F59 (בנק לאומי —…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F59; לא שימש שוב לחילוץ' },
+      { name: 'אימייל פנימי מגדל (אלינו שרנסקי', type: 'תביעות', date: '07/06/2026', status: 'ok', docKey: 'doc-mz-F61' },
+      { name: 'עותק כפול מדויק של קובץ F61 (אימייל פנימי…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F61; לא שימש שוב לחילוץ' },
+      { name: 'אימייל פנימי מגדל (אלינו שרנסקי)', type: 'תביעות', date: '23/07/2026', status: 'ok', docKey: 'doc-mz-F63' },
+      { name: 'טופס תביעה 756 (תרופות)', type: 'תביעות', date: '24/05/2026', status: 'ok', docKey: 'doc-mz-F64' },
+      { name: 'עותק כפול מדויק של קובץ F64 (טופס תביעה —…', type: 'תביעות', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F64; לא שימש שוב לחילוץ' },
+      { name: 'דוח רפואי כללית "מור" — רשומה אורכית (25 עמ\'', type: 'מסמכים רפואיים', date: '—', status: 'ok', docKey: 'doc-mz-F66' },
+      { name: 'דוח רפואי כללית "מור" — רשומה כרונולוגית מלאה…', type: 'מסמכים רפואיים', date: '23/12/2020', status: 'ok', docKey: 'doc-mz-F67' },
+      { name: 'דוח רפואי כללית "מור" — מכתב מלווה + רשומת…', type: 'מסמכים רפואיים', date: '12/07/2026', status: 'ok', docKey: 'doc-mz-F68' },
+      { name: 'עותק כפול מדויק של קובץ F66 (דוח רפואי כללית…', type: 'מסמכים רפואיים', date: '—', status: 'ok', duplicate: true, failReason: 'מסמך כפול — עותק זהה של F66; לא שימש שוב לחילוץ' },
+      { name: 'הצעה לביטוח בריאות טופס 170', type: 'השלמת סוכן', date: '08/11/2022', status: 'ok', docKey: 'doc-mz-F70' },
+      { name: 'ויתור על סודיות רפואית טופס 106', type: 'השלמת סוכן', date: '05/07/2026', status: 'ok', docKey: 'doc-mz-F71' },
+      { name: 'ויתור על סודיות רפואית טופס 106', type: 'השלמת סוכן', date: '15/06/2026', status: 'ok', docKey: 'doc-mz-F72' }
   ],
 ];
 
@@ -3657,6 +4231,18 @@ const lifestyleData = [
       underwritingResults: RISK_GROUP_ORDER.map(rg => _cell(rg, 'CLEAN')),
     },
   },
+  {
+    occupation: {
+      value: 'עובד עיריית ראשון לציון', source: 'doc-mz-F67', findingSource: 'OCCUPATION',
+      swissResults: [ _cell('MORTGAGE', 'CLEAN') ],
+      underwritingResults: [ _cell('MORTGAGE', 'CLEAN') ],
+    },
+    profession: {
+      value: 'לא נמצא מידע על תחביבים במסמכים שנכללו', source: '', findingSource: 'HOBBY',
+      swissResults: RISK_GROUP_ORDER.map(rg => _cell(rg, 'CLEAN')),
+      underwritingResults: RISK_GROUP_ORDER.map(rg => _cell(rg, 'CLEAN')),
+    },
+  },
 ];
 
 // ---- Original health-declaration checklist forms ----
@@ -3700,6 +4286,27 @@ const healthForms = [
       3: '<strong>פירוט (ריאות):</strong> סרקואידוזיס ריאתי Stage II מאז 2016, יציב, ללא טיפול. תפקודי ריאה תקינים (FEV1 97%, FVC 97%, DLCO 91%, KCO 102%).',
       5: '<strong>פירוט:</strong> 19% נכות (משנת 2022) בגין טינטון / תלונות שמיעה.',
       7: '<strong>פירוט:</strong> בדיקות 2024 — HeartTrends (לב), מעבדה מקיפה (כימיה + ספירת דם), בדיקת HIV שלילית.',
+    },
+  },
+  {
+    date: '13.03.2022', sign: 'מבוסס על הצהרת בריאות טופס 415 + תיק רפואי כללית',
+    insureds: [
+      { id: '034112391', last: 'וסר', first: 'אמיר', gender: 'זכר', height: 171, weight: 115 },
+    ],
+    answers: {
+      1: ['no'],
+      2: { smokes: ['no'], count: ['—'], quit2yrs: ['no'] },
+      3: [['no'], ['no'], ['no'], ['no'], ['no'], ['no'], ['no'], ['no']],
+      4: ['no'],
+      5: ['no'],
+      6: ['no'],
+      7: ['no'],
+    },
+    extra: {
+      3: '<strong>שים לב — אי-התאמה מהותית:</strong> בהצהרה סומן "לא" לכל המערכות, אך בתיק הרפואי מתועדות אבחנות מהותיות: מיאלופתיה צווארית לאחר ניתוח (מערכת העצבים), דיכאון/חרדה (נפש), השמנה Class II ושגשוג ערמונית (BPH).',
+      5: '<strong>שים לב:</strong> בתיק מצוין סטטוס נכות ("65%" — קריאה חלקית) והערכה תפקודית — לא הוצהר.',
+      6: '<strong>שים לב:</strong> אשפוז וניתוח עמוד שדרה צווארי (הרצליה מדיקל סנטר, 23/12/2020) — לא הוצהר.',
+      7: '<strong>שים לב:</strong> ריבוי בדיקות אבחנתיות (MRI צוואר/מותני, EMG, ביופסיה 09/2024, סקר טרום-ביולוגי) — לא הוצהר.',
     },
   },
 ];
@@ -3890,10 +4497,12 @@ let fbContext = { key: null, stars: 0 };
 // =====================================================================
 function switchId(idx) {
   currentIdx = idx;
+  medicalMetrics = medicalMetricsByPatient[idx] || [];
   document.querySelectorAll('.id-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   renderHeader();
   renderHealthBar();
   renderHealthDeclActions();
+  renderMetricsSection();
   renderCrossChecks();
   renderPrevDeclarations();
   renderLifestyle();
@@ -3904,6 +4513,20 @@ function switchId(idx) {
   renderUwSummary();
   renderAllFeedback();
   updateAgg();
+}
+
+// resolve an entered code / ת״ז to a patient index (login codes: 111→0, 222→1)
+function resolvePatientIdx(val) {
+  const codeMap = { '111': 0, '222': 1 };
+  if (codeMap[val] != null) return codeMap[val];
+  return patients.findIndex(p => p.id === val);
+}
+// header ת״ז search — Enter reopens the process picker for that insured
+function headerIdSearch(val) {
+  const idx = resolvePatientIdx((val || '').trim());
+  if (idx < 0) return;
+  switchId(idx);
+  openProcessList();
 }
 
 // ===== ID SEARCH FILTER =====
@@ -6685,6 +7308,11 @@ function fmtDateTime(iso) {
 
 // open processes waiting for underwriting for an ID
 function processListFor(p) {
+  if (p && p.id === '034112391') {
+    return [
+      { processId: 'PRC-2026-00222', requestType: 'HAFAKA', date: '2026-07-20T10:00:00', note: 'ביטוח חיים למשכנתא — תיק רפואי מורכב; הצהרת בריאות מול תיק כללית לבדיקת חתם.', supported: true },
+    ];
+  }
   return [
     { processId: 'PRC-2026-00111', requestType: 'HAFAKA', date: '2026-07-07T09:30:00', note: 'מבוטח יחיד, מבקש הרחבת כיסוי. סתירת עישון — לבדיקת חתם.', supported: true },
     { processId: 'PRC-2026-00122', requestType: 'SHINUIM', date: '2026-06-18T14:05:00', note: '', supported: false },
@@ -6700,19 +7328,19 @@ function openUwScreen() {
 function submitPolicySearch() {
   const val = (document.getElementById('landing-input').value || '').trim();
   const err = document.getElementById('landing-error');
-  const p = patients[0];
-  const ok = val === '111' || val === p.id;
-  if (!ok) {
-    err.textContent = 'ת״ז לא נמצאה. נסה/י 111';
+  const idx = resolvePatientIdx(val);
+  if (idx < 0) {
+    err.textContent = 'ת״ז לא נמצאה. נסה/י 111 או 222';
     err.classList.add('show');
     return;
   }
   err.classList.remove('show');
+  switchId(idx);
   openProcessList();
 }
 
 function openProcessList() {
-  const p = patientsState[0];
+  const p = patientsState[currentIdx];
   const list = processListFor(p);
   document.getElementById('proc-popup-meta').textContent =
     `ת״ז ${p.id} · ${p.name} · ${list.length} מזהי תהליך`;
