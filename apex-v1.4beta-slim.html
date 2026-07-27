@@ -4025,37 +4025,31 @@ function renderPrevDeclarations() {
 }
 
 // ===== DOCUMENTS STATUS =====
-// SLIM: documents section shows the document NAMES only (no source viewing —
-// the underwriter opens the originals in the image system). No "open source" links.
+// SLIM: like the beta — a button that opens the documents table (openDocsList),
+// but the table has no "open source" action (originals are opened in the image system).
 function renderDocsStatus() {
   const wrap = document.getElementById('docs-status');
   const docsList = patientDocuments[currentIdx] || [];
   const total = docsList.length;
   const failed = docsList.filter(d => d.status === 'failed').length;
-  const summary = failed > 0
-    ? `<div class="docs-summary-bar has-failed"><span class="status-dot dot-orange"></span><span class="docs-summary-text"><span class="docs-fail-count">${failed} מסמכים</span> לא נקראו על ידי המערכת — דרושה בדיקה ידנית <span style="color:var(--text-light);">(מתוך ${total} מסמכים בתיק)</span></span></div>`
-    : `<div class="docs-summary-bar"><span class="status-dot dot-green"></span><span class="docs-summary-text">כל ${total} המסמכים בתיק</span></div>`;
-  const rows = docsList.map(d => {
-    let badge;
-    if (d.status === 'failed') badge = '<span class="doc-status-badge failed">● נכשל בקריאה</span>';
-    else if (d.status === 'unknown') badge = '<span class="doc-status-badge unknown">● סוג לא מזוהה</span>';
-    else badge = '<span class="doc-status-badge ok">● נקרא בהצלחה</span>';
-    const fr = d.failReason || '';
-    const isDup = d.duplicate || /כפול|עותק כפול|חופף/.test(fr);
-    const isWrongId = d.wrongId || /אינו שייך|לא שייך|אינה שייכת|מבוטח אחר|ת״ז של מבוטח/.test(fr);
-    const flags =
-      (isDup ? '<span class="doc-flag-badge doc-flag-dup" title="מסמך כפול">⧉ כפול</span>' : '') +
-      (isWrongId ? '<span class="doc-flag-badge doc-flag-wrongid" title="ת״ז של מבוטח אחר">⚠ ת״ז אחר</span>' : '');
-    return `
-      <div class="slim-doc-row">
-        <span class="slim-doc-name">${escapeHtml(d.name)}</span>
-        <span class="slim-doc-meta">${escapeHtml(d.type || '')}${d.date && d.date !== '—' ? ' · ' + escapeHtml(d.date) : ''}</span>
-        <span class="slim-doc-badges">${flags}${badge}</span>
+  if (failed > 0) {
+    wrap.innerHTML = `
+      <div class="docs-summary-bar has-failed">
+        <span class="status-dot dot-orange"></span>
+        <span class="docs-summary-text">
+          <span class="docs-fail-count">${failed} מסמכים</span> לא נקראו על ידי המערכת — דרושה בדיקה ידנית
+          <span style="color:var(--text-light);">(מתוך ${total} מסמכים בתיק)</span>
+        </span>
+        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
       </div>`;
-  }).join('');
-  wrap.innerHTML = summary +
-    `<div class="slim-doc-list">${rows}</div>` +
-    `<div class="slim-doc-hint">לצפייה במסמך המקורי — יש לפתוח את הקובץ במערכת האימג׳.</div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="docs-summary-bar">
+        <span class="status-dot dot-green"></span>
+        <span class="docs-summary-text">כל ${total} המסמכים נקראו בהצלחה</span>
+        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
+      </div>`;
+  }
 }
 
 function openDocsList() {
@@ -4086,10 +4080,11 @@ function openDocsList() {
     const okManual = d.status === 'ok' && d.manualRead;
     if (okManual) badge = '<span class="doc-status-badge ok">● נקרא (עודכן ידנית)</span>';
 
-    const openBtn = `<button class="docs-action-sm" onclick="openDocumentOriginal(${i})">📄 פתח מקור</button>`;
+    // SLIM: no "open source" action — the original is opened in the image system
     const markReadBtn = failedRow
       ? `<button class="docs-action-sm" id="markread-btn-${i}" onclick="markDocRead(${i})">✓ שנה סטטוס ל״נקרא״</button>`
       : '';
+    const actionCell = markReadBtn || `<span style="color:var(--text-light);font-size:11px;">פתיחה במערכת האימג׳</span>`;
 
     return `
       <tr class="${failedRow ? 'row-failed' : ''}">
@@ -4099,7 +4094,7 @@ function openDocsList() {
         </td>
         <td>${badge}</td>
         <td>${reasonCell}</td>
-        <td><div class="docs-table-actions">${openBtn}${markReadBtn}</div></td>
+        <td><div class="docs-table-actions">${actionCell}</div></td>
       </tr>`;
   }).join('');
 
@@ -4116,7 +4111,7 @@ function openDocsList() {
       <tbody>${rows}</tbody>
     </table>
     <div class="docs-popup-note">
-      מסמכים שנכשלו בקריאה האוטומטית מסומנים בהתאם. ניתן לפתוח את המסמך המקורי לצפייה.
+      מסמכים שנכשלו בקריאה האוטומטית מסומנים בהתאם. לצפייה במסמך המקורי — יש לפתוח את הקובץ במערכת האימג׳.
     </div>`;
   document.getElementById('docs-popup').classList.add('open');
 }
