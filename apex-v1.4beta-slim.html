@@ -513,6 +513,19 @@
   .hd-summary-label { font-size: 12px; color: var(--text-muted); }
   .hd-summary-chip { font-size: 12px; font-weight: 600; color: var(--text); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; }
 
+  /* SLIM: offline feedback report */
+  .fbr-rating { display: flex; gap: 8px; }
+  .fbr-opt { flex: 1; padding: 8px 10px; font-size: 13px; font-family: inherit; cursor: pointer; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); }
+  .fbr-opt:hover { background: var(--bg-subtle); }
+  .fbr-opt.active { border-color: var(--mig-blue); background: var(--mig-blue); color: #fff; font-weight: 700; }
+  .fbr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .fbr-chip { font-size: 12px; font-family: inherit; cursor: pointer; border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; background: #fff; color: var(--text); }
+  .fbr-chip:hover { background: var(--bg-subtle); }
+  .fbr-chip.active { border-color: var(--mig-blue); background: #eef3fb; color: var(--mig-ink); font-weight: 600; }
+  .fbr-changes-box { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-subtle); padding: 9px 12px; }
+  .fbr-changes-title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .fbr-changes { font-size: 12px; color: var(--text); line-height: 1.6; }
+
   .dx-add-btn {
     display: flex;
     align-items: center;
@@ -2574,24 +2587,10 @@
 </div>
 
 <!-- ===== HEADER ===== -->
-<div id="header" style="display:none;">
+<div id="header">
   <div class="header-top">
-    <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">V1.4β</span></div>
-    <div class="id-search-wrap" style="display:none;">
-      <input type="text" class="id-search" id="id-search" placeholder="חיפוש לפי ת״ז"
-        oninput="filterIds(this.value)" autocomplete="off">
-      <span class="id-search-icon">⌕</span>
-    </div>
-    <div class="id-tabs-row" id="id-tabs-row">
-      <div class="header-label" style="margin-left:8px;">מבוטח:</div>
-      <div class="id-tab active" id="id-tab-0">046262002 — רונן קדישב</div>
-      <div class="id-no-results" id="id-no-results" style="display:none;">לא נמצאו מבוטחים תואמים</div>
-    </div>
-    <div class="policy-badge" id="process-badge" style="margin-right:auto;">מזהה תהליך <span id="process-badge-id">—</span></div>
-    <div class="header-actions">
-      <button class="header-doc-btn" onclick="openEnrollmentForm()">טופס הצטרפות</button>
-      <button class="header-doc-btn" onclick="openAgentAgreement()">הסכם סוכן</button>
-    </div>
+    <div class="apex-brand" aria-hidden="true"><span class="apex-brand-name">APEX <b>AI</b></span><span style="font-size:11px;font-weight:700;color:var(--text-light);border:1px solid var(--border);border-radius:999px;padding:1px 7px;margin-right:8px;">Beta Slim</span></div>
+    <div class="header-label" style="margin-right:auto;font-weight:700;color:var(--mig-ink);">פרופיל רפואי לדוגמה</div>
   </div>
   <div class="header-data-row" id="header-data"></div>
 </div>
@@ -2718,7 +2717,7 @@
   </div>
   <div class="footer-actions">
     <button class="footer-save-btn" onclick="openNoUnderwriting()">לא נדרש חיתום</button>
-    <button class="footer-submit-btn" onclick="openBetaFeedback()">אישור ▸</button>
+    <button class="footer-submit-btn" onclick="openFbReport()">💬 משוב על הפרופיל</button>
   </div>
 </div>
 
@@ -2739,6 +2738,43 @@
         <button class="submit-btn" onclick="submitBetaFeedback()">אישור</button>
         <button class="btn-secondary" onclick="closePopup('beta-feedback-popup')">ביטול</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE FEEDBACK REPORT (offline — export as JSON / copy) ===== -->
+<div class="popup-overlay" id="fbreport-popup">
+  <div class="popup-box" style="max-width:580px;">
+    <div class="popup-header">
+      <div>
+        <div class="popup-title">משוב על הפרופיל שנוצר</div>
+        <div class="popup-meta" id="fbreport-meta"></div>
+      </div>
+      <button class="popup-close" onclick="closePopup('fbreport-popup')">✕ סגור</button>
+    </div>
+    <div class="popup-body">
+      <span class="fb-field-label">איכות הפרופיל שנוצר</span>
+      <div class="fbr-rating" id="fbr-rating">
+        <button type="button" class="fbr-opt" data-val="good" onclick="fbrSetRating('good')">👍 טוב</button>
+        <button type="button" class="fbr-opt" data-val="partial" onclick="fbrSetRating('partial')">◐ חלקי</button>
+        <button type="button" class="fbr-opt" data-val="wrong" onclick="fbrSetRating('wrong')">👎 שגוי</button>
+      </div>
+      <span class="fb-field-label" style="margin-top:14px;">סיבות (ניתן לבחור כמה)</span>
+      <div class="fbr-chips" id="fbr-chips"></div>
+      <span class="fb-field-label" style="margin-top:14px;">הערה חופשית</span>
+      <textarea class="fb-textarea" id="fbr-note" placeholder="מה היה טוב / מה חסר / מה שגוי…" oninput="fbrRefresh()"></textarea>
+      <div class="fbr-changes-box">
+        <div class="fbr-changes-title">סיכום שינויים שביצע החתם (נלכד אוטומטית)</div>
+        <div class="fbr-changes" id="fbr-changes"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+        <button class="submit-btn" onclick="downloadFeedback()">⬇ הורד קובץ משוב (JSON)</button>
+        <button class="btn-secondary" onclick="copyFeedback()">📋 העתק ללוח</button>
+      </div>
+      <details style="margin-top:12px;">
+        <summary style="font-size:11px;color:var(--text-light);cursor:pointer;">תצוגת ה-JSON (לגיבוי ידני)</summary>
+        <textarea id="fbr-json" readonly class="fb-textarea" style="width:100%;min-height:120px;font-family:monospace;font-size:10px;direction:ltr;margin-top:6px;"></textarea>
+      </details>
     </div>
   </div>
 </div>
@@ -3345,7 +3381,7 @@ function _cell(rg, decision, opts) {
 const patients = [
   {
     id: '046262002', name: 'רונן קדישב', age: 47, weight: 79, height: 183, bmi: 23.6,
-    birthDate: '—', gender: 'זכר', smokingStatus: 'מעולם לא',
+    birthDate: '14/06/1979', gender: 'זכר', smokingStatus: 'מעולם לא',
     // --- process (mezahe tahalich) is now the top-level anchor; policy is secondary ---
     processId: 'PRC-2026-00111',
     requestType: 'HAFAKA',                    // HAFAKA | SHINUIM | SHINUIM_MUNCHIM
@@ -3927,49 +3963,20 @@ function selectCoverage(code) {
   updateFinancialVisibility();
 }
 
+// SLIM: profile header — only identity/demographic data not shown elsewhere in the profile
 function renderHeader() {
   const p = patientsState[currentIdx];
   document.getElementById('footer-name').textContent = p.name;
-  const badge = document.getElementById('process-badge-id');
-  if (badge) badge.textContent = p.processId || '—';
-  const pb = document.getElementById('process-badge');
-  if (pb) pb.title = 'סוג בקשה: ' + requestTypeLabel(p.requestType) + (p.clerkNotesToUnderwriter ? ' · הערת רפרנטית: ' + p.clerkNotesToUnderwriter : '');
-  const groups = riskGroupsOf(p);
-  if (!selectedRgCode || !groups.some(g => g.riskGroupCode === selectedRgCode)) {
-    selectedRgCode = groups[0] ? groups[0].riskGroupCode : null;
-  }
-  const selRg = groups.find(g => g.riskGroupCode === selectedRgCode) || {};
-  const selReasons = selRg.reasons || p.reasons || [];
-  const tagsHtml = selReasons.map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
-  const rgTagsHtml = groups.map(g =>
-    `<span class="tag">${escapeHtml(g.riskGroupName)}</span>`).join('') || '—';
-  const overallReasons = (p.reasons || []).map(r => `<span class="tag">${escapeHtml(r)}</span>`).join('') || '—';
   document.getElementById('header-data').innerHTML = `
-    <div class="hd-field"><div class="hd-label">מזהה תהליך</div><div class="hd-value ltr">${p.processId || '—'}</div></div>
+    <div class="hd-field"><div class="hd-label">שם מלא</div><div class="hd-value">${escapeHtml(p.name)}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סוג בקשה</div><div class="hd-value" style="font-size:12px;">${requestTypeLabel(p.requestType)}</div></div>
+    <div class="hd-field"><div class="hd-label">ת״ז</div><div class="hd-value ltr">${escapeHtml(p.id)}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">שם מלא</div><div class="hd-value">${p.name}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">ת״ז</div><div class="hd-value ltr">${p.id}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">תאריך לידה</div><div class="hd-value ltr">${p.birthDate || '—'}</div></div>
+    <div class="hd-field"><div class="hd-label">תאריך לידה</div><div class="hd-value ltr">${escapeHtml(p.birthDate || '—')}</div></div>
     <div class="divider-v"></div>
     <div class="hd-field"><div class="hd-label">גיל</div><div class="hd-value">${p.age}</div></div>
     <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">מין</div><div class="hd-value">${p.gender || '—'}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סטטוס עישון</div><div class="hd-value" style="font-size:12px;">${p.smokingStatus || '—'}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">משקל / גובה</div><div class="hd-value ltr">${p.weight==='—'?'—':p.weight+'kg'} / ${p.height==='—'?'—':p.height+'cm'}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">BMI</div><div class="hd-value ltr">${p.bmi}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סיבות חיתום</div><div class="tags-row">${overallReasons}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">כיסויים</div><div class="tags-row">${rgTagsHtml}</div></div>
-    <div class="divider-v"></div>
-    <div class="hd-field"><div class="hd-label">סכום קיים</div><div class="hd-value" style="font-size:12px;color:var(--text-light);font-weight:400;">—</div></div>
+    <div class="hd-field"><div class="hd-label">מין</div><div class="hd-value">${escapeHtml(p.gender || '—')}</div></div>
   `;
 }
 
@@ -6003,6 +6010,147 @@ function submitBetaFeedback() {
   alert('תודה! המשוב שלך נשלח.');
 }
 
+// =====================================================================
+// OFFLINE FEEDBACK REPORT
+// The file is a standalone, offline artifact — feedback is captured inside it
+// and exported (download JSON / copy). Metadata below is injected at generation time.
+// =====================================================================
+const PROFILE_META = { profileId: 'PROFILE-001-KADISHEV', version: 'gen-1', engine: 'apex-v1.4beta-slim', generatedAt: '2024-03-10' };
+let baselineSnapshot = null;
+const FBR_REASONS = [
+  'אבחנה חסרה', 'אבחנה שגויה', 'אירוע חסר', 'אירוע שגוי / כפול',
+  'מדד שגוי', 'הצהרת בריאות לא תואמת', 'מיפוי מסמך מקור שגוי', 'ניסוח / שפה',
+];
+let fbrState = { rating: '', reasons: [] };
+
+function snapshotProfile() {
+  const p = patientsState[currentIdx];
+  return {
+    diagnoses: (p.diagnoses || []).map(d => ({
+      code: d.code, fullName: d.fullName,
+      events: (d.timeline || []).map(e => ({ date: e.date, text: e.text })),
+    })),
+    metrics: (medicalMetrics || []).map(m => ({ id: m.id || '', name: m.name, value: m.value, date: m.date })),
+    lifestyle: {
+      occupation: (p.lifestyle && p.lifestyle.occupation && p.lifestyle.occupation.value) || '',
+      profession: (p.lifestyle && p.lifestyle.profession && p.lifestyle.profession.value) || '',
+    },
+  };
+}
+function captureBaseline() { baselineSnapshot = JSON.parse(JSON.stringify(snapshotProfile())); }
+
+function computeProfileDiff() {
+  const base = baselineSnapshot || snapshotProfile();
+  const cur = snapshotProfile();
+  const byCode = arr => { const m = {}; arr.forEach(d => { m[d.code] = d; }); return m; };
+  const bD = byCode(base.diagnoses), cD = byCode(cur.diagnoses);
+  const dxAdded = cur.diagnoses.filter(d => !bD[d.code]).map(d => d.code);
+  const dxRemoved = base.diagnoses.filter(d => !cD[d.code]).map(d => d.code);
+  const dxEdited = [];
+  let evAdded = 0, evRemoved = 0; const evDetail = [];
+  cur.diagnoses.forEach(d => {
+    const b = bD[d.code]; if (!b) return;
+    const bev = new Set(b.events.map(e => e.date + '|' + e.text));
+    const cev = new Set(d.events.map(e => e.date + '|' + e.text));
+    let a = 0, r = 0;
+    d.events.forEach(e => { if (!bev.has(e.date + '|' + e.text)) a++; });
+    b.events.forEach(e => { if (!cev.has(e.date + '|' + e.text)) r++; });
+    if (a || r) { evAdded += a; evRemoved += r; evDetail.push({ code: d.code, added: a, removed: r }); }
+    if (d.fullName !== b.fullName) dxEdited.push(d.code);
+  });
+  const key = m => (m.id || '') + '|' + m.name + '|' + m.date;
+  const bM = new Set(base.metrics.map(key)), cM = new Set(cur.metrics.map(key));
+  const mAdded = cur.metrics.filter(m => !bM.has(key(m))).map(m => m.name);
+  const mRemoved = base.metrics.filter(m => !cM.has(key(m))).map(m => m.name);
+  const lsChanged = [];
+  if (cur.lifestyle.occupation !== base.lifestyle.occupation) lsChanged.push('עיסוק');
+  if (cur.lifestyle.profession !== base.lifestyle.profession) lsChanged.push('תחביבים');
+  const touched = !!(dxAdded.length || dxRemoved.length || dxEdited.length || evAdded || evRemoved || mAdded.length || mRemoved.length || lsChanged.length);
+  return { diagnoses: { added: dxAdded, removed: dxRemoved, edited: dxEdited }, events: { added: evAdded, removed: evRemoved, perDiagnosis: evDetail }, metrics: { added: mAdded, removed: mRemoved }, lifestyleChanged: lsChanged, touched };
+}
+
+function fbrChangesText() {
+  const d = computeProfileDiff();
+  if (!d.touched) return 'לא בוצעו שינויים ידניים — הפרופיל התקבל כפי שנוצר.';
+  const parts = [];
+  if (d.diagnoses.added.length) parts.push('אבחנות שנוספו: ' + d.diagnoses.added.join(', '));
+  if (d.diagnoses.removed.length) parts.push('אבחנות שנמחקו: ' + d.diagnoses.removed.join(', '));
+  if (d.diagnoses.edited.length) parts.push('אבחנות שנערכו: ' + d.diagnoses.edited.join(', '));
+  if (d.events.added) parts.push('אירועים שנוספו: ' + d.events.added);
+  if (d.events.removed) parts.push('אירועים שנמחקו: ' + d.events.removed);
+  if (d.metrics.added.length) parts.push('מדדים שנוספו: ' + d.metrics.added.length);
+  if (d.metrics.removed.length) parts.push('מדדים שנמחקו: ' + d.metrics.removed.length);
+  if (d.lifestyleChanged.length) parts.push('עודכן: ' + d.lifestyleChanged.join(', '));
+  return parts.join(' · ');
+}
+
+function buildFeedbackPacket() {
+  const secFb = {};
+  Object.keys(feedbackState).forEach(k => { const f = feedbackState[k]; if (f && (f.vote || f.text)) secFb[k] = { vote: f.vote || '', note: f.text || '' }; });
+  return {
+    profileId: PROFILE_META.profileId, version: PROFILE_META.version, engine: PROFILE_META.engine, generatedAt: PROFILE_META.generatedAt,
+    submittedAt: new Date().toISOString(),
+    insured: (patientsState[currentIdx] && patientsState[currentIdx].name) || '',
+    overall: fbrState.rating || '',
+    reasons: fbrState.reasons.slice(),
+    note: (document.getElementById('fbr-note').value || '').trim(),
+    sectionFeedback: secFb,
+    changes: computeProfileDiff(),
+  };
+}
+
+function openFbReport() {
+  fbrState = { rating: '', reasons: [] };
+  document.getElementById('fbreport-meta').textContent =
+    PROFILE_META.profileId + ' · גרסה ' + PROFILE_META.version + ' · ' + ((patientsState[currentIdx] && patientsState[currentIdx].name) || '');
+  document.getElementById('fbr-note').value = '';
+  document.querySelectorAll('#fbr-rating .fbr-opt').forEach(b => b.classList.remove('active'));
+  document.getElementById('fbr-chips').innerHTML = FBR_REASONS.map((r, i) =>
+    `<button type="button" class="fbr-chip" data-i="${i}" onclick="fbrToggleChip(${i})">${escapeHtml(r)}</button>`).join('');
+  fbrRefresh();
+  document.getElementById('fbreport-popup').classList.add('open');
+}
+function fbrSetRating(val) {
+  fbrState.rating = val;
+  document.querySelectorAll('#fbr-rating .fbr-opt').forEach(b => b.classList.toggle('active', b.dataset.val === val));
+  fbrRefresh();
+}
+function fbrToggleChip(i) {
+  const r = FBR_REASONS[i];
+  const idx = fbrState.reasons.indexOf(r);
+  if (idx >= 0) fbrState.reasons.splice(idx, 1); else fbrState.reasons.push(r);
+  const btn = document.querySelector('#fbr-chips .fbr-chip[data-i="' + i + '"]');
+  if (btn) btn.classList.toggle('active', idx < 0);
+  fbrRefresh();
+}
+function fbrRefresh() {
+  document.getElementById('fbr-changes').textContent = fbrChangesText();
+  document.getElementById('fbr-json').value = JSON.stringify(buildFeedbackPacket(), null, 2);
+}
+function downloadFeedback() {
+  const pkt = buildFeedbackPacket();
+  const blob = new Blob([JSON.stringify(pkt, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'feedback-' + pkt.profileId + '-' + pkt.submittedAt.replace(/[:.]/g, '-') + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function copyFeedback() {
+  const ta = document.getElementById('fbr-json');
+  const txt = ta.value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(() => alert('המשוב הועתק ללוח.'), fbrManualCopy);
+  } else { fbrManualCopy(); }
+}
+function fbrManualCopy() {
+  const ta = document.getElementById('fbr-json');
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); alert('המשוב הועתק ללוח.'); }
+  catch (e) { alert('בחר/י את הטקסט בתיבת ה-JSON והעתק/י ידנית.'); }
+}
+
 // ===== NO-UNDERWRITING (לא נדרש חיתום ריסק) =====
 function openNoUnderwriting() {
   const p = patientsState[currentIdx];
@@ -6690,6 +6838,8 @@ function chooseProcess(id) {
   openUwScreen();
   const badge = document.getElementById('process-badge-id');
   if (badge) badge.textContent = patientsState[0].processId || '';
+  // capture the generated baseline for the offline feedback diff (before any edits)
+  captureBaseline();
 })();
 </script>
 </body>
