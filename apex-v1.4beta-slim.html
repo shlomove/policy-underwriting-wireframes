@@ -508,8 +508,10 @@
 
   .tl-text:hover { text-decoration-color: var(--mig-blue); color: var(--mig-ink); }
 
-  /* SLIM: source document name as plain, non-clickable text */
-  .tl-src { display: block; margin-top: 3px; font-size: 10px; color: var(--text-light); text-decoration: none; cursor: default; }
+  /* SLIM: health-declaration marked-systems summary */
+  .hd-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hd-summary-label { font-size: 12px; color: var(--text-muted); }
+  .hd-summary-chip { font-size: 12px; font-weight: 600; color: var(--text); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 999px; padding: 3px 12px; }
 
   .dx-add-btn {
     display: flex;
@@ -3652,6 +3654,7 @@ const hdQuestions = [
       'ו. נפש (דיכאון, PTSD, הפרעת נפש אחרת)',
       'ז. מערכת העצבים והמוח',
       'ח. כליות ודרכי שתן',
+      'ט. מערכת אף אוזן וגרון (שמיעה)',
   ] },
   { num: 4, text: 'מחלות מערכת החיסון / מחלות אוטואימוניות (איידס, נשאות, חום ממושך מעל 3 חודשים)' },
   { num: 5, text: 'נכות / תהליך לקבלת אחוזי נכות' },
@@ -3668,7 +3671,7 @@ const healthForms = [
     answers: {
       1: ['yes'],
       2: { smokes: ['no'], count: ['—'], quit2yrs: ['no'] },
-      3: [['no'], ['no'], ['yes'], ['no'], ['no'], ['no'], ['no'], ['no']],
+      3: [['no'], ['no'], ['yes'], ['no'], ['no'], ['no'], ['no'], ['no'], ['yes']],
       4: ['no'],
       5: ['yes'],
       6: ['no'],
@@ -3983,20 +3986,21 @@ function renderHealthBar() {
   }
 }
 
+// SLIM: no viewing of the original declaration — show only a summary of the systems marked
 function renderHealthDeclActions() {
   const wrap = document.getElementById('health-decl-actions');
-  const decl = healthDeclarations[currentIdx];
-  const p = patientsState[currentIdx];
-  let btns = '';
-  if (decl && decl.docKey && healthForms[currentIdx]) {
-    btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="openHealthForm(${currentIdx})">צפה בהצהרה המקורית <span style="color:var(--text-light);">(${decl.date})</span></button>`;
-  } else {
-    btns += `<button class="health-decl-btn" style="margin-right:0;" disabled title="לא נמצאה הצהרת בריאות חתומה">אין הצהרה מקורית בתיק</button>`;
+  const form = healthForms[currentIdx];
+  const subs = (hdQuestions.find(q => q.num === 3) || {}).subs || [];
+  const systems = [];
+  if (form && form.answers && Array.isArray(form.answers[3])) {
+    form.answers[3].forEach((a, i) => {
+      const yes = Array.isArray(a) ? a.includes('yes') : a === 'yes';
+      if (yes && subs[i]) systems.push(subs[i].replace(/^[א-ת]\.?\s*/, ''));
+    });
   }
-  if (p.uploadedDeclaration) {
-    btns += `<button class="health-decl-btn" style="margin-right:0;" onclick="openUploadedSource('${p.uploadedDeclaration}')">פתח קובץ שהועלה</button>`;
-  }
-  wrap.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;">${btns}</div>`;
+  wrap.innerHTML = systems.length
+    ? `<div class="hd-summary"><span class="hd-summary-label">סומן בהצהרת הבריאות:</span>${systems.map(s => `<span class="hd-summary-chip">${escapeHtml(s)}</span>`).join('')}</div>`
+    : `<div class="hd-summary"><span class="hd-summary-label" style="color:var(--text-light);">לא סומנו מערכות בהצהרת הבריאות</span></div>`;
 }
 
 function renderCrossChecks() {
@@ -4264,20 +4268,17 @@ function renderDiagnoses() {
 }
 
 function buildCard(dx, idx) {
-  const tlHtml = dx.timeline.map((item, ei) => {
-    const srcName = item.docName || (item.doc && docs[item.doc] ? docs[item.doc].title : '');
-    return `
+  const tlHtml = dx.timeline.map((item, ei) => `
     <div class="timeline-item">
       <div class="tl-date">${item.date}</div>
       <div class="tl-dot"></div>
-      <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="פתח סיכום אירוע">${item.text}${srcName ? `<span class="tl-src" onclick="event.stopPropagation();">מסמך מקור: ${escapeHtml(srcName)}</span>` : ''}</div>
+      <div class="tl-text" onclick="event.stopPropagation();openEventInfo(${idx}, ${ei})" style="cursor:pointer;" title="פתח סיכום אירוע">${item.text}</div>
       <div class="tl-actions">
         <button class="tl-mini-btn" onclick="event.stopPropagation();editEvent(${idx}, ${ei})" title="ערוך אירוע">✏</button>
         <button class="tl-mini-btn del" onclick="event.stopPropagation();deleteEvent(${idx}, ${ei})" title="מחק אירוע">🗑</button>
       </div>
     </div>
-  `;
-  }).join('');
+  `).join('');
 
   // beta: no missing-docs ("חוסרים") tag; keep only the not-in-declaration anomaly flag
   let tagHtml = '';
@@ -5309,6 +5310,20 @@ function deleteEvent(dxIdx, evIdx) {
 
 function _evYear(s) { const m = ('' + (s || '')).match(/(\d{4})/); return m ? parseInt(m[1]) : null; }
 
+// SLIM: every event gets a source document name (invented deterministically if none exists)
+const _SRC_POOL = [
+  'סיכום ביקור — רופא מטפל', 'סיכום ייעוץ מומחה', 'דוח הדמיה (צילום/US/CT/MRI)',
+  'תוצאות בדיקות מעבדה', 'מכתב שחרור / סיכום אשפוז', 'רשומה רפואית — קופת חולים',
+  'מכתב הפניה', 'סיכום מידע רפואי',
+];
+function eventSourceName(dxIdx, evIdx, ev) {
+  if (ev && ev.docName) return ev.docName;
+  if (ev && ev.doc && typeof docs !== 'undefined' && docs[ev.doc]) return docs[ev.doc].title;
+  const base = _SRC_POOL[((dxIdx || 0) * 7 + (evIdx || 0)) % _SRC_POOL.length];
+  const yr = ev && ev.date ? (('' + ev.date).match(/\d{4}/) || [])[0] : '';
+  return yr ? base + ' (' + yr + ')' : base;
+}
+
 let evInfoCtx = null;
 function openEventInfo(dxIdx, evIdx, edit) {
   const p = patientsState[currentIdx];
@@ -5349,11 +5364,9 @@ function openEventInfo(dxIdx, evIdx, edit) {
   ];
   // an existing event always links to its source document — no upload here
   // (uploading is available only when creating a new event / diagnosis / metric)
-  // SLIM: no source-file viewing — show the source name as plain text
-  const srcName = ev.docName || (ev.doc && docs[ev.doc] ? docs[ev.doc].title : '');
-  const sourceBtn = srcName
-    ? `<span class="metrics-src-none">מסמך מקור: ${escapeHtml(srcName)} — נפתח במערכת האימג׳</span>`
-    : `<span class="metrics-src-none">אין מסמך מקור</span>`;
+  // SLIM: no source-file viewing — every event shows a source document name (invented if none)
+  const srcName = eventSourceName(dxIdx, evIdx, ev);
+  const sourceBtn = `<span class="metrics-src-none">מסמך מקור: ${escapeHtml(srcName)} — נפתח במערכת האימג׳</span>`;
   document.getElementById('evinfo-popup-body').innerHTML =
     `<div class="ev-summary">${escapeHtml(ev.text || '—')}</div>
      <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
