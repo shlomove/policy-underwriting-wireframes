@@ -2716,8 +2716,7 @@
     <span class="footer-status" id="footer-name">כהן יעל</span>
   </div>
   <div class="footer-actions">
-    <button class="footer-save-btn" onclick="openNoUnderwriting()">לא נדרש חיתום</button>
-    <button class="footer-submit-btn" onclick="openFbReport()">💬 משוב על הפרופיל</button>
+    <button class="footer-submit-btn" onclick="sendFeedbackEmail()">📧 שלח פידבק במייל</button>
   </div>
 </div>
 
@@ -6099,6 +6098,24 @@ function buildFeedbackPacket() {
   };
 }
 
+function sendFeedbackEmail() {
+  const insured = (patientsState[currentIdx] && patientsState[currentIdx].name) || '';
+  const subject = 'פידבק על פרופיל ' + PROFILE_META.profileId + ' (' + PROFILE_META.version + ')' + (insured ? ' — ' + insured : '');
+  const body =
+    'פרטי הפרופיל' + '\n' +
+    '----------------' + '\n' +
+    'מזהה פרופיל: ' + PROFILE_META.profileId + '\n' +
+    'גרסה: ' + PROFILE_META.version + ' · מנוע: ' + PROFILE_META.engine + '\n' +
+    'מבוטח: ' + insured + '\n' +
+    'שינויים שנלכדו אוטומטית: ' + fbrChangesText() + '\n\n' +
+    'הפידבק שלי' + '\n' +
+    '----------------' + '\n' +
+    'דירוג כללי (טוב / חלקי / שגוי): ' + '\n' +
+    'מה היה טוב: ' + '\n' +
+    'מה חסר / שגוי: ' + '\n' +
+    'הערות נוספות: ' + '\n';
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
 function openFbReport() {
   fbrState = { rating: '', reasons: [] };
   document.getElementById('fbreport-meta').textContent =
