@@ -166,9 +166,23 @@
   .metric .mv{font-weight:700;white-space:nowrap}
   .metric .mmeta{color:var(--text-light);font-size:11px}
 
-  .kv{display:flex;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border-light);font-size:12.5px}
-  .kv .k{font-weight:600;min-width:118px;color:var(--text-muted)}
-  .kv .v{flex:1}
+  .kv{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border-light);font-size:12.5px}
+  .kv .k{font-weight:600;min-width:110px;color:var(--text-muted);flex:none}
+  .kv .v{flex:1;cursor:text;border-radius:4px;padding:1px 4px;margin:-1px -4px}
+  .kv .v:hover{background:var(--warn-bg)}
+  .kv.changed{background:#fff7f7}
+  .kv-edit{width:22px;height:22px;font-size:11px;flex:none;opacity:0;transition:.12s}
+  .kv:hover .kv-edit{opacity:1}
+  .metric{cursor:default}
+  .metric.changed{background:#fff7f7;margin:0 -12px;padding-inline:12px}
+  .metric .m-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .m-edit{cursor:text;border-radius:4px;padding:0 3px}
+  .m-edit:hover{background:var(--warn-bg)}
+  .metric .mv{display:flex;align-items:center;gap:4px}
+  .m-full{width:22px;height:22px;font-size:11px;flex:none;margin-inline-start:auto;opacity:0;transition:.12s}
+  .metric:hover .m-full{opacity:1}
+  .edited-tag{font-size:9px;font-weight:800;color:var(--diff);background:var(--err-bg);border:1px solid var(--err-line);border-radius:999px;padding:0 6px;margin-inline-start:6px;white-space:nowrap}
+  .inline-input{width:100%;box-sizing:border-box;font-family:inherit;font-size:12.5px;color:var(--text);border:1px solid var(--mig-blue);border-radius:4px;padding:3px 6px;resize:vertical}
 
   /* ===== MODAL (flat) ===== */
   .overlay{position:fixed;inset:0;background:rgba(2,1,64,.34);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
@@ -921,6 +935,9 @@ function renderDocs(){
     </div>`;
   }).join("");
 }
+function metricChanged(id){
+  return ["שם נתון","ערך נתון","יחידות מידה","תאריך מדידה","רמת ביטחון","מקור הנתון","אבחנה קשורה"].some(h=>cellChanged("metrics",id,h));
+}
 function renderMetrics(){
   const s=sec("metrics"); const pane=document.getElementById("pane-metrics");
   if(!s){ pane.innerHTML="<p style='padding:12px'>אין טבלת מדדים.</p>"; return; }
@@ -931,15 +948,80 @@ function renderMetrics(){
   });
   pane.innerHTML=Object.keys(groups).map(g=>`
     <div class="metric-group"><h3>${esc(g)}</h3>
-    ${groups[g].map(r=>{const d=r.data;return `<div class="metric">
-       <div><b>${esc(d["שם נתון"]||"")}</b> <span class="mmeta">${esc(d["תאריך מדידה"]||"")}</span></div>
-       <div class="mv">${esc(d["ערך נתון"]||"")} ${esc(d["יחידות מידה"]||"")}</div></div>`;}).join("")}
+    ${groups[g].map(r=>{const d=r.data;const ch=metricChanged(r._id);return `<div class="metric${ch?' changed':''}" data-id="${esc(r._id)}">
+       <div class="m-line"><b class="m-edit" data-edit-h="שם נתון">${esc(d["שם נתון"]||"—")}</b> <span class="mmeta m-edit" data-edit-h="תאריך מדידה">${esc(d["תאריך מדידה"]||"—")}</span>${ch?' <span class="edited-tag">נערך</span>':''}</div>
+       <div class="mv"><span class="m-edit" data-edit-h="ערך נתון">${esc(d["ערך נתון"]||"—")}</span> <span class="m-edit units" data-edit-h="יחידות מידה">${esc(d["יחידות מידה"]||"")}</span><button class="icon-btn m-full" data-row-edit title="עריכת כל השדות">✎</button></div>
+    </div>`;}).join("")}
     </div>`).join("");
 }
 function renderPersonal(){
   const s=sec("personal"); const pane=document.getElementById("pane-personal");
   if(!s){ pane.innerHTML="<p style='padding:12px'>אין נתונים.</p>"; return; }
-  pane.innerHTML=s.rows.map(r=>`<div class="kv"><div class="k">${esc(r.data[s.headers[0]])}</div><div class="v">${esc(r.data[s.headers[1]])}</div></div>`).join("");
+  pane.innerHTML=s.rows.map(r=>{
+    const ch=cellChanged("personal",r._id,s.headers[1]);
+    return `<div class="kv${ch?' changed':''}" data-id="${esc(r._id)}">
+      <div class="k">${esc(r.data[s.headers[0]])}</div>
+      <div class="v" data-edit-val>${esc(r.data[s.headers[1]])||"—"}${ch?' <span class="edited-tag">נערך</span>':''}</div>
+      <button class="icon-btn kv-edit" data-row-edit title="עריכה">✎</button>
+    </div>`;
+  }).join("");
+}
+
+/* ---- inline cell editor (personal + metrics) ---- */
+function inlineEditCell(el,key,id,header){
+  if(el.querySelector("input,textarea")) return;
+  const s=sec(key); const r=s.rows.find(x=>x._id===id); if(!r) return;
+  const cur=r.data[header]||"";
+  const long=cur.length>36 || /\n/.test(cur);
+  const inp=document.createElement(long?"textarea":"input");
+  inp.value=cur; inp.className="inline-input";
+  if(long) inp.rows=Math.min(7,cur.split("\n").length+1);
+  el.textContent=""; el.appendChild(inp); inp.focus(); if(inp.select) inp.select();
+  let done=false;
+  const commit=(save)=>{ if(done) return; done=true;
+    if(save && inp.value!==cur){ r.data[header]=inp.value; toast("הנתון עודכן."); }
+    renderPersonal(); renderMetrics(); renderHeader();
+  };
+  inp.addEventListener("blur",()=>commit(true));
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ e.preventDefault(); commit(false); }
+    else if(e.key==="Enter" && (!long || e.ctrlKey || e.metaKey)){ e.preventDefault(); commit(true); }
+  });
+}
+
+/* ---- full-row editor modal (personal + metrics) ---- */
+let rowModalCtx=null;
+function openRowModal(key,id){
+  const s=sec(key); const r=s.rows.find(x=>x._id===id); if(!r) return;
+  const isPersonal=(key==="personal");
+  let ov=document.getElementById("row-modal");
+  if(!ov){
+    ov=document.createElement("div"); ov.className="overlay"; ov.id="row-modal";
+    ov.innerHTML=`<div class="modal"><div class="modal-head"><h3 id="row-modal-title"></h3><button class="close-x" data-close>✕</button></div><div class="modal-body" id="row-modal-body"></div><div class="modal-foot"><button class="btn" data-close>ביטול</button><button class="btn primary" id="row-modal-save">שמירה</button></div></div>`;
+    document.body.appendChild(ov);
+    ov.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>closeOverlay("row-modal")));
+    ov.addEventListener("click",e=>{ if(e.target===ov) closeOverlay("row-modal"); });
+    ov.querySelector("#row-modal-save").addEventListener("click",saveRowModal);
+  }
+  rowModalCtx={key,id};
+  document.getElementById("row-modal-title").textContent=isPersonal?("עריכת: "+(r.data[s.headers[0]]||"")):"עריכת מדד";
+  const editHeaders=s.headers.filter(h=>h!==s.headers[0] && h!=="מזהה פרופיל" && h!=="מזהה נתון");
+  document.getElementById("row-modal-body").innerHTML=editHeaders.map(h=>{
+    const val=r.data[h]||"";
+    const long=val.length>40 || /\n/.test(val) || /הערות|תוכן|תיאור|מקור/.test(h);
+    const label=isPersonal && h===s.headers[1] ? "ערך" : h;
+    const ctl=long?`<textarea data-h="${esc(h)}">${esc(val)}</textarea>`:`<input data-h="${esc(h)}" value="${esc(val)}">`;
+    return `<div class="field"><label>${esc(label)}</label>${ctl}</div>`;
+  }).join("");
+  openOverlay("row-modal");
+}
+function saveRowModal(){
+  if(!rowModalCtx) return;
+  const {key,id}=rowModalCtx; const s=sec(key); const r=s.rows.find(x=>x._id===id);
+  if(r) document.querySelectorAll("#row-modal-body [data-h]").forEach(inp=>{ r.data[inp.dataset.h]=inp.value; });
+  closeOverlay("row-modal");
+  renderPersonal(); renderMetrics(); renderHeader();
+  toast("הנתון עודכן.");
 }
 
 /* ============================ EVENT BINDING ============================ */
@@ -1302,6 +1384,20 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",e=>closeOverlay(e.target.closest(".overlay").id)));
   document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) closeOverlay(o.id); }));
   document.querySelectorAll("#side .tabs .tab").forEach(t=>t.addEventListener("click",()=>switchTab(t.dataset.pane)));
+  // inline / full-row editing — personal
+  document.getElementById("pane-personal").addEventListener("click",e=>{
+    const kv=e.target.closest(".kv"); if(!kv) return;
+    if(e.target.closest("[data-row-edit]")){ openRowModal("personal",kv.dataset.id); return; }
+    const v=e.target.closest("[data-edit-val]");
+    if(v) inlineEditCell(v,"personal",kv.dataset.id,sec("personal").headers[1]);
+  });
+  // inline / full-row editing — metrics
+  document.getElementById("pane-metrics").addEventListener("click",e=>{
+    const m=e.target.closest(".metric"); if(!m) return;
+    if(e.target.closest("[data-row-edit]")){ openRowModal("metrics",m.dataset.id); return; }
+    const me=e.target.closest("[data-edit-h]");
+    if(me) inlineEditCell(me,"metrics",m.dataset.id,me.dataset.editH);
+  });
   document.getElementById("load-demo").addEventListener("click",()=>{
     const tpl=document.getElementById("demo-src");
     currentSourceHTML=tpl.innerHTML;
