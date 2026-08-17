@@ -95,20 +95,6 @@ svg.edges{position:absolute;top:0;left:0;overflow:visible;pointer-events:none;z-
 .hier .tier .lab{color:var(--ink-600);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hier .tier .cf{margin-inline-start:auto;font-size:9px;font-weight:850;padding:1px 7px;border-radius:999px;flex:0 0 auto}
 
-.detail{position:fixed;top:76px;left:16px;width:344px;max-height:calc(100% - 96px);background:var(--white);border:1px solid var(--line);
-  border-radius:16px;box-shadow:var(--footed);z-index:50;overflow:auto;transform:translateX(-130%);transition:transform .22s}
-.detail.open{transform:none}
-.detail .dh{padding:15px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--white)}
-.detail .dh .tag{font-size:10px;font-weight:850;letter-spacing:.4px;text-transform:uppercase}
-.detail .dh h3{margin:6px 0 2px;font-size:16px;font-weight:850;color:var(--navy)}
-.detail .dh p{margin:0;color:var(--ink-400);font-size:12px;font-weight:300}
-.detail .db{padding:14px 16px}
-.detail .db h4{margin:12px 0 6px;font-size:12px;color:var(--blue-700);font-weight:850}
-.detail .db ul{margin:0;padding-inline-start:18px}
-.detail .db li{font-size:12.5px;line-height:1.55;margin-bottom:5px;color:var(--ink-600);font-weight:300}
-.detail .close{position:absolute;top:13px;left:14px;background:var(--lav-100);border:1px solid var(--line);color:var(--navy);border-radius:9px;width:28px;height:28px;cursor:pointer;font-size:15px}
-.kv{display:inline-block;background:var(--lav-100);border:1px solid var(--lav-200);border-radius:7px;padding:1px 8px;font-size:11px;color:var(--navy);margin:2px 3px 0 0;font-weight:500}
-
 .legend{position:fixed;bottom:14px;right:14px;background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:var(--footed-sm);padding:10px 13px;z-index:45;font-size:11.5px;max-width:min(96vw,920px)}
 .legend .lt{font-weight:850;margin-bottom:7px;color:var(--navy)}
 .legend .items{display:flex;flex-wrap:wrap;gap:7px 14px}
@@ -142,12 +128,6 @@ svg.edges{position:absolute;top:0;left:0;overflow:visible;pointer-events:none;z-
     </div>
   </div>
 
-  <aside class="detail" id="detail">
-    <button class="close" id="detailClose">×</button>
-    <div class="dh"><div class="tag" id="dTag"></div><h3 id="dTitle"></h3><p id="dSub"></p></div>
-    <div class="db" id="dBody"></div>
-  </aside>
-
   <div class="legend" id="legend">
     <button class="collapse" id="legendToggle">▾</button>
     <div class="lt">מקרא</div>
@@ -165,7 +145,7 @@ svg.edges{position:absolute;top:0;left:0;overflow:visible;pointer-events:none;z-
       <div class="li"><span class="sw" style="border-color:var(--amber);background:transparent;border-style:dashed"></span>לולאת RETRY (עד 3 ימים) / ריצה יומית</div>
     </div>
   </div>
-  <div class="hint">גלגלת = זום · גרירה = הזזה · לחיצה על צומת = פירוט והדגשה · Esc = ניקוי</div>
+  <div class="hint">גלגלת = זום · גרירה = הזזה · לחיצה על צומת = הדגשת המסלול · Esc = ניקוי</div>
 
 <script>
 /* ================= MODEL ================= */
@@ -404,26 +384,9 @@ function selectNode(id){
   edgeRecords.forEach(r=>{ if(r.from===id||r.to===id){conn.add(r.from);conn.add(r.to);} });
   Object.entries(nodeEls).forEach(([nid,el])=>{ el.classList.toggle('dim',!conn.has(nid)); el.classList.toggle('sel',nid===id); });
   edgeRecords.forEach(r=>{ const hot=(r.from===id||r.to===id); r.el.classList.toggle('dim',!hot); r.el.classList.toggle('hot',hot); if(r.label)r.label.classList.toggle('dim',!hot); });
-  openDetail(id);
 }
 function clearSel(){ selId=null; Object.values(nodeEls).forEach(el=>el.classList.remove('dim','sel'));
-  edgeRecords.forEach(r=>{r.el.classList.remove('dim','hot'); if(r.label)r.label.classList.remove('dim');});
-  document.getElementById('detail').classList.remove('open'); }
-function openDetail(id){
-  const n=N.find(x=>x.id===id); if(!n)return; const d=n.detail||{};
-  document.getElementById('dTag').textContent=typeTag[n.type]||'';
-  document.getElementById('dTag').style.color=getComputedStyle(nodeEls[id]).getPropertyValue('color');
-  document.getElementById('dTitle').textContent=d.h||n.title;
-  document.getElementById('dSub').textContent=d.sub||n.sub||'';
-  const body=document.getElementById('dBody'); body.innerHTML='';
-  (d.body||[]).forEach(sec=>{ const h=document.createElement('h4'); h.textContent=sec[0]; body.appendChild(h);
-    const ul=document.createElement('ul'); sec[1].forEach(li=>{const l=document.createElement('li'); l.textContent=li; ul.appendChild(l);}); body.appendChild(ul); });
-  const meta=document.createElement('div'); meta.style.marginTop='12px';
-  meta.innerHTML='<span class="kv">'+(typeTag[n.type]||'')+'</span>';
-  body.appendChild(meta);
-  document.getElementById('detail').classList.add('open');
-}
-document.getElementById('detailClose').onclick=clearSel;
+  edgeRecords.forEach(r=>{r.el.classList.remove('dim','hot'); if(r.label)r.label.classList.remove('dim');}); }
 document.getElementById('viewport').addEventListener('click',clearSel);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape')clearSel(); });
 document.getElementById('legendToggle').onclick=function(){ const lg=document.getElementById('legend'); lg.classList.toggle('min'); this.textContent=lg.classList.contains('min')?'▴':'▾'; };
