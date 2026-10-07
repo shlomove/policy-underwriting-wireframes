@@ -2366,6 +2366,20 @@
   .gs-notes:focus { outline:none; border-color:var(--mig-blue); box-shadow:var(--sh-focus); }
   .gs-final-calc { font-size:12px; color:var(--text-muted); margin-top:10px; padding-top:9px; border-top:1px solid var(--border); line-height:1.7; }
   .gs-final-b { color:var(--text); font-size:14px; }
+  /* POC: Swiss underwriting ring button (per diagnosis) */
+  .poc-swiss-btn { position:relative; width:28px; height:28px; flex-shrink:0; padding:0; border:none; background:transparent; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+  .poc-swiss-ring { box-sizing:border-box; width:26px; height:26px; border-radius:50%; border:4px solid #0a1f8f; display:flex; align-items:center; justify-content:center; transition:border-color .15s, transform .15s; }
+  .poc-swiss-btn:hover .poc-swiss-ring { transform:scale(1.08); }
+  .poc-swiss-btn:focus-visible { outline:2px solid #0a1f8f; outline-offset:2px; border-radius:50%; }
+  .poc-swiss-check { display:none; width:12px; height:12px; }
+  .poc-swiss-btn.done .poc-swiss-check { display:block; }
+  .poc-swiss-btn.busy { cursor:progress; }
+  .poc-swiss-btn.busy .poc-swiss-ring { border-color:#c9d3ff; border-top-color:#0a1f8f; border-right-color:#3d5afe; animation:poc-swiss-spin .8s linear infinite; }
+  @keyframes poc-swiss-spin { to { transform:rotate(360deg); } }
+  .poc-swiss-btn::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(3px); background:#0a1f8f; color:#fff; font-size:11px; font-weight:700; line-height:1; padding:6px 10px; border-radius:12px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s, transform .12s; z-index:20; }
+  .poc-swiss-btn::before { content:''; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); border:5px solid transparent; border-bottom:none; border-top-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
+  .poc-swiss-btn:hover::after, .poc-swiss-btn:hover::before { opacity:1; }
+  .poc-swiss-btn:hover::after { transform:translateX(-50%) translateY(0); }
   .poc-sum-note { flex-basis:100%; font-size:12px; color:var(--text-muted); white-space:pre-wrap; border-top:1px dashed var(--border-light); padding-top:4px; margin-top:2px; }
   .gs-saved { font-size:11px; font-weight:800; color:var(--text-muted); background:var(--bg-hover); border:1px solid var(--border); border-radius:999px; padding:2px 9px; }
   .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
@@ -4338,7 +4352,10 @@ function pocTempLabel(dx) {
 function pocUwCard(dx, idx) {
   const hasTemp = !!(dx.tempLoading && (+dx.tempLoading.pct || +dx.tempLoading.permille));
   const hasNote = !!(dx.uwNote || '').trim();
+  const sw = dx.swissState === 'busy' ? ' busy' : dx.swissState === 'done' ? ' done' : '';
+  const swTip = dx.swissState === 'busy' ? 'Scout — מעבד…' : dx.swissState === 'done' ? 'Scout — לחץ לעיבוד נוסף' : 'Scout';
   return `<div class="itemuw" onclick="event.stopPropagation()">
+    <button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" data-tip="${swTip}" aria-label="${swTip}" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
     <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" id="loading-${idx}" min="0" step="25" value="${+dx.loading || 0}" onchange="onLoadingChange(${idx}, this.value)"><span>%</span></label>
     <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" id="permille-${idx}" min="0" step="1" value="${+dx.loadingPermille || 0}" onchange="onPermilleChange(${idx}, this.value)"><span>‰</span></label>
     <button class="itemuw-btn${hasTemp ? ' has' : ''}" onclick="openTempLoading(${idx})">⏱ ${escapeHtml(pocTempLabel(dx))}</button>
@@ -4396,6 +4413,64 @@ function onPocCancel(field, val) {
     p[field === 'pct' ? 'pocCancelPct' : 'pocCancelPer'] = n;
   }
   renderPocLoadSummary();
+}
+// POC: send a diagnosis to the Swiss underwriting API (via Scout) → final result + explainability
+// written into the diagnosis' underwriting-description field. Independent of the left-panel Scout / CMC.
+// Mocked here: the response is built from the diagnosis' Swiss results, its Swiss source table and the profile.
+function swissCellText(c) {
+  if (!c || c.decision === 'CLEAN') return 'ללא תוספת';
+  if (c.decision === 'REJECTION') return 'דחייה';
+  const b = [];
+  if (+c.medicalAdditionPercent) b.push('+' + fmtNum(+c.medicalAdditionPercent) + '%');
+  if (+c.medicalAdditionPermille) b.push('+' + fmtPermille(+c.medicalAdditionPermille));
+  if (c.decision === 'EXCLUSION' || c.exclusionText) b.push('החרגה' + (c.exclusionText ? ': ' + c.exclusionText : ''));
+  return b.join(' · ') || 'ללא תוספת';
+}
+function buildSwissResponse(dx) {
+  const p = patientsState[currentIdx];
+  const srcDx = ((patients[currentIdx] || {}).diagnoses || []).find(d => d.code === dx.code) || {};
+  const results = dx.swissResults || srcDx.swissResults || [];
+  const t = loadingTables[dx.loadingTableKey || srcDx.loadingTableKey];
+  const tl = dx.timeline || [];
+  const covs = riskGroupsOf(p).map(rg => rg.riskGroupCode);
+  const now = new Date();
+  const L = [];
+  L.push('תוצאת חיתום Swiss — ' + dx.code + ' (' + now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ')');
+  L.push('');
+  L.push('החלטה לפי כיסוי:');
+  if (results.length) {
+    results.filter(c => !covs.length || covs.includes(c.riskGroupCode))
+      .forEach(c => L.push('• ' + (riskGroupNames[c.riskGroupCode] || c.riskGroupCode) + ': ' + swissCellText(c)));
+  } else {
+    L.push('• לא נמצא כלל Swiss תואם לאבחנה — נדרש חיתום ידני');
+  }
+  L.push('');
+  L.push('פרמטרים שנלקחו בחשבון:');
+  L.push('• מבוטח: גיל ' + (p.age || '—') + ', ' + (p.gender || '—') + ', עישון: ' + (p.smokingStatus || '—') + (p.bmi ? ', BMI ' + p.bmi : ''));
+  L.push('• אבחנה: ' + (dx.fullName || dx.code) + (dx.inDeclaration === false ? ' — לא הוצהרה בהצהרת הבריאות' : ''));
+  if (tl.length) L.push('• היסטוריה: ' + tl.length + ' אירועים רפואיים, ' + tl[0].date + '–' + tl[tl.length - 1].date + '; אירוע אחרון: ' + tl[tl.length - 1].text);
+  if (t) t.rows.forEach(r => L.push('• ' + r.label + ': ' + r.vals.slice(0, 2).filter(v => v && v !== '—').join(', ') + (r.active ? '  ← קובע' : '')));
+  L.push('');
+  L.push('Explainability:');
+  const active = t && t.rows.find(r => r.active);
+  if (active) L.push('הדירוג נקבע לפי "' + active.label + ': ' + active.vals[0] + '" — השורה הקובעת בטבלת המקור.');
+  const note = results.map(c => c.freeText).filter(Boolean).join('; ');
+  if (note) L.push('הערת מנוע: ' + note + '.');
+  if (t && t.note) L.push(t.note.replace(/^\*\s*/, ''));
+  if (!active && !note) L.push('לא נמצאו נתוני מקור מספיקים לדירוג אוטומטי.');
+  return L.join('\n');
+}
+function runSwissUw(idx) {
+  const dx = patientsState[currentIdx].diagnoses[idx];
+  if (!dx || dx.swissState === 'busy') return;
+  const pIdx = currentIdx;
+  dx.swissState = 'busy';
+  renderDiagnoses();
+  setTimeout(() => {   // simulated API round-trip
+    dx.uwNote = buildSwissResponse(dx);
+    dx.swissState = 'done';
+    if (currentIdx === pIdx) { renderDiagnoses(); renderUwSummary(); }
+  }, 2200);
 }
 let pocNoteCtx = null;
 function openPocUwNote(idx) {
