@@ -2380,6 +2380,17 @@
   .poc-swiss-btn::before { content:''; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); border:5px solid transparent; border-right:none; border-left-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
   .poc-swiss-btn:hover::after, .poc-swiss-btn:hover::before { opacity:1; }
   .poc-swiss-btn:hover::after { transform:translateY(-50%) translateX(0); }
+  /* POC: missing & completeness — per-diagnosis button + checklist */
+  .poc-mc-btn { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; font-family:inherit; font-size:11px; font-weight:700; border-radius:999px; padding:3px 9px 3px 8px; cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--text-muted); white-space:nowrap; }
+  .poc-mc-btn svg { width:13px; height:13px; flex-shrink:0; }
+  .poc-mc-btn.ok { color:#2a7d4f; background:#eaf6ef; border-color:#a9d8bd; }
+  .poc-mc-btn.miss { color:#8a5a1f; background:#fff4e5; border-color:#e6c98f; }
+  .poc-mc-btn:hover { filter:brightness(.97); }
+  .poc-mc-btn:focus-visible { outline:2px solid var(--mig-blue); outline-offset:2px; }
+  .poc-mc-item { cursor:pointer; }
+  .poc-mc-item input { width:16px; height:16px; margin:0; accent-color:#2a7d4f; cursor:pointer; flex-shrink:0; }
+  .poc-mc-progress { height:6px; border-radius:3px; background:var(--warn-bg); overflow:hidden; margin-bottom:12px; }
+  .poc-mc-progress > span { display:block; height:100%; background:var(--dot-green); transition:width .2s; }
   .poc-sum-note { flex-basis:100%; font-size:12px; color:var(--text-muted); white-space:pre-wrap; border-top:1px dashed var(--border-light); padding-top:4px; margin-top:2px; }
   .gs-saved { font-size:11px; font-weight:800; color:var(--text-muted); background:var(--bg-hover); border:1px solid var(--border); border-radius:999px; padding:2px 9px; }
   .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
@@ -4318,6 +4329,7 @@ function buildCard(dx, idx) {
     <div class="diagnosis-card">
       <div class="diagnosis-header" onclick="toggleTl(${idx})">
         <span class="dx-toggle" id="toggle-${idx}">▶</span>
+        ${pocMcBtn(dx, idx)}
         <span class="dx-name">${dx.code}</span>
         ${tagHtml}
         <span class="dx-full-name">— ${dx.fullName}</span>
@@ -5585,32 +5597,49 @@ function addEventNote(dxIdx, evIdx) {
 let missingCtx = null; // diagnosis index
 let emailMode = 'single'; // 'single' | 'aggregate'
 
+// POC: missing & completeness — per-diagnosis button (next to the collapse toggle) → checklist popup
+function pocMcBtn(dx, idx) {
+  const reqs = dx.requiredDocs || [];
+  const have = reqs.filter(d => d.received).length;
+  const cls = !reqs.length ? '' : have === reqs.length ? ' ok' : ' miss';
+  const label = !reqs.length ? 'מסמכים' : have === reqs.length ? 'מסמכים ' + have + '/' + reqs.length : 'חסר ' + (reqs.length - have);
+  return `<button type="button" class="poc-mc-btn${cls}" onclick="event.stopPropagation();openMissingDocs(${idx})" title="Missing & Completeness — מסמכים נדרשים לאבחנה"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9.2l1.6 1.6L11 7.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${label}</button>`;
+}
 function openMissingDocs(idx) {
   const dx = patientsState[currentIdx].diagnoses[idx];
   if (!dx) return;
   missingCtx = idx;
-  const p = patientsState[currentIdx];
   const reqs = dx.requiredDocs || [];
-  const missing = reqs.filter(d => !d.received);
-  document.getElementById('missing-popup-title').textContent = 'מסמכים נדרשים — ' + dx.code;
+  const have = reqs.filter(d => d.received).length;
+  const missing = reqs.length - have;
+  document.getElementById('missing-popup-title').textContent = dx.fullName || dx.code;
   document.getElementById('missing-popup-meta').textContent =
-    `${dx.fullName} · ${reqs.length - missing.length}/${reqs.length} התקבלו`;
+    dx.code + ' · ' + (reqs.length ? `${have}/${reqs.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
 
-  const items = reqs.map(d => `
-    <div class="missing-item ${d.received ? 'received' : 'missing'}">
-      <span class="missing-mark ${d.received ? 'ok' : 'no'}">${d.received ? '✓' : '✗'}</span>
-      <span class="missing-item-name">${d.name}</span>
-      <span class="missing-item-status">${d.received ? 'התקבל' : 'חסר'}</span>
-    </div>`).join('');
+  const items = reqs.map((d, di) => `
+    <label class="missing-item poc-mc-item ${d.received ? 'received' : 'missing'}">
+      <input type="checkbox" ${d.received ? 'checked' : ''} onchange="toggleReqDoc(${di}, this.checked)">
+      <span class="missing-item-name">${escapeHtml(d.name)}</span>
+      <span class="missing-item-status">${d.received ? 'קיים' : 'לא קיים'}</span>
+    </label>`).join('');
 
-  const sendBlock = missing.length
-    ? `<button class="submit-btn" onclick="openEmailModal()">📧 שלח בקשה ללקוח</button>`
-    : `<div style="font-size:12px;color:var(--green);">✓ כל המסמכים הנדרשים התקבלו</div>`;
+  const status = !reqs.length ? ''
+    : missing
+      ? `<button class="submit-btn" onclick="openEmailModal()">📧 שלח בקשה ללקוח (${missing})</button>`
+      : `<div style="font-size:12px;color:var(--green);font-weight:700;">✓ כל המסמכים הנדרשים קיימים</div>`;
 
-  document.getElementById('missing-popup-body').innerHTML = `
+  document.getElementById('missing-popup-body').innerHTML = reqs.length ? `
+    <div class="poc-mc-progress" title="${have}/${reqs.length}"><span style="width:${Math.round(have / reqs.length * 100)}%"></span></div>
     <div class="missing-list">${items}</div>
-    ${sendBlock}`;
+    ${status}` : '<div class="uw-summary-empty">לא הוגדרו מסמכים נדרשים לאבחנה זו</div>';
   document.getElementById('missing-popup').classList.add('open');
+}
+function toggleReqDoc(di, checked) {
+  const dx = patientsState[currentIdx].diagnoses[missingCtx];
+  if (!dx || !dx.requiredDocs[di]) return;
+  dx.requiredDocs[di].received = !!checked;
+  openMissingDocs(missingCtx);
+  renderDiagnoses();
 }
 
 function buildEmailBody(p, dx, missing) {
