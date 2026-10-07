@@ -2376,10 +2376,10 @@
   .poc-swiss-btn.busy { cursor:progress; }
   .poc-swiss-btn.busy .poc-swiss-ring { border-color:#c9d3ff; border-top-color:#0a1f8f; border-right-color:#3d5afe; animation:poc-swiss-spin .8s linear infinite; }
   @keyframes poc-swiss-spin { to { transform:rotate(360deg); } }
-  .poc-swiss-btn::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(3px); background:#0a1f8f; color:#fff; font-size:11px; font-weight:700; line-height:1; padding:6px 10px; border-radius:12px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s, transform .12s; z-index:20; }
-  .poc-swiss-btn::before { content:''; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); border:5px solid transparent; border-bottom:none; border-top-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
+  .poc-swiss-btn::after { content:attr(data-tip); position:absolute; right:calc(100% + 9px); top:50%; transform:translateY(-50%) translateX(-3px); background:#0a1f8f; color:#fff; font-size:11px; font-weight:700; line-height:1; padding:6px 10px; border-radius:12px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s, transform .12s; z-index:20; }
+  .poc-swiss-btn::before { content:''; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); border:5px solid transparent; border-right:none; border-left-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
   .poc-swiss-btn:hover::after, .poc-swiss-btn:hover::before { opacity:1; }
-  .poc-swiss-btn:hover::after { transform:translateX(-50%) translateY(0); }
+  .poc-swiss-btn:hover::after { transform:translateY(-50%) translateX(0); }
   .poc-sum-note { flex-basis:100%; font-size:12px; color:var(--text-muted); white-space:pre-wrap; border-top:1px dashed var(--border-light); padding-top:4px; margin-top:2px; }
   .gs-saved { font-size:11px; font-weight:800; color:var(--text-muted); background:var(--bg-hover); border:1px solid var(--border); border-radius:999px; padding:2px 9px; }
   .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
