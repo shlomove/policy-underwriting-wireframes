@@ -1364,6 +1364,15 @@
   .doc-fail-reason .reason-label { color: var(--red); font-weight: 600; }
 
   .docs-table-actions { display: flex; flex-direction: column; gap: 5px; }
+  /* POC: status filter above the documents table */
+  .docs-filter { display:inline-flex; gap:2px; padding:3px; margin-bottom:12px; background:var(--bg-hover); border:1px solid var(--border-light); border-radius:999px; }
+  .docs-filter-btn { font-family:inherit; font-size:12px; font-weight:700; color:var(--text-muted); background:transparent; border:none; border-radius:999px; padding:6px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .docs-filter-btn:hover { color:var(--text); }
+  .docs-filter-btn.active { background:#fff; color:var(--text); box-shadow:0 1px 2px rgba(2,1,64,.08); }
+  .docs-filter-btn:focus-visible { outline:2px solid var(--mig-blue); outline-offset:1px; }
+  .docs-filter-n { font-size:10.5px; font-weight:700; color:var(--text-light); background:#fff; border:1px solid var(--border-light); border-radius:999px; padding:0 6px; line-height:16px; }
+  .docs-filter-btn.active .docs-filter-n { color:var(--mig-blue); border-color:#c5d3f5; }
+  .docs-filter-empty { padding:28px 12px; text-align:center; font-size:12.5px; color:var(--text-light); border:1px dashed var(--border); border-radius:var(--radius); }
 
   .docs-action-sm {
     border: 1px solid var(--border);
@@ -4097,27 +4106,40 @@ function renderDocsStatus() {
           <span class="docs-fail-count">${failed} מסמכים</span> לא נקראו על ידי המערכת — דרושה בדיקה ידנית
           <span style="color:var(--text-light);">(מתוך ${total} מסמכים בתיק)</span>
         </span>
-        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
+        <button class="docs-open-link" onclick="openDocsList('default')">צפה ברשימת המסמכים ▸</button>
       </div>`;
   } else {
     wrap.innerHTML = `
       <div class="docs-summary-bar">
         <span class="status-dot dot-green"></span>
         <span class="docs-summary-text">כל ${total} המסמכים נקראו בהצלחה</span>
-        <button class="docs-open-link" onclick="openDocsList()">צפה ברשימת המסמכים ▸</button>
+        <button class="docs-open-link" onclick="openDocsList('default')">צפה ברשימת המסמכים ▸</button>
       </div>`;
   }
 }
 
-function openDocsList() {
-  const docsList = patientDocuments[currentIdx] || [];
+// POC: status filter — opens on 'נכשל בקריאה' (a real file holds ~100 docs); refreshes keep the current filter
+let docsFilter = 'failed';
+const DOCS_FILTERS = [
+  { key: 'failed', label: 'נכשל בקריאה', test: d => d.status === 'failed' },
+  { key: 'ok', label: 'נקרא', test: d => d.status !== 'failed' },
+  { key: 'all', label: 'כל המסמכים', test: () => true },
+];
+function setDocsFilter(key) { docsFilter = key; openDocsList(); }
+function openDocsList(mode) {
+  const allDocs = patientDocuments[currentIdx] || [];
   const p = patientsState[currentIdx];
-  const failed = docsList.filter(d => d.status === 'failed').length;
+  const failed = allDocs.filter(d => d.status === 'failed').length;
+  if (mode === 'default') docsFilter = failed ? 'failed' : 'all';
+  const flt = DOCS_FILTERS.find(f => f.key === docsFilter) || DOCS_FILTERS[2];
+  const docsList = allDocs.map((d, i) => ({ d, i })).filter(x => flt.test(x.d));
+  const filterBar = `<div class="docs-filter" role="tablist" aria-label="סינון לפי סטטוס קריאה">${DOCS_FILTERS.map(f =>
+    `<button type="button" role="tab" aria-selected="${f.key === docsFilter}" class="docs-filter-btn${f.key === docsFilter ? ' active' : ''}" onclick="setDocsFilter('${f.key}')">${f.label} <span class="docs-filter-n">${allDocs.filter(f.test).length}</span></button>`).join('')}</div>`;
   document.getElementById('docs-popup-title').textContent = 'רשימת מסמכים — ' + p.name;
   document.getElementById('docs-popup-meta').textContent =
-    `${docsList.length} מסמכים בתיק · ${failed} לא נקראו` + (p.id ? ' · ת״ז ' + p.id : '');
+    `${allDocs.length} מסמכים בתיק · ${failed} לא נקראו` + (p.id ? ' · ת״ז ' + p.id : '');
 
-  const rows = docsList.map((d, i) => {
+  const rows = docsList.map(({ d, i }) => {
     const failedRow = d.status === 'failed';
     let badge;
     if (d.status === 'ok') badge = '<span class="doc-status-badge ok">● נקרא בהצלחה</span>';
@@ -4154,7 +4176,8 @@ function openDocsList() {
       </tr>`;
   }).join('');
 
-  document.getElementById('docs-popup-body').innerHTML = `
+  document.getElementById('docs-popup-body').innerHTML = filterBar + (!docsList.length
+    ? `<div class="docs-filter-empty">אין מסמכים בסטטוס "${flt.label}"</div>` : `
     <table class="docs-table">
       <thead>
         <tr>
@@ -4165,7 +4188,7 @@ function openDocsList() {
         </tr>
       </thead>
       <tbody>${rows}</tbody>
-    </table>
+    </table>`) + `
     <div class="docs-popup-note">
       מסמכים שנכשלו בקריאה האוטומטית מסומנים בהתאם. ניתן לפתוח את המסמך המקורי לצפייה.
     </div>`;
