@@ -2380,17 +2380,30 @@
   .poc-swiss-btn::before { content:''; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); border:5px solid transparent; border-right:none; border-left-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
   .poc-swiss-btn:hover::after, .poc-swiss-btn:hover::before { opacity:1; }
   .poc-swiss-btn:hover::after { transform:translateY(-50%) translateX(0); }
-  /* POC: missing & completeness — per-diagnosis button + checklist */
+  /* POC: missing & completeness — per-diagnosis pill + checklist popup (soft system palette) */
   .poc-mc-btn { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; font-family:inherit; font-size:11px; font-weight:700; border-radius:999px; padding:3px 9px 3px 8px; cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--text-muted); white-space:nowrap; }
   .poc-mc-btn svg { width:13px; height:13px; flex-shrink:0; }
-  .poc-mc-btn.ok { color:#2a7d4f; background:#eaf6ef; border-color:#a9d8bd; }
-  .poc-mc-btn.miss { color:#8a5a1f; background:#fff4e5; border-color:#e6c98f; }
-  .poc-mc-btn:hover { filter:brightness(.97); }
+  .poc-mc-btn.miss { color:var(--mig-blue); background:var(--bg-hover); border-color:#c5d3f5; }
+  .poc-mc-btn:hover { border-color:var(--mig-blue); }
   .poc-mc-btn:focus-visible { outline:2px solid var(--mig-blue); outline-offset:2px; }
-  .poc-mc-item { cursor:pointer; }
-  .poc-mc-item input { width:16px; height:16px; margin:0; accent-color:#2a7d4f; cursor:pointer; flex-shrink:0; }
-  .poc-mc-progress { height:6px; border-radius:3px; background:var(--warn-bg); overflow:hidden; margin-bottom:12px; }
-  .poc-mc-progress > span { display:block; height:100%; background:var(--dot-green); transition:width .2s; }
+  #doc-popup { z-index:520; }   /* a source doc opened from the checklist stacks above it */
+  .poc-mc-progress { height:4px; border-radius:2px; background:var(--border-light); overflow:hidden; margin-bottom:12px; }
+  .poc-mc-progress > span { display:block; height:100%; background:var(--mig-blue); transition:width .2s; }
+  .poc-mc-list { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .poc-mc-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border:1px solid var(--border-light); border-radius:var(--radius); background:#fff; font-size:13px; }
+  .poc-mc-row.no { background:var(--bg-hover); }
+  .poc-mc-row input[type=checkbox] { width:16px; height:16px; margin:0; accent-color:var(--mig-blue); cursor:pointer; flex-shrink:0; }
+  .poc-mc-name { flex:1; min-width:0; text-align:right; font:inherit; color:var(--text); background:none; border:none; padding:0; }
+  button.poc-mc-name { cursor:pointer; }
+  button.poc-mc-name:hover { color:var(--mig-blue); text-decoration:underline; }
+  span.poc-mc-name { cursor:default; }
+  .poc-mc-st { font-size:11px; color:var(--text-muted); white-space:nowrap; }
+  .poc-mc-row.no .poc-mc-st { color:var(--text-light); }
+  .poc-mc-del { border:none; background:none; color:var(--text-light); cursor:pointer; font-size:13px; padding:0 2px; }
+  .poc-mc-del:hover { color:var(--text); }
+  .poc-mc-add { display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding-top:12px; border-top:1px solid var(--border-light); }
+  .poc-mc-add .form-input { flex:1; min-width:150px; margin:0; }
+  .poc-mc-foot { display:flex; gap:8px; align-items:center; margin-top:16px; }
   .poc-sum-note { flex-basis:100%; font-size:12px; color:var(--text-muted); white-space:pre-wrap; border-top:1px dashed var(--border-light); padding-top:4px; margin-top:2px; }
   .gs-saved { font-size:11px; font-weight:800; color:var(--text-muted); background:var(--bg-hover); border:1px solid var(--border); border-radius:999px; padding:2px 9px; }
   .gs-err { font-size:11.5px; font-weight:700; color:var(--error); }
@@ -3728,13 +3741,13 @@ const healthForms = [
 // ---- Required documents + declaration status per diagnosis (by code) ----
 const diagnosisRequirements = {
   SARCOIDOSIS: { inDeclaration: true, requiredDocs: [
-    { name: 'דוח EBUS + ביופסיה', received: true },
-    { name: 'תפקודי ריאה (ספירומטריה / DLCO)', received: true },
-    { name: 'ייעוץ ריאות עדכני', received: true },
+    { name: 'דוח EBUS + ביופסיה', received: true, docKey: 'doc-sarc-2' },
+    { name: 'תפקודי ריאה (ספירומטריה / DLCO)', received: true, docKey: 'doc-sarc-2' },
+    { name: 'ייעוץ ריאות עדכני', received: true, docKey: 'doc-sarc-3' },
   ]},
   TINNITUS: { inDeclaration: true, requiredDocs: [
     { name: 'בדיקת שמיעה / אודיוגרם', received: false },
-    { name: 'שאלון נכות', received: true },
+    { name: 'שאלון נכות', received: true, docKey: 'doc-hear-2' },
   ]},
   WHIPLASH: { inDeclaration: true, requiredDocs: [
     { name: 'צילום עמ״ש צווארי', received: false },
@@ -5601,44 +5614,74 @@ let emailMode = 'single'; // 'single' | 'aggregate'
 function pocMcBtn(dx, idx) {
   const reqs = dx.requiredDocs || [];
   const have = reqs.filter(d => d.received).length;
-  const cls = !reqs.length ? '' : have === reqs.length ? ' ok' : ' miss';
-  const label = !reqs.length ? 'מסמכים' : have === reqs.length ? 'מסמכים ' + have + '/' + reqs.length : 'חסר ' + (reqs.length - have);
-  return `<button type="button" class="poc-mc-btn${cls}" onclick="event.stopPropagation();openMissingDocs(${idx})" title="Missing & Completeness — מסמכים נדרשים לאבחנה"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9.2l1.6 1.6L11 7.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${label}</button>`;
+  const miss = reqs.length - have;
+  const label = !reqs.length ? 'מסמכים' : miss ? 'חסר ' + miss : 'מסמכים ' + have + '/' + reqs.length;
+  return `<button type="button" class="poc-mc-btn${miss ? ' miss' : ''}" onclick="event.stopPropagation();openMissingDocs(${idx})" title="Missing & Completeness — מסמכים נדרשים לאבחנה"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9.2l1.6 1.6L11 7.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${label}</button>`;
 }
+// the popup edits a draft; only 'שמור' writes it back to the diagnosis (closing discards)
+let mcDraft = [];
 function openMissingDocs(idx) {
   const dx = patientsState[currentIdx].diagnoses[idx];
   if (!dx) return;
   missingCtx = idx;
-  const reqs = dx.requiredDocs || [];
-  const have = reqs.filter(d => d.received).length;
-  const missing = reqs.length - have;
+  mcDraft = (dx.requiredDocs || []).map(d => ({ ...d }));
   document.getElementById('missing-popup-title').textContent = dx.fullName || dx.code;
-  document.getElementById('missing-popup-meta').textContent =
-    dx.code + ' · ' + (reqs.length ? `${have}/${reqs.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
-
-  const items = reqs.map((d, di) => `
-    <label class="missing-item poc-mc-item ${d.received ? 'received' : 'missing'}">
-      <input type="checkbox" ${d.received ? 'checked' : ''} onchange="toggleReqDoc(${di}, this.checked)">
-      <span class="missing-item-name">${escapeHtml(d.name)}</span>
-      <span class="missing-item-status">${d.received ? 'קיים' : 'לא קיים'}</span>
-    </label>`).join('');
-
-  const status = !reqs.length ? ''
-    : missing
-      ? `<button class="submit-btn" onclick="openEmailModal()">📧 שלח בקשה ללקוח (${missing})</button>`
-      : `<div style="font-size:12px;color:var(--green);font-weight:700;">✓ כל המסמכים הנדרשים קיימים</div>`;
-
-  document.getElementById('missing-popup-body').innerHTML = reqs.length ? `
-    <div class="poc-mc-progress" title="${have}/${reqs.length}"><span style="width:${Math.round(have / reqs.length * 100)}%"></span></div>
-    <div class="missing-list">${items}</div>
-    ${status}` : '<div class="uw-summary-empty">לא הוגדרו מסמכים נדרשים לאבחנה זו</div>';
+  const docOpts = (patientDocuments[currentIdx] || []).filter(d => d.docKey)
+    .map(d => `<option value="${d.docKey}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`).join('');
+  document.getElementById('missing-popup-body').innerHTML = `
+    <div class="poc-mc-progress"><span id="mc-progress"></span></div>
+    <div class="poc-mc-list" id="mc-list"></div>
+    <div class="poc-mc-add">
+      <input type="text" class="form-input" id="mc-new-name" placeholder="שם המסמך הנדרש" onkeydown="if(event.key==='Enter')addReqDoc()">
+      <select class="form-input" id="mc-new-doc"><option value="">— ללא קישור למסמך בתיק —</option>${docOpts}</select>
+      <button class="btn-secondary" onclick="addReqDoc()">＋ הוסף מסמך</button>
+    </div>
+    <div class="poc-mc-foot">
+      <button class="submit-btn" onclick="saveReqDocs()">שמור</button>
+      <button class="btn-secondary" onclick="closePopup('missing-popup')">ביטול</button>
+    </div>`;
+  renderMcList();
   document.getElementById('missing-popup').classList.add('open');
 }
-function toggleReqDoc(di, checked) {
+function renderMcList() {
   const dx = patientsState[currentIdx].diagnoses[missingCtx];
-  if (!dx || !dx.requiredDocs[di]) return;
-  dx.requiredDocs[di].received = !!checked;
-  openMissingDocs(missingCtx);
+  const have = mcDraft.filter(d => d.received).length;
+  document.getElementById('missing-popup-meta').textContent =
+    dx.code + ' · ' + (mcDraft.length ? `${have}/${mcDraft.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
+  document.getElementById('mc-progress').style.width = (mcDraft.length ? Math.round(have / mcDraft.length * 100) : 0) + '%';
+  document.getElementById('mc-list').innerHTML = mcDraft.length ? mcDraft.map((d, di) => {
+    const name = d.docKey && docs[d.docKey]
+      ? `<button type="button" class="poc-mc-name" onclick="openDoc('${d.docKey}')" title="פתח מסמך">${escapeHtml(d.name)}</button>`
+      : `<span class="poc-mc-name" title="אין מסמך מקושר בתיק">${escapeHtml(d.name)}</span>`;
+    return `<div class="poc-mc-row ${d.received ? 'ok' : 'no'}">
+      <input type="checkbox" ${d.received ? 'checked' : ''} aria-label="${escapeHtml(d.name)} — קיים" onchange="toggleReqDoc(${di}, this.checked)">
+      ${name}
+      <span class="poc-mc-st">${d.received ? 'קיים' : 'לא קיים'}</span>
+      ${d.added ? `<button type="button" class="poc-mc-del" onclick="removeReqDoc(${di})" title="הסר מהרשימה">✕</button>` : ''}
+    </div>`;
+  }).join('') : '<div class="uw-summary-empty">לא הוגדרו מסמכים נדרשים לאבחנה זו</div>';
+}
+function toggleReqDoc(di, checked) {
+  if (!mcDraft[di]) return;
+  mcDraft[di].received = !!checked;
+  renderMcList();
+}
+function addReqDoc() {
+  const inp = document.getElementById('mc-new-name'), sel = document.getElementById('mc-new-doc');
+  const name = inp.value.trim();
+  if (!name) { inp.focus(); return; }
+  const docKey = sel.value || null;
+  mcDraft.push({ name, received: !!docKey, docKey, added: true });
+  inp.value = ''; sel.value = '';
+  renderMcList();
+  inp.focus();
+}
+function removeReqDoc(di) { mcDraft.splice(di, 1); renderMcList(); }
+function saveReqDocs() {
+  const dx = patientsState[currentIdx].diagnoses[missingCtx];
+  if (!dx) return;
+  dx.requiredDocs = mcDraft.map(d => ({ ...d }));
+  closePopup('missing-popup');
   renderDiagnoses();
 }
 
