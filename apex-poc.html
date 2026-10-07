@@ -2387,8 +2387,6 @@
   .poc-mc-btn:hover { border-color:var(--mig-blue); }
   .poc-mc-btn:focus-visible { outline:2px solid var(--mig-blue); outline-offset:2px; }
   #doc-popup { z-index:520; }   /* a source doc opened from the checklist stacks above it */
-  .poc-mc-progress { height:4px; border-radius:2px; background:var(--border-light); overflow:hidden; margin-bottom:12px; }
-  .poc-mc-progress > span { display:block; height:100%; background:var(--mig-blue); transition:width .2s; }
   .poc-mc-list { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
   .poc-mc-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border:1px solid var(--border-light); border-radius:var(--radius); background:#fff; font-size:13px; }
   .poc-mc-row.no { background:var(--bg-hover); }
@@ -5629,7 +5627,6 @@ function openMissingDocs(idx) {
   const docOpts = (patientDocuments[currentIdx] || []).filter(d => d.docKey)
     .map(d => `<option value="${d.docKey}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`).join('');
   document.getElementById('missing-popup-body').innerHTML = `
-    <div class="poc-mc-progress"><span id="mc-progress"></span></div>
     <div class="poc-mc-list" id="mc-list"></div>
     <div class="poc-mc-add">
       <input type="text" class="form-input" id="mc-new-name" placeholder="שם המסמך הנדרש" onkeydown="if(event.key==='Enter')addReqDoc()">
@@ -5648,7 +5645,6 @@ function renderMcList() {
   const have = mcDraft.filter(d => d.received).length;
   document.getElementById('missing-popup-meta').textContent =
     dx.code + ' · ' + (mcDraft.length ? `${have}/${mcDraft.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
-  document.getElementById('mc-progress').style.width = (mcDraft.length ? Math.round(have / mcDraft.length * 100) : 0) + '%';
   document.getElementById('mc-list').innerHTML = mcDraft.length ? mcDraft.map((d, di) => {
     const name = d.docKey && docs[d.docKey]
       ? `<button type="button" class="poc-mc-name" onclick="openDoc('${d.docKey}')" title="פתח מסמך">${escapeHtml(d.name)}</button>`
