@@ -4367,13 +4367,35 @@ function renderPocLoadSummary() {
     return `<div class="gs-line" style="flex-wrap:wrap;"><span class="gs-item">אבחנה: <b>${escapeHtml(dx.code)}</b> — ${escapeHtml(dx.fullName || '')}</span><span class="gs-val">${escapeHtml(pocLoadText(lp, lr) || 'ללא תוספת קבועה')}${tmp}</span>${noteH}</div>`;
   }).join('');
   const sumTxt = (a, b) => pocLoadText(a, b) || '0%';
+  const p = patientsState[currentIdx] || {};
+  const cPct = +p.pocCancelPct || 0, cPer = +p.pocCancelPer || 0;
+  const reasonReq = (cPct || cPer) && !(p.pocCancelReason || '').trim();
+  const fPct = Math.max(0, pct - cPct), fPer = Math.max(0, per - cPer);
+  const negTxt = (cPct || cPer) ? '−' + [cPct ? fmtNum(cPct) + '%' : '', cPer ? fmtPermille(cPer) : ''].filter(Boolean).join(' · −') : '0%';
   wrap.innerHTML = `
     <div class="gs-card">
       <div class="gs-lines">${lines || '<div class="uw-summary-empty">טרם נקבעו תוספות לאבחנות</div>'}</div>
       <div class="gs-row gs-total"><span>סך תוספות קבועות (אדיטיבי)</span><span class="gs-total-val">${sumTxt(pct, per)}</span></div>
       <div class="gs-row"><span>סך תוספות זמניות</span><span class="gs-temp">${sumTxt(tPct, tPer)}</span></div>
-      <div class="gs-final-calc">סך הכל בתקופת התוספת הזמנית: <b class="gs-final-b">${sumTxt(pct + tPct, per + tPer)}</b> · לאחר פקיעתה: <b class="gs-final-b">${sumTxt(pct, per)}</b></div>
+      <div class="gs-cancel">
+        <div class="gs-cancel-fields">
+          <label class="uwi-inp-wrap">תוספת מתבטלת <input type="number" class="uwi-inp" id="poc-cancel-pct" min="0" step="25" value="${cPct}" onchange="onPocCancel('pct', this.value)"><span>%</span></label>
+          <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" id="poc-cancel-per" min="0" step="1" value="${cPer}" onchange="onPocCancel('per', this.value)"><span>‰</span></label>
+        </div>
+        <input type="text" class="gs-cancel-reason ${reasonReq ? 'req' : ''}" id="poc-cancel-reason" placeholder="הסבר לתוספת מתבטלת (חובה)" value="${escapeHtml(p.pocCancelReason || '')}" onchange="onPocCancel('reason', this.value)">
+      </div>
+      <div class="gs-final-calc">סך תוספות קבועות: <b>${sumTxt(pct, per)}</b> → תוספת מתבטלת: <b>${negTxt}</b> → סך הכל סופי: <b class="gs-final-b">${sumTxt(fPct, fPer)}</b>${(tPct || tPer) ? `<br>בתקופת התוספת הזמנית: <b class="gs-final-b">${sumTxt(fPct + tPct, fPer + tPer)}</b> · לאחר פקיעתה: <b class="gs-final-b">${sumTxt(fPct, fPer)}</b>` : ''}</div>
     </div>`;
+}
+function onPocCancel(field, val) {
+  const p = patientsState[currentIdx];
+  if (field === 'reason') p.pocCancelReason = (val || '').trim();
+  else {
+    let n = Math.max(0, parseFloat(val) || 0);
+    n = field === 'pct' ? Math.round(n / 25) * 25 : Math.round(n);
+    p[field === 'pct' ? 'pocCancelPct' : 'pocCancelPer'] = n;
+  }
+  renderPocLoadSummary();
 }
 let pocNoteCtx = null;
 function openPocUwNote(idx) {
