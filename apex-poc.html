@@ -4426,9 +4426,12 @@ function swissCellText(c) {
   if (c.decision === 'EXCLUSION' || c.exclusionText) b.push('החרגה' + (c.exclusionText ? ': ' + c.exclusionText : ''));
   return b.join(' · ') || 'ללא תוספת';
 }
+function swissSrcDx(dx) {
+  return ((patients[currentIdx] || {}).diagnoses || []).find(d => d.code === dx.code) || {};
+}
 function buildSwissResponse(dx) {
   const p = patientsState[currentIdx];
-  const srcDx = ((patients[currentIdx] || {}).diagnoses || []).find(d => d.code === dx.code) || {};
+  const srcDx = swissSrcDx(dx);
   const results = dx.swissResults || srcDx.swissResults || [];
   const t = loadingTables[dx.loadingTableKey || srcDx.loadingTableKey];
   const tl = dx.timeline || [];
@@ -4468,8 +4471,17 @@ function runSwissUw(idx) {
   renderDiagnoses();
   setTimeout(() => {   // simulated API round-trip
     dx.uwNote = buildSwissResponse(dx);
+    // the loading fields follow Swiss' RISK result (permanent + temporary); no RISK result → fields untouched
+    const risk = (dx.swissResults || swissSrcDx(dx).swissResults || []).find(c => c.riskGroupCode === 'RISK');
+    if (risk) {
+      dx.loading = +risk.medicalAdditionPercent || 0;
+      dx.loadingPermille = +risk.medicalAdditionPermille || 0;
+      dx.tempLoading = (+risk.temporaryAdditionPercent || +risk.temporaryAdditionPermille)
+        ? { pct: +risk.temporaryAdditionPercent || 0, permille: +risk.temporaryAdditionPermille || 0, until: risk.temporaryUntil || '' }
+        : null;
+    }
     dx.swissState = 'done';
-    if (currentIdx === pIdx) { renderDiagnoses(); renderUwSummary(); }
+    if (currentIdx === pIdx) { renderDiagnoses(); renderUwSummary(); updateAgg(); }
   }, 2200);
 }
 let pocNoteCtx = null;
