@@ -2382,6 +2382,7 @@
   .poc-swiss-ring { box-sizing:border-box; width:26px; height:26px; border-radius:50%; border:4px solid #0a1f8f; display:flex; align-items:center; justify-content:center; transition:border-color .15s, transform .15s; }
   .poc-swiss-btn:hover .poc-swiss-ring { transform:scale(1.08); }
   .poc-swiss-btn:focus-visible { outline:2px solid #0a1f8f; outline-offset:2px; border-radius:50%; }
+  .poc-tax-title { text-transform:none; letter-spacing:0; font-size:12.5px; font-weight:700; color:var(--text); }
   .poc-row-tools { display:inline-flex; align-items:center; gap:6px; width:92px; flex-shrink:0; }   /* fixed slot → controls line up on every row */
   .poc-swiss-ph { width:28px; height:28px; flex-shrink:0; }   /* keeps lifestyle rows aligned with dx rows */
   .poc-swiss-check { display:none; width:12px; height:12px; }
@@ -4411,7 +4412,7 @@ function buildCard(dx, idx) {
         </div>
       </div>
       <div class="timeline-container" id="tl-${idx}">
-        <div class="timeline-title">${escapeHtml(dxTaxFull(dx))}</div>
+        <div class="timeline-title poc-tax-title">${escapeHtml(dxTaxFull(dx))}</div>
         ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
         <button class="tl-add-btn" onclick="event.stopPropagation();addEvent(${idx})">
           <span style="font-size:13px;line-height:1;">＋</span> הוסף אירוע רפואי
