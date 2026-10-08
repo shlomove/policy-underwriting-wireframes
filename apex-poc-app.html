@@ -2383,6 +2383,7 @@
   .poc-swiss-btn:hover .poc-swiss-ring { transform:scale(1.08); }
   .poc-swiss-btn:focus-visible { outline:2px solid #0a1f8f; outline-offset:2px; border-radius:50%; }
   .poc-tax-title { text-transform:none; letter-spacing:0; font-size:12.5px; font-weight:700; color:var(--text); }
+  .poc-tax-en { font-weight:500; color:var(--text-muted); }
   .poc-row-tools { display:inline-flex; align-items:center; gap:6px; width:92px; flex-shrink:0; }   /* fixed slot → controls line up on every row */
   .poc-swiss-ph { width:28px; height:28px; flex-shrink:0; }   /* keeps lifestyle rows aligned with dx rows */
   .poc-swiss-check { display:none; width:12px; height:12px; }
@@ -3470,7 +3471,7 @@ const patients = [
       {
         code: 'SARCOIDOSIS', fullName: 'Pulmonary Sarcoidosis Stage II — סרקואידוזיס ריאתי',
         heName: 'סרקואידוזיס ריאתי', enName: 'Pulmonary Sarcoidosis',
-        taxFull: 'D86.0 — סרקואידוזיס של הריאה, שלב II (Sarcoidosis of lung, Stage II)',
+        tax: { icd: 'D86.0', he: 'סרקואידוזיס של הריאה, שלב 2', en: 'Sarcoidosis of lung, Stage II' },
         source: 'MEDICAL', flag: null, loadingTableKey: 'sarcoid',
         swissResults: [
           _cell('RISK', 'LOADING', { medicalAdditionPercent: 50, freeText: 'Stage II stable, age 47' }),
@@ -3493,7 +3494,7 @@ const patients = [
       {
         code: 'TINNITUS', fullName: 'Hearing Complaints / Tinnitus — תלונות שמיעה / טינטון',
         heName: 'טינטון / תלונות שמיעה', enName: 'Tinnitus / Hearing Complaints',
-        taxFull: 'H93.1 — טינטון (Tinnitus)',
+        tax: { icd: 'H93.1', he: 'טינטון', en: 'Tinnitus' },
         source: 'MEDICAL', flag: null, loadingTableKey: 'tinnitus',
         swissResults: [
           _cell('RISK', 'LOADING', { medicalAdditionPercent: 25 }),
@@ -3515,7 +3516,7 @@ const patients = [
       {
         code: 'WHIPLASH', fullName: 'Whiplash Injury — חבלת צוואר (תאונת דרכים)',
         heName: 'חבלת צוואר', enName: 'Whiplash Injury',
-        taxFull: 'S13.4 — נקע ומתיחה של עמוד השדרה הצווארי (Sprain of ligaments of cervical spine — Whiplash)',
+        tax: { icd: 'S13.4', he: 'נקע ומתיחה של עמוד השדרה הצווארי', en: 'Sprain of ligaments of cervical spine (Whiplash)' },
         source: 'MEDICAL', flag: null, loadingTableKey: 'whiplash',
         swissResults: [
           _cell('RISK', 'CLEAN'), _cell('ACC_DIS', 'CLEAN'), _cell('WORK_DIS', 'CLEAN'), _cell('MORTGAGE', 'CLEAN'),
@@ -4412,7 +4413,7 @@ function buildCard(dx, idx) {
         </div>
       </div>
       <div class="timeline-container" id="tl-${idx}">
-        <div class="timeline-title poc-tax-title">${escapeHtml(dxTaxFull(dx))}</div>
+        <div class="timeline-title poc-tax-title">${dxTaxHtml(dx)}</div>
         ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
         <button class="tl-add-btn" onclick="event.stopPropagation();addEvent(${idx})">
           <span style="font-size:13px;line-height:1;">＋</span> הוסף אירוע רפואי
@@ -4425,7 +4426,18 @@ function buildCard(dx, idx) {
 // POC: diagnosis display names — Hebrew name (bold) - English name; events header = full taxonomy name
 function dxHe(dx) { return (dx && (dx.heName || dx.code)) || ''; }
 function dxEn(dx) { return (dx && dx.enName) || ''; }
-function dxTaxFull(dx) { return (dx && (dx.taxFull || dx.fullName || dx.code)) || ''; }
+function dxTaxFull(dx) {
+  const t = dx && dx.tax;
+  if (t) return [t.icd, t.he].filter(Boolean).join(' — ') + (t.en ? ' (' + t.en + ')' : '');
+  return (dx && (dx.taxFull || dx.fullName || dx.code)) || '';
+}
+// same as dxTaxFull, but each language isolated so mixed Hebrew/English keeps its order
+function dxTaxHtml(dx) {
+  const t = dx && dx.tax;
+  if (!t) return `<bdi>${escapeHtml(dxTaxFull(dx))}</bdi>`;
+  return (t.icd ? `<bdi dir="ltr">${escapeHtml(t.icd)}</bdi> — ` : '') + `<bdi>${escapeHtml(t.he || '')}</bdi>` +
+    (t.en ? ` · <bdi dir="ltr" class="poc-tax-en">${escapeHtml(t.en)}</bdi>` : '');
+}
 
 // POC: per-diagnosis underwriting (from V1.4) — loading % / ‰, temporary loading, underwriting description
 function pocTempLabel(dx) {
@@ -5349,7 +5361,8 @@ function saveAddDiagnosis() {
   const tax = DX_TAXONOMY[+document.getElementById('adddx-tax').value];
   const fromTax = document.getElementById('adddx-tax').value !== '' && tax && tax.name === code;
   const taxEn = fromTax ? tax.en : '';
-  const taxFull = fromTax ? `${tax.icd} — ${tax.name} (${tax.en})` : (full !== code ? code + ' — ' + full : code);
+  const taxObj = fromTax ? { icd: tax.icd, he: tax.name, en: tax.en } : null;
+  const taxFull = fromTax ? '' : (full !== code ? code + ' — ' + full : code);
   const p = patientsState[currentIdx];
   const rgCodes = riskGroupsOf(p).map(rg => rg.riskGroupCode);
   const uw = {}, swiss = {};
@@ -5358,7 +5371,7 @@ function saveAddDiagnosis() {
     code: code.toUpperCase(), fullName: full,
     source: 'MEDICAL', flag: null, loadingTableKey: null, timeline: [],
     requiredDocs: [], inDeclaration: true, missingStatus: null,
-    heName: code, enName: taxEn, taxFull: taxFull,
+    heName: code, enName: taxEn, taxFull: taxFull, tax: taxObj,
     swiss, uw, doc: selectedDocKey('adddx-doc'), supportDoc: (patientDocuments[currentIdx] || [])[+docSel.value].name,
   };
   p.diagnoses.push(newDx);
