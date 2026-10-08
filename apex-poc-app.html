@@ -2394,7 +2394,9 @@
   .poc-mc-btn.ok { color:#2f7a52; background:#eef8f2; border-color:#c4e3d1; }
   .poc-mc-btn.miss { color:#b04646; background:#fdf0f0; border-color:#f0caca; }
   /* aligned dx row: name truncates, actions never wrap, fixed-width buttons line up across rows */
-  .poc-dx-full { flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .poc-dx-header { flex-wrap:wrap; row-gap:8px; }
+  .poc-dx-full { flex:1 1 120px; min-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* the whole action group moves to its own line when the row is too narrow — same layout on every row */
   .poc-dx-actions { display:flex; gap:8px; align-items:center; margin-right:auto; flex-wrap:nowrap; flex-shrink:0; }
   .poc-dx-actions .itemuw { flex-wrap:nowrap; }
   .poc-dx-actions .itemuw-btn { width:108px; text-align:center; overflow:hidden; text-overflow:ellipsis; }
@@ -4382,7 +4384,7 @@ function buildCard(dx, idx) {
 
   return `
     <div class="diagnosis-card">
-      <div class="diagnosis-header" onclick="toggleTl(${idx})">
+      <div class="diagnosis-header poc-dx-header" onclick="toggleTl(${idx})">
         <span class="dx-toggle" id="toggle-${idx}">▶</span>
         <span class="dx-name">${dx.code}</span>
         ${tagHtml}
