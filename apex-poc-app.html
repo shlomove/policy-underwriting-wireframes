@@ -3468,6 +3468,8 @@ const patients = [
     diagnoses: [
       {
         code: 'SARCOIDOSIS', fullName: 'Pulmonary Sarcoidosis Stage II — סרקואידוזיס ריאתי',
+        heName: 'סרקואידוזיס ריאתי', enName: 'Pulmonary Sarcoidosis',
+        taxFull: 'D86.0 — סרקואידוזיס של הריאה, שלב II (Sarcoidosis of lung, Stage II)',
         source: 'MEDICAL', flag: null, loadingTableKey: 'sarcoid',
         swissResults: [
           _cell('RISK', 'LOADING', { medicalAdditionPercent: 50, freeText: 'Stage II stable, age 47' }),
@@ -3489,6 +3491,8 @@ const patients = [
       },
       {
         code: 'TINNITUS', fullName: 'Hearing Complaints / Tinnitus — תלונות שמיעה / טינטון',
+        heName: 'טינטון / תלונות שמיעה', enName: 'Tinnitus / Hearing Complaints',
+        taxFull: 'H93.1 — טינטון (Tinnitus)',
         source: 'MEDICAL', flag: null, loadingTableKey: 'tinnitus',
         swissResults: [
           _cell('RISK', 'LOADING', { medicalAdditionPercent: 25 }),
@@ -3509,6 +3513,8 @@ const patients = [
       },
       {
         code: 'WHIPLASH', fullName: 'Whiplash Injury — חבלת צוואר (תאונת דרכים)',
+        heName: 'חבלת צוואר', enName: 'Whiplash Injury',
+        taxFull: 'S13.4 — נקע ומתיחה של עמוד השדרה הצווארי (Sprain of ligaments of cervical spine — Whiplash)',
         source: 'MEDICAL', flag: null, loadingTableKey: 'whiplash',
         swissResults: [
           _cell('RISK', 'CLEAN'), _cell('ACC_DIS', 'CLEAN'), _cell('WORK_DIS', 'CLEAN'), _cell('MORTGAGE', 'CLEAN'),
@@ -4390,9 +4396,9 @@ function buildCard(dx, idx) {
     <div class="diagnosis-card">
       <div class="diagnosis-header poc-dx-header" onclick="toggleTl(${idx})">
         <span class="dx-toggle" id="toggle-${idx}">▶</span>
-        <span class="dx-name">${dx.code}</span>
+        <span class="dx-name">${escapeHtml(dxHe(dx))}</span>
+        <span class="dx-full-name poc-dx-full" title="${escapeHtml(dxTaxFull(dx))}">${dxEn(dx) ? '- ' + escapeHtml(dxEn(dx)) : ''}</span>
         ${tagHtml}
-        <span class="dx-full-name poc-dx-full" title="${escapeHtml(dx.fullName || '')}">— ${dx.fullName}</span>
         ${pocMcBtn(dx, idx)}
         <div class="poc-dx-actions" onclick="event.stopPropagation()">
           ${pocUwCard(dx, idx)}
@@ -4405,7 +4411,7 @@ function buildCard(dx, idx) {
         </div>
       </div>
       <div class="timeline-container" id="tl-${idx}">
-        <div class="timeline-title">אירועים רפואיים — לחץ על פריט לפתיחת מסמך מקור</div>
+        <div class="timeline-title">${escapeHtml(dxTaxFull(dx))}</div>
         ${tlHtml || '<div style="font-size:12px;color:var(--text-light);">אין אירועים רפואיים</div>'}
         <button class="tl-add-btn" onclick="event.stopPropagation();addEvent(${idx})">
           <span style="font-size:13px;line-height:1;">＋</span> הוסף אירוע רפואי
@@ -4414,6 +4420,11 @@ function buildCard(dx, idx) {
     </div>
   `;
 }
+
+// POC: diagnosis display names — Hebrew name (bold) - English name; events header = full taxonomy name
+function dxHe(dx) { return (dx && (dx.heName || dx.code)) || ''; }
+function dxEn(dx) { return (dx && dx.enName) || ''; }
+function dxTaxFull(dx) { return (dx && (dx.taxFull || dx.fullName || dx.code)) || ''; }
 
 // POC: per-diagnosis underwriting (from V1.4) — loading % / ‰, temporary loading, underwriting description
 function pocTempLabel(dx) {
@@ -4432,7 +4443,7 @@ function pocItem(ref) {
 }
 function pocItemLabel(ref) {
   const r = '' + ref, it = pocItem(ref) || {};
-  return r.indexOf('ls:') === 0 ? (lifestyleLabels[r.slice(3)] || '') + ' — ' + (it.value || '—') : it.code + ' — ' + it.fullName;
+  return r.indexOf('ls:') === 0 ? (lifestyleLabels[r.slice(3)] || '') + ' — ' + (it.value || '—') : dxHe(it) + (dxEn(it) ? ' - ' + dxEn(it) : '');
 }
 function pocRerender(ref) {
   if (('' + ref).indexOf('ls:') === 0) renderLifestyle(); else renderDiagnoses();
@@ -4463,7 +4474,7 @@ function renderPocLoadSummary() {
   const wrap = document.getElementById('poc-load-summary'); if (!wrap) return;
   const pS = patientsState[currentIdx] || {};
   const ls = pS.lifestyle || {};
-  const diags = (pS.diagnoses || []).map(dx => ({ ...dx, _label: dx.code, _title: dx.fullName }))
+  const diags = (pS.diagnoses || []).map(dx => ({ ...dx, _label: dxHe(dx), _title: dxTaxFull(dx) }))
     .concat(['occupation', 'profession'].filter(k => ls[k]).map(k => ({ ...ls[k], _label: lifestyleLabels[k], _title: ls[k].value })));
   let pct = 0, per = 0, tPct = 0, tPer = 0;
   const lines = diags.map(dx => {
@@ -4529,7 +4540,7 @@ function buildSwissResponse(dx) {
   const covs = riskGroupsOf(p).map(rg => rg.riskGroupCode);
   const now = new Date();
   const L = [];
-  L.push('תוצאת חיתום Swiss — ' + dx.code + ' (' + now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ')');
+  L.push('תוצאת חיתום Swiss — ' + dxHe(dx) + ' (' + now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ')');
   L.push('');
   L.push('החלטה לפי כיסוי:');
   if (results.length) {
@@ -4541,7 +4552,7 @@ function buildSwissResponse(dx) {
   L.push('');
   L.push('פרמטרים שנלקחו בחשבון:');
   L.push('• מבוטח: גיל ' + (p.age || '—') + ', ' + (p.gender || '—') + ', עישון: ' + (p.smokingStatus || '—') + (p.bmi ? ', BMI ' + p.bmi : ''));
-  L.push('• אבחנה: ' + (dx.fullName || dx.code) + (dx.inDeclaration === false ? ' — לא הוצהרה בהצהרת הבריאות' : ''));
+  L.push('• אבחנה: ' + dxTaxFull(dx) + (dx.inDeclaration === false ? ' — לא הוצהרה בהצהרת הבריאות' : ''));
   if (tl.length) L.push('• היסטוריה: ' + tl.length + ' אירועים רפואיים, ' + tl[0].date + '–' + tl[tl.length - 1].date + '; אירוע אחרון: ' + tl[tl.length - 1].text);
   if (t) t.rows.forEach(r => L.push('• ' + r.label + ': ' + r.vals.slice(0, 2).filter(v => v && v !== '—').join(', ') + (r.active ? '  ← קובע' : '')));
   L.push('');
@@ -5304,14 +5315,14 @@ function updateAgg() {
 
 // POC: diagnosis taxonomy (sample of ~20 common underwriting diagnoses)
 const DX_TAXONOMY = [
-  { name: 'יתר לחץ דם', icd: 'I10' }, { name: 'סוכרת סוג 2', icd: 'E11' }, { name: 'סוכרת סוג 1', icd: 'E10' },
-  { name: 'היפרליפידמיה', icd: 'E78.5' }, { name: 'השמנת יתר', icd: 'E66' }, { name: 'תת-פעילות בלוטת התריס', icd: 'E03' },
-  { name: 'מחלת לב איסכמית', icd: 'I25' }, { name: 'פרפור פרוזדורים', icd: 'I48' }, { name: 'אי-ספיקת לב', icd: 'I50' },
-  { name: 'שבץ מוחי', icd: 'I63' }, { name: 'אסתמה', icd: 'J45' }, { name: 'מחלת ריאות חסימתית כרונית (COPD)', icd: 'J44' },
-  { name: 'דום נשימה בשינה', icd: 'G47.3' }, { name: 'אפילפסיה', icd: 'G40' }, { name: 'טרשת נפוצה', icd: 'G35' },
-  { name: 'דיכאון', icd: 'F32' }, { name: 'הפרעת חרדה', icd: 'F41' }, { name: 'מחלת קרוהן', icd: 'K50' },
-  { name: 'קוליטיס כיבית', icd: 'K51' }, { name: 'כבד שומני', icd: 'K76.0' }, { name: 'אי-ספיקת כליות כרונית', icd: 'N18' },
-  { name: 'דלקת מפרקים שגרונית', icd: 'M06' }, { name: 'פריצת דיסק', icd: 'M51' }, { name: 'סרטן השד', icd: 'C50' },
+  { name: 'יתר לחץ דם', en: "Essential Hypertension", icd: 'I10' }, { name: 'סוכרת סוג 2', en: "Type 2 Diabetes Mellitus", icd: 'E11' }, { name: 'סוכרת סוג 1', en: "Type 1 Diabetes Mellitus", icd: 'E10' },
+  { name: 'היפרליפידמיה', en: "Hyperlipidemia", icd: 'E78.5' }, { name: 'השמנת יתר', en: "Obesity", icd: 'E66' }, { name: 'תת-פעילות בלוטת התריס', en: "Hypothyroidism", icd: 'E03' },
+  { name: 'מחלת לב איסכמית', en: "Ischemic Heart Disease", icd: 'I25' }, { name: 'פרפור פרוזדורים', en: "Atrial Fibrillation", icd: 'I48' }, { name: 'אי-ספיקת לב', en: "Heart Failure", icd: 'I50' },
+  { name: 'שבץ מוחי', en: "Cerebral Infarction", icd: 'I63' }, { name: 'אסתמה', en: "Asthma", icd: 'J45' }, { name: 'מחלת ריאות חסימתית כרונית (COPD)', en: "Chronic Obstructive Pulmonary Disease", icd: 'J44' },
+  { name: 'דום נשימה בשינה', en: "Sleep Apnea", icd: 'G47.3' }, { name: 'אפילפסיה', en: "Epilepsy", icd: 'G40' }, { name: 'טרשת נפוצה', en: "Multiple Sclerosis", icd: 'G35' },
+  { name: 'דיכאון', en: "Depressive Episode", icd: 'F32' }, { name: 'הפרעת חרדה', en: "Anxiety Disorder", icd: 'F41' }, { name: 'מחלת קרוהן', en: "Crohn's Disease", icd: 'K50' },
+  { name: 'קוליטיס כיבית', en: "Ulcerative Colitis", icd: 'K51' }, { name: 'כבד שומני', en: "Fatty Liver", icd: 'K76.0' }, { name: 'אי-ספיקת כליות כרונית', en: "Chronic Kidney Disease", icd: 'N18' },
+  { name: 'דלקת מפרקים שגרונית', en: "Rheumatoid Arthritis", icd: 'M06' }, { name: 'פריצת דיסק', en: "Intervertebral Disc Disorder", icd: 'M51' }, { name: 'סרטן השד', en: "Breast Cancer", icd: 'C50' },
 ];
 function onDxTaxonomy(v) {
   const t = DX_TAXONOMY[+v];
@@ -5334,6 +5345,10 @@ function saveAddDiagnosis() {
   const docSel = document.getElementById('adddx-doc');
   if (docSel.value === '') { alert('לא ניתן להוסיף אבחנה ללא מסמך תומך — יש לבחור מסמך מרשימת המסמכים.'); docSel.focus(); return; }
   const full = document.getElementById('adddx-full').value.trim() || code;
+  const tax = DX_TAXONOMY[+document.getElementById('adddx-tax').value];
+  const fromTax = document.getElementById('adddx-tax').value !== '' && tax && tax.name === code;
+  const taxEn = fromTax ? tax.en : '';
+  const taxFull = fromTax ? `${tax.icd} — ${tax.name} (${tax.en})` : (full !== code ? code + ' — ' + full : code);
   const p = patientsState[currentIdx];
   const rgCodes = riskGroupsOf(p).map(rg => rg.riskGroupCode);
   const uw = {}, swiss = {};
@@ -5342,6 +5357,7 @@ function saveAddDiagnosis() {
     code: code.toUpperCase(), fullName: full,
     source: 'MEDICAL', flag: null, loadingTableKey: null, timeline: [],
     requiredDocs: [], inDeclaration: true, missingStatus: null,
+    heName: code, enName: taxEn, taxFull: taxFull,
     swiss, uw, doc: selectedDocKey('adddx-doc'), supportDoc: (patientDocuments[currentIdx] || [])[+docSel.value].name,
   };
   p.diagnoses.push(newDx);
@@ -5371,7 +5387,7 @@ let editDxCtx = null;
 function editDx(idx) {
   editDxCtx = idx;
   const dx = patientsState[currentIdx].diagnoses[idx];
-  document.getElementById('editdx-code').value = dx.code || '';
+  document.getElementById('editdx-code').value = dxHe(dx);
   document.getElementById('editdx-full').value = dx.fullName || '';
   document.getElementById('editdx-popup').classList.add('open');
 }
@@ -5380,15 +5396,15 @@ function saveEditDx() {
   const dx = patientsState[currentIdx].diagnoses[editDxCtx];
   const code = document.getElementById('editdx-code').value.trim();
   if (!code) { alert('יש להזין שם אבחנה.'); return; }
-  dx.code = code.toUpperCase();
-  dx.fullName = document.getElementById('editdx-full').value.trim() || dx.code;
+  dx.heName = code;
+  dx.fullName = document.getElementById('editdx-full').value.trim() || code;
   closePopup('editdx-popup');
   renderDiagnoses();
 }
 
 function deleteDiagnosis(idx) {
   const dx = patientsState[currentIdx].diagnoses[idx];
-  if (!confirm(`למחוק את האבחנה "${dx.code}"?`)) return;
+  if (!confirm(`למחוק את האבחנה "${dxHe(dx)}"?`)) return;
   patientsState[currentIdx].diagnoses.splice(idx, 1);
   renderDiagnoses();
   updateAgg();
@@ -5594,7 +5610,7 @@ function addEvent(dxIdx) {
   document.getElementById('addev-date').value = '';
   document.getElementById('addev-text').value = '';
   const dx = patientsState[currentIdx].diagnoses[dxIdx];
-  document.getElementById('addev-meta').textContent = 'הוספת אירוע חדש — ' + (dx ? dx.code : '');
+  document.getElementById('addev-meta').textContent = 'הוספת אירוע חדש — ' + (dx ? dxHe(dx) : '');
   fillDocSelect('addev-doc');
   document.getElementById('addev-popup').classList.add('open');
 }
@@ -5617,7 +5633,7 @@ function editEvent(dxIdx, evIdx) {
   editEvCtx = { dxIdx, evIdx };
   const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
   const dx = patientsState[currentIdx].diagnoses[dxIdx];
-  document.getElementById('editev-meta').textContent = 'עריכת אירוע — ' + (dx ? dx.code : '');
+  document.getElementById('editev-meta').textContent = 'עריכת אירוע — ' + (dx ? dxHe(dx) : '');
   document.getElementById('editev-date').value = (ev.date && ev.date !== '—') ? ev.date : '';
   document.getElementById('editev-text').value = ev.text || '';
   fillDocSelect('editev-doc');
@@ -5663,7 +5679,7 @@ function openEventInfo(dxIdx, evIdx, edit) {
     const by = _evYear(p.birthDate), ey = _evYear(ev.date);
     if (by && ey) ageAtEvent = ey - by;
   }
-  document.getElementById('evinfo-popup-meta').textContent = dx.code + ' · ' + (ev.date || '—');
+  document.getElementById('evinfo-popup-meta').textContent = dxHe(dx) + ' · ' + (ev.date || '—');
 
   if (edit) {
     const inp = (label, id, val) => `<div class="lbl">${label}</div><div class="val"><input id="${id}" class="ev-edit-inp" value="${escapeHtml(val == null ? '' : ('' + val))}"></div>`;
@@ -5766,7 +5782,7 @@ function openMissingDocs(idx) {
   if (!dx) return;
   missingCtx = idx;
   mcDraft = (dx.requiredDocs || []).map(d => ({ ...d }));
-  document.getElementById('missing-popup-title').textContent = dx.fullName || dx.code;
+  document.getElementById('missing-popup-title').textContent = dxHe(dx) + (dxEn(dx) ? ' - ' + dxEn(dx) : '');
   const docOpts = (patientDocuments[currentIdx] || [])
     .map((d, i) => `<option value="${i}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`).join('');
   document.getElementById('missing-popup-body').innerHTML = `
@@ -5786,7 +5802,7 @@ function renderMcList() {
   const dx = patientsState[currentIdx].diagnoses[missingCtx];
   const have = mcDraft.filter(d => d.received).length;
   document.getElementById('missing-popup-meta').textContent =
-    dx.code + ' · ' + (mcDraft.length ? `${have}/${mcDraft.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
+    dxTaxFull(dx) + ' · ' + (mcDraft.length ? `${have}/${mcDraft.length} מסמכים קיימים` : 'אין מסמכים נדרשים');
   document.getElementById('mc-list').innerHTML = mcDraft.length ? mcDraft.map((d, di) => {
     const name = d.docKey && docs[d.docKey]
       ? `<button type="button" class="poc-mc-name" onclick="openDoc('${d.docKey}')" title="פתח מסמך">${escapeHtml(d.name)}</button>`
