@@ -2171,6 +2171,9 @@
   .metrics-name { font-weight:700; color:var(--text); }
   .metrics-src-link { font-family:inherit; font-size:11.5px; font-weight:700; color:var(--text); background:none; border:none; cursor:pointer; padding:0; text-decoration:underline; }
   .metrics-src-none { font-size:11px; color:var(--text-light); }
+  .metrics-src-bpr { display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.3px; color:var(--mig-blue); background:var(--bg-hover); border:1px solid #c5d3f5; border-radius:999px; padding:1px 8px; }
+  .metrics-edit-btn { border:none; background:none; cursor:pointer; color:var(--text-light); font-size:13px; padding:2px 4px; }
+  .metrics-edit-btn:hover { color:var(--text); }
   .metrics-empty { padding:22px; text-align:center; font-size:13px; color:var(--text-light); border:1px dashed var(--border); border-radius:var(--radius); background:#fafbfc; }
   .metrics-add-bar { display:flex; gap:8px; align-items:center; margin-top:14px; flex-wrap:wrap; }
   /* PDF/image source placeholder in the doc view */
@@ -2384,10 +2387,6 @@
   .poc-swiss-btn.busy { cursor:progress; }
   .poc-swiss-btn.busy .poc-swiss-ring { border-color:#c9d3ff; border-top-color:#0a1f8f; border-right-color:#3d5afe; animation:poc-swiss-spin .8s linear infinite; }
   @keyframes poc-swiss-spin { to { transform:rotate(360deg); } }
-  .poc-swiss-btn::after { content:attr(data-tip); position:absolute; right:calc(100% + 9px); top:50%; transform:translateY(-50%) translateX(-3px); background:#0a1f8f; color:#fff; font-size:11px; font-weight:700; line-height:1; padding:6px 10px; border-radius:12px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s, transform .12s; z-index:20; }
-  .poc-swiss-btn::before { content:''; position:absolute; right:calc(100% + 4px); top:50%; transform:translateY(-50%); border:5px solid transparent; border-right:none; border-left-color:#0a1f8f; opacity:0; transition:opacity .12s; pointer-events:none; z-index:20; }
-  .poc-swiss-btn:hover::after, .poc-swiss-btn:hover::before { opacity:1; }
-  .poc-swiss-btn:hover::after { transform:translateY(-50%) translateX(0); }
   /* POC: missing & completeness — per-diagnosis pill + checklist popup (soft system palette) */
   .poc-mc-btn { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; font-family:inherit; font-size:11px; font-weight:700; border-radius:999px; padding:3px 9px 3px 8px; cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--text-muted); white-space:nowrap; }
   .poc-mc-btn svg { width:13px; height:13px; flex-shrink:0; }
@@ -3051,7 +3050,7 @@
   <div class="popup-box" style="max-width:560px;">
     <div class="popup-header">
       <div>
-        <div class="popup-title">תיאור החיתום לאבחנה</div>
+        <div class="popup-title">תיאור החיתום</div>
         <div class="popup-meta" id="poc-uwnote-meta"></div>
       </div>
       <button class="popup-close" onclick="closePopup('poc-uwnote-popup')">✕ סגור</button>
@@ -3072,7 +3071,7 @@
   <div class="popup-box" style="max-width:420px;">
     <div class="popup-header">
       <div>
-        <div class="popup-title">תוספת זמנית לאבחנה</div>
+        <div class="popup-title">תוספת זמנית</div>
         <div class="popup-meta" id="temp-popup-meta"></div>
       </div>
       <button class="popup-close" onclick="closePopup('temp-popup')">✕ סגור</button>
@@ -3246,7 +3245,7 @@
   <div class="popup-box" style="max-width:480px;">
     <div class="popup-header">
       <div>
-        <div class="popup-title">הוספת מדד רפואי</div>
+        <div class="popup-title" id="addmetric-title">הוספת מדד רפואי</div>
         <div class="popup-meta" id="addmetric-meta">הוספת מדד חדש לטבלת המדדים</div>
       </div>
       <button class="popup-close" onclick="closePopup('addmetric-popup')">✕ סגור</button>
@@ -3269,7 +3268,7 @@
       <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
       <select class="fb-select" id="addmetric-doc"></select>
       <div style="display:flex;gap:8px;margin-top:14px;">
-        <button class="submit-btn" onclick="saveAddMetric()">הוספה</button>
+        <button class="submit-btn" id="addmetric-save" onclick="saveAddMetric()">הוספה</button>
         <button class="btn-secondary" onclick="closePopup('addmetric-popup')">ביטול</button>
       </div>
     </div>
@@ -3287,11 +3286,13 @@
       <button class="popup-close" onclick="closePopup('adddx-popup')">✕ סגור</button>
     </div>
     <div class="popup-body">
-      <span class="fb-field-label">קוד אבחנה</span>
-      <input type="text" class="fb-input" id="adddx-code" placeholder="לדוגמה: HTN, ASTHMA" style="margin-bottom:14px;">
-      <span class="fb-field-label">שם מלא של האבחנה</span>
-      <input type="text" class="fb-input" id="adddx-full" placeholder="לדוגמה: יתר לחץ דם" style="margin-bottom:14px;">
-      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <span class="fb-field-label">אבחנה מתוך הטקסונומיה</span>
+      <select class="fb-select" id="adddx-tax" onchange="onDxTaxonomy(this.value)" style="margin-bottom:14px;"></select>
+      <span class="fb-field-label">שם אבחנה</span>
+      <input type="text" class="fb-input" id="adddx-code" placeholder="לדוגמה: יתר לחץ דם" style="margin-bottom:14px;">
+      <span class="fb-field-label">תיאור אבחנה</span>
+      <input type="text" class="fb-input" id="adddx-full" placeholder="לדוגמה: יתר לחץ דם מאוזן תרופתית" style="margin-bottom:14px;">
+      <span class="fb-field-label">מסמך תומך (חובה, מתוך רשימת המסמכים)</span>
       <select class="fb-select" id="adddx-doc"></select>
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="saveAddDiagnosis()">הוספה</button>
@@ -3312,9 +3313,9 @@
       <button class="popup-close" onclick="closePopup('editdx-popup')">✕ סגור</button>
     </div>
     <div class="popup-body">
-      <span class="fb-field-label">קוד אבחנה</span>
+      <span class="fb-field-label">שם אבחנה</span>
       <input type="text" class="fb-input" id="editdx-code" style="margin-bottom:14px;">
-      <span class="fb-field-label">שם מלא של האבחנה</span>
+      <span class="fb-field-label">תיאור אבחנה</span>
       <input type="text" class="fb-input" id="editdx-full">
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="saveEditDx()">שמירה</button>
@@ -3563,11 +3564,12 @@ const docs = {
 // Medical metrics (per profile) — each metric is tagged with the calculators it feeds.
 // doc = source docKey (existing document) OR uploadedDoc set at creation time.
 const medicalMetrics = [
-  { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
-  { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
-  { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: 'doc-sarc-4' },
+  { id: 'M-000', name: 'גיל',          value: '47',     unit: 'שנים', date: '10.03.2024', calc: ['cmc', 'cad', 'cc'],        doc: null, bpr: true },
+  { id: 'M-001', name: 'גובה',         value: '183',    unit: 'ס״מ',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: null, bpr: true },
+  { id: 'M-002', name: 'משקל',         value: '79',     unit: 'ק״ג',  date: '10.03.2024', calc: ['cmc', 'cc'],               doc: null, bpr: true },
+  { id: 'M-003', name: 'BMI',          value: '23.6',   unit: '—',    date: '10.03.2024', calc: ['cmc', 'cc'],               doc: null, bpr: true },
   { id: 'M-004', name: 'לחץ דם',       value: '119/81', unit: 'mmHg', date: '10.03.2024', calc: ['cmc', 'cad', 'lvmc', 'cc'], doc: 'doc-sarc-4' },
-  { id: 'M-005', name: 'סטטוס עישון',  value: 'מעולם לא', unit: '—',   date: '10.03.2024', calc: ['cmc', 'cad'],              doc: 'doc-sarc-4' },
+  { id: 'M-005', name: 'סטטוס עישון',  value: 'מעולם לא', unit: '—',   date: '10.03.2024', calc: ['cmc', 'cad'],              doc: null, bpr: true },
   { id: 'M-006', name: 'סטורציה (SpO₂)', value: '98',   unit: '%',    date: '23.02.2016', calc: ['cc'],                      doc: 'doc-sarc-1' },
   { id: 'M-007', name: 'FEV1',         value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
   { id: 'M-008', name: 'FVC',          value: '97',     unit: '%',    date: '10.05.2016', calc: ['cc'],                      doc: 'doc-sarc-2' },
@@ -4418,17 +4420,32 @@ function pocTempLabel(dx) {
   if (+t.permille) bits.push('+' + fmtPermille(+t.permille));
   return 'זמנית ' + bits.join('/') + (t.until ? ' · עד ' + t.until.split('-').reverse().join('/') : '');
 }
-function pocUwCard(dx, idx) {
+// ref = diagnosis index (number / digits) or 'ls:occupation' / 'ls:profession' for lifestyle findings
+function pocItem(ref) {
+  const p = patientsState[currentIdx];
+  const r = '' + ref;
+  return r.indexOf('ls:') === 0 ? p.lifestyle[r.slice(3)] : p.diagnoses[+r];
+}
+function pocItemLabel(ref) {
+  const r = '' + ref, it = pocItem(ref) || {};
+  return r.indexOf('ls:') === 0 ? (lifestyleLabels[r.slice(3)] || '') + ' — ' + (it.value || '—') : it.code + ' — ' + it.fullName;
+}
+function pocRerender(ref) {
+  if (('' + ref).indexOf('ls:') === 0) renderLifestyle(); else renderDiagnoses();
+  renderPocLoadSummary();
+}
+function pocUwCard(dx, idx, withSwiss) {
+  const ref = '' + idx;
   const hasTemp = !!(dx.tempLoading && (+dx.tempLoading.pct || +dx.tempLoading.permille));
   const hasNote = !!(dx.uwNote || '').trim();
   const sw = dx.swissState === 'busy' ? ' busy' : dx.swissState === 'done' ? ' done' : '';
-  const swTip = dx.swissState === 'busy' ? 'Scout — מעבד…' : dx.swissState === 'done' ? 'Scout — לחץ לעיבוד נוסף' : 'Scout';
+  const swissBtn = withSwiss === false ? '' : `<button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" aria-label="Scout" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`;
   return `<div class="itemuw" onclick="event.stopPropagation()">
-    <button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" data-tip="${swTip}" aria-label="${swTip}" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
-    <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" id="loading-${idx}" min="0" step="25" value="${+dx.loading || 0}" onchange="onLoadingChange(${idx}, this.value)"><span>%</span></label>
-    <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" id="permille-${idx}" min="0" step="1" value="${+dx.loadingPermille || 0}" onchange="onPermilleChange(${idx}, this.value)"><span>‰</span></label>
-    <button class="itemuw-btn${hasTemp ? ' has' : ''}" onclick="openTempLoading(${idx})" title="${escapeHtml(pocTempLabel(dx))}">⏱ ${escapeHtml(pocTempLabel(dx))}</button>
-    <button class="itemuw-btn${hasNote ? ' has' : ''}" onclick="openPocUwNote(${idx})">תיאור חיתום${hasNote ? ' ✓' : ''} ▸</button>
+    ${swissBtn}
+    <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" id="loading-${ref}" min="0" step="25" value="${+dx.loading || 0}" onchange="onLoadingChange('${ref}', this.value)"><span>%</span></label>
+    <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" id="permille-${ref}" min="0" step="1" value="${+dx.loadingPermille || 0}" onchange="onPermilleChange('${ref}', this.value)"><span>‰</span></label>
+    <button class="itemuw-btn${hasTemp ? ' has' : ''}" onclick="openTempLoading('${ref}')" title="${escapeHtml(pocTempLabel(dx))}">⏱ ${escapeHtml(pocTempLabel(dx))}</button>
+    <button class="itemuw-btn${hasNote ? ' has' : ''}" onclick="openPocUwNote('${ref}')">תיאור חיתום${hasNote ? ' ✓' : ''} ▸</button>
   </div>`;
 }
 // POC: bottom summary — per-diagnosis loadings + additive totals (permanent / temporary / total now)
@@ -4440,7 +4457,10 @@ function pocLoadText(pct, per) {
 }
 function renderPocLoadSummary() {
   const wrap = document.getElementById('poc-load-summary'); if (!wrap) return;
-  const diags = (patientsState[currentIdx] || {}).diagnoses || [];
+  const pS = patientsState[currentIdx] || {};
+  const ls = pS.lifestyle || {};
+  const diags = (pS.diagnoses || []).map(dx => ({ ...dx, _label: dx.code, _title: dx.fullName }))
+    .concat(['occupation', 'profession'].filter(k => ls[k]).map(k => ({ ...ls[k], _label: lifestyleLabels[k], _title: ls[k].value })));
   let pct = 0, per = 0, tPct = 0, tPer = 0;
   const lines = diags.map(dx => {
     const lp = +dx.loading || 0, lr = +dx.loadingPermille || 0;
@@ -4448,7 +4468,7 @@ function renderPocLoadSummary() {
     pct += lp; per += lr; tPct += tp; tPer += tr;
     // one line per diagnosis: code + loading only (the underwriting description stays on the diagnosis)
     const tmp = (tp || tr) ? ` <span class="gs-temp">⏱ זמנית ${escapeHtml(pocLoadText(tp, tr))}</span>` : '';
-    return `<div class="gs-line poc-sum-line"><span class="gs-item" title="${escapeHtml(dx.fullName || '')}"><b>${escapeHtml(dx.code)}</b></span><span class="gs-val">${escapeHtml(pocLoadText(lp, lr) || '0%')}${tmp}</span></div>`;
+    return `<div class="gs-line poc-sum-line"><span class="gs-item" title="${escapeHtml(dx._title || '')}"><b>${escapeHtml(dx._label)}</b></span><span class="gs-val">${escapeHtml(pocLoadText(lp, lr) || '0%')}${tmp}</span></div>`;
   }).join('');
   const sumTxt = (a, b) => pocLoadText(a, b) || '0%';
   const p = patientsState[currentIdx] || {};
@@ -4554,16 +4574,18 @@ function runSwissUw(idx) {
 let pocNoteCtx = null;
 function openPocUwNote(idx) {
   pocNoteCtx = idx;
-  const dx = patientsState[currentIdx].diagnoses[idx];
-  document.getElementById('poc-uwnote-meta').textContent = dx.code + ' — ' + dx.fullName;
+  const dx = pocItem(idx);
+  document.getElementById('poc-uwnote-meta').textContent = pocItemLabel(idx);
   document.getElementById('poc-uwnote-text').value = dx.uwNote || '';
   document.getElementById('poc-uwnote-popup').classList.add('open');
 }
 function confirmPocUwNote() {
   if (pocNoteCtx == null) return;
-  setUwNote(pocNoteCtx, document.getElementById('poc-uwnote-text').value);
+  const v = document.getElementById('poc-uwnote-text').value;
+  if (('' + pocNoteCtx).indexOf('ls:') === 0) pocItem(pocNoteCtx).uwNote = (v || '').trim();
+  else setUwNote(+pocNoteCtx, v);
   closePopup('poc-uwnote-popup');
-  renderDiagnoses();
+  pocRerender(pocNoteCtx);
 }
 
 function setUwNote(idx, val) {
@@ -4586,7 +4608,7 @@ function toggleTl(idx) {
 function onLoadingChange(idx, val) {
   let n = parseInt(val) || 0;
   n = Math.max(0, Math.round(n / 25) * 25);
-  patientsState[currentIdx].diagnoses[idx].loading = n;
+  pocItem(idx).loading = n;
   document.getElementById('loading-' + idx).value = n;
   updateAgg();
   renderPocLoadSummary();
@@ -4595,7 +4617,7 @@ function onLoadingChange(idx, val) {
 function onPermilleChange(idx, val) {
   let n = parseFloat(val) || 0;
   n = Math.max(0, n);
-  patientsState[currentIdx].diagnoses[idx].loadingPermille = n;
+  pocItem(idx).loadingPermille = n;
   document.getElementById('permille-' + idx).value = n;
   updateAgg();
   renderPocLoadSummary();
@@ -5276,15 +5298,37 @@ function updateAgg() {
   }
 }
 
+// POC: diagnosis taxonomy (sample of ~20 common underwriting diagnoses)
+const DX_TAXONOMY = [
+  { name: 'יתר לחץ דם', icd: 'I10' }, { name: 'סוכרת סוג 2', icd: 'E11' }, { name: 'סוכרת סוג 1', icd: 'E10' },
+  { name: 'היפרליפידמיה', icd: 'E78.5' }, { name: 'השמנת יתר', icd: 'E66' }, { name: 'תת-פעילות בלוטת התריס', icd: 'E03' },
+  { name: 'מחלת לב איסכמית', icd: 'I25' }, { name: 'פרפור פרוזדורים', icd: 'I48' }, { name: 'אי-ספיקת לב', icd: 'I50' },
+  { name: 'שבץ מוחי', icd: 'I63' }, { name: 'אסתמה', icd: 'J45' }, { name: 'מחלת ריאות חסימתית כרונית (COPD)', icd: 'J44' },
+  { name: 'דום נשימה בשינה', icd: 'G47.3' }, { name: 'אפילפסיה', icd: 'G40' }, { name: 'טרשת נפוצה', icd: 'G35' },
+  { name: 'דיכאון', icd: 'F32' }, { name: 'הפרעת חרדה', icd: 'F41' }, { name: 'מחלת קרוהן', icd: 'K50' },
+  { name: 'קוליטיס כיבית', icd: 'K51' }, { name: 'כבד שומני', icd: 'K76.0' }, { name: 'אי-ספיקת כליות כרונית', icd: 'N18' },
+  { name: 'דלקת מפרקים שגרונית', icd: 'M06' }, { name: 'פריצת דיסק', icd: 'M51' }, { name: 'סרטן השד', icd: 'C50' },
+];
+function onDxTaxonomy(v) {
+  const t = DX_TAXONOMY[+v];
+  if (v === '' || !t) return;
+  document.getElementById('adddx-code').value = t.name;
+  const full = document.getElementById('adddx-full');
+  if (!full.value.trim()) full.value = t.name + ' (' + t.icd + ')';
+}
 function addDiagnosis() {
   document.getElementById('adddx-code').value = '';
   document.getElementById('adddx-full').value = '';
-  fillDocSelect('adddx-doc');
+  document.getElementById('adddx-tax').innerHTML = '<option value="">בחר/י אבחנה מהטקסונומיה…</option>' +
+    DX_TAXONOMY.map((t, i) => `<option value="${i}">${escapeHtml(t.name)} · ${t.icd}</option>`).join('');
+  fillDocSelect('adddx-doc', null, '— בחר/י מסמך תומך —');
   document.getElementById('adddx-popup').classList.add('open');
 }
 function saveAddDiagnosis() {
   const code = document.getElementById('adddx-code').value.trim();
-  if (!code) { alert('יש להזין קוד אבחנה.'); return; }
+  if (!code) { alert('יש להזין שם אבחנה.'); return; }
+  const docSel = document.getElementById('adddx-doc');
+  if (docSel.value === '') { alert('לא ניתן להוסיף אבחנה ללא מסמך תומך — יש לבחור מסמך מרשימת המסמכים.'); docSel.focus(); return; }
   const full = document.getElementById('adddx-full').value.trim() || code;
   const p = patientsState[currentIdx];
   const rgCodes = riskGroupsOf(p).map(rg => rg.riskGroupCode);
@@ -5294,7 +5338,7 @@ function saveAddDiagnosis() {
     code: code.toUpperCase(), fullName: full,
     source: 'MEDICAL', flag: null, loadingTableKey: null, timeline: [],
     requiredDocs: [], inDeclaration: true, missingStatus: null,
-    swiss, uw, doc: selectedDocKey('adddx-doc'),
+    swiss, uw, doc: selectedDocKey('adddx-doc'), supportDoc: (patientDocuments[currentIdx] || [])[+docSel.value].name,
   };
   p.diagnoses.push(newDx);
   closePopup('adddx-popup');
@@ -5331,7 +5375,7 @@ function saveEditDx() {
   if (editDxCtx == null) return;
   const dx = patientsState[currentIdx].diagnoses[editDxCtx];
   const code = document.getElementById('editdx-code').value.trim();
-  if (!code) { alert('יש להזין קוד אבחנה.'); return; }
+  if (!code) { alert('יש להזין שם אבחנה.'); return; }
   dx.code = code.toUpperCase();
   dx.fullName = document.getElementById('editdx-full').value.trim() || dx.code;
   closePopup('editdx-popup');
@@ -5383,6 +5427,7 @@ function selectMetricsCalc(calc) {
 }
 
 function metricSourceCell(m) {
+  if (m.bpr) return `<span class="metrics-src-bpr" title="הנתון הגיע מה-BPR (נתוני ההצעה) ולא ממסמך רפואי">BPR</span>`;
   if (m.uploadedDoc) return `<button class="metrics-src-link" onclick="openUploadedSource('${m.uploadedDoc}')">📄 צפייה במקור</button>`;
   if (m.doc && docs[m.doc]) return `<button class="metrics-src-link" onclick="openDoc('${m.doc}')">📄 צפייה במקור</button>`;
   return `<span class="metrics-src-none">אין מסמך מקור</span>`;
@@ -5397,12 +5442,13 @@ function renderMetricsTable(calc) {
       <td>${escapeHtml(m.unit || '—')}</td>
       <td class="ltr">${escapeHtml(m.date || '—')}</td>
       <td>${metricSourceCell(m)}</td>
+      <td><button class="metrics-edit-btn" onclick="editMetric('${m.id}')" title="ערוך מדד" aria-label="ערוך מדד ${escapeHtml(m.name)}">✏</button></td>
     </tr>`).join('');
 
   const table = rows.length ? `
     <table class="metrics-table">
       <thead><tr>
-        <th>שם נתון</th><th>ערך</th><th>יחידת מדידה</th><th>תאריך מדידה</th><th>קישור למסמך מקור</th>
+        <th>שם נתון</th><th>ערך</th><th>יחידת מדידה</th><th>תאריך מדידה</th><th>מקור</th><th></th>
       </tr></thead>
       <tbody>${body}</tbody>
     </table>`
@@ -5412,19 +5458,41 @@ function renderMetricsTable(calc) {
     ${table}
     <div class="metrics-add-bar">
       <button class="doc-action-btn" onclick="addMetric('${calc}')">＋ הוסף מדד למחשבון ${calc.toUpperCase()}</button>
-      <span style="font-size:11px;color:var(--text-light);">בהוספת מדד ניתן לצרף גם קובץ מקור.</span>
+      <span style="font-size:11px;color:var(--text-light);">מקור המדד: מסמך מרשימת המסמכים או BPR (נתוני ההצעה).</span>
     </div>`;
 }
 
 let addMetricCtx = null;
+// metric source dropdown: BPR (application data) or a document from the client's list
+function fillMetricSrc(m) {
+  fillDocSelect('addmetric-doc', m && m.doc);
+  const sel = document.getElementById('addmetric-doc');
+  sel.insertAdjacentHTML('beforeend', '<option value="bpr">BPR — נתוני ההצעה</option>');
+  if (m && m.bpr) sel.value = 'bpr';
+}
+function editMetric(id) {
+  const m = medicalMetrics.find(x => x.id === id); if (!m) return;
+  addMetricCtx = { calc: metricsActiveCalc, editId: id };
+  document.getElementById('addmetric-title').textContent = 'עריכת מדד רפואי';
+  document.getElementById('addmetric-save').textContent = 'שמירה';
+  document.getElementById('addmetric-name').value = m.name || '';
+  document.getElementById('addmetric-value').value = m.value || '';
+  document.getElementById('addmetric-unit').value = m.unit && m.unit !== '—' ? m.unit : '';
+  document.getElementById('addmetric-date').value = m.date && m.date !== '—' ? m.date : '';
+  document.getElementById('addmetric-meta').textContent = m.id + ' · ' + m.name;
+  fillMetricSrc(m);
+  document.getElementById('addmetric-popup').classList.add('open');
+}
 function addMetric(calc) {
   addMetricCtx = { calc };
+  document.getElementById('addmetric-title').textContent = 'הוספת מדד רפואי';
+  document.getElementById('addmetric-save').textContent = 'הוספה';
   document.getElementById('addmetric-name').value = '';
   document.getElementById('addmetric-value').value = '';
   document.getElementById('addmetric-unit').value = '';
   document.getElementById('addmetric-date').value = '';
   document.getElementById('addmetric-meta').textContent = 'הוספת מדד חדש למחשבון ' + calc.toUpperCase();
-  fillDocSelect('addmetric-doc');
+  fillMetricSrc(null);
   document.getElementById('addmetric-popup').classList.add('open');
 }
 function saveAddMetric() {
@@ -5436,13 +5504,22 @@ function saveAddMetric() {
   if (!value) { alert('יש להזין ערך.'); return; }
   const unit = document.getElementById('addmetric-unit').value.trim() || '—';
   const date = document.getElementById('addmetric-date').value.trim() || '—';
+  const isBpr = document.getElementById('addmetric-doc').value === 'bpr';
+  const docKey = isBpr ? null : selectedDocKey('addmetric-doc');
+  if (addMetricCtx.editId) {
+    const m = medicalMetrics.find(x => x.id === addMetricCtx.editId);
+    if (m) Object.assign(m, { name, value, unit, date, doc: docKey, bpr: isBpr, uploadedDoc: null });
+    closePopup('addmetric-popup');
+    renderMetricsTable(calc);
+    return;
+  }
   const nextNum = medicalMetrics.reduce((mx, m) => {
     const n = parseInt(('' + m.id).replace(/\D/g, '')) || 0; return Math.max(mx, n);
   }, 0) + 1;
   const metric = {
     id: 'M-' + String(nextNum).padStart(3, '0'),
     name: name, value: value, unit: unit,
-    date: date, calc: [calc], doc: selectedDocKey('addmetric-doc'),
+    date: date, calc: [calc], doc: docKey, bpr: isBpr,
   };
   medicalMetrics.push(metric);
   closePopup('addmetric-popup');
@@ -5461,9 +5538,9 @@ function fmtDate(iso) {
 
 function openTempLoading(idx) {
   tempCtx = idx;
-  const dx = patientsState[currentIdx].diagnoses[idx];
+  const dx = pocItem(idx);
   const t = dx.tempLoading || {};
-  document.getElementById('temp-popup-meta').textContent = dx.code + ' — ' + dx.fullName;
+  document.getElementById('temp-popup-meta').textContent = pocItemLabel(idx);
   document.getElementById('temp-pct').value = (t.pct != null ? t.pct : 0);
   document.getElementById('temp-permille').value = (t.permille != null ? t.permille : 0);
   document.getElementById('temp-until').value = t.until || '';
@@ -5472,21 +5549,21 @@ function openTempLoading(idx) {
 }
 
 function confirmTempLoading() {
-  const dx = patientsState[currentIdx].diagnoses[tempCtx];
+  const dx = pocItem(tempCtx);
   if (!dx) return;
   const pct = Math.max(0, Math.round((parseFloat(document.getElementById('temp-pct').value) || 0) / 25) * 25);
   const permille = Math.max(0, Math.round(parseFloat(document.getElementById('temp-permille').value) || 0));
   const until = document.getElementById('temp-until').value;
   dx.tempLoading = { pct, permille, until };
   closePopup('temp-popup');
-  renderDiagnoses();
+  pocRerender(tempCtx);
 }
 
 function clearTempLoading() {
-  const dx = patientsState[currentIdx].diagnoses[tempCtx];
+  const dx = pocItem(tempCtx);
   if (dx) dx.tempLoading = null;
   closePopup('temp-popup');
-  renderDiagnoses();
+  pocRerender(tempCtx);
 }
 
 // ===== MEDICAL EVENTS (timeline) CRUD =====
@@ -5686,13 +5763,12 @@ function openMissingDocs(idx) {
   missingCtx = idx;
   mcDraft = (dx.requiredDocs || []).map(d => ({ ...d }));
   document.getElementById('missing-popup-title').textContent = dx.fullName || dx.code;
-  const docOpts = (patientDocuments[currentIdx] || []).filter(d => d.docKey)
-    .map(d => `<option value="${d.docKey}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`).join('');
+  const docOpts = (patientDocuments[currentIdx] || [])
+    .map((d, i) => `<option value="${i}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`).join('');
   document.getElementById('missing-popup-body').innerHTML = `
     <div class="poc-mc-list" id="mc-list"></div>
     <div class="poc-mc-add">
-      <input type="text" class="form-input" id="mc-new-name" placeholder="שם המסמך הנדרש" onkeydown="if(event.key==='Enter')addReqDoc()">
-      <select class="form-input" id="mc-new-doc"><option value="">— ללא קישור למסמך בתיק —</option>${docOpts}</select>
+      <select class="form-input" id="mc-new-doc"><option value="">בחר מסמך מרשימת המסמכים…</option>${docOpts}</select>
       <button class="btn-secondary" onclick="addReqDoc()">＋ הוסף מסמך</button>
     </div>
     <div class="poc-mc-foot">
@@ -5725,14 +5801,15 @@ function toggleReqDoc(di, checked) {
   renderMcList();
 }
 function addReqDoc() {
-  const inp = document.getElementById('mc-new-name'), sel = document.getElementById('mc-new-doc');
-  const name = inp.value.trim();
-  if (!name) { inp.focus(); return; }
-  const docKey = sel.value || null;
-  mcDraft.push({ name, received: !!docKey, docKey, added: true });
-  inp.value = ''; sel.value = '';
+  const sel = document.getElementById('mc-new-doc');
+  if (sel.value === '') { sel.focus(); return; }
+  const d = (patientDocuments[currentIdx] || [])[+sel.value];
+  if (!d) return;
+  const docKey = d.docKey || null;
+  if (mcDraft.some(x => x.name === d.name)) { sel.value = ''; return; }   // already on the list
+  mcDraft.push({ name: d.name, received: true, docKey, added: true });
+  sel.value = '';
   renderMcList();
-  inp.focus();
 }
 function removeReqDoc(di) { mcDraft.splice(di, 1); renderMcList(); }
 function saveReqDocs() {
@@ -5850,11 +5927,12 @@ function renderLifestyle() {
   const rows = ['occupation', 'profession'].map(key => ({ key, kind: lifestyleLabels[key], data: ls[key] }));
   wrap.innerHTML = rows.map(r => `
     <div class="diagnosis-card">
-      <div class="diagnosis-header" onclick="toggleLs('${r.key}')">
+      <div class="diagnosis-header poc-dx-header" onclick="toggleLs('${r.key}')">
         <span class="dx-toggle" id="ls-toggle-${r.key}">▶</span>
         <span class="dx-name">${r.kind}</span>
-        <span class="dx-full-name">— ${r.data.value || '—'}</span>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
+        <span class="dx-full-name poc-dx-full" title="${escapeHtml(r.data.value || '')}">— ${r.data.value || '—'}</span>
+        <div class="poc-dx-actions" onclick="event.stopPropagation()">
+          ${pocUwCard(r.data, 'ls:' + r.key, false)}
           <button class="dx-edit-btn" onclick="event.stopPropagation();editLifestyle('${r.key}')" title="ערוך">✏</button>
           ${r.key === 'profession' ? `<button class="dx-edit-btn" onclick="event.stopPropagation();addHobby()" title="הוסף תחביב"><span style="font-size:14px;line-height:1;">＋</span></button>` : ''}
         </div>
