@@ -2382,6 +2382,7 @@
   .poc-swiss-ring { box-sizing:border-box; width:26px; height:26px; border-radius:50%; border:4px solid #0a1f8f; display:flex; align-items:center; justify-content:center; transition:border-color .15s, transform .15s; }
   .poc-swiss-btn:hover .poc-swiss-ring { transform:scale(1.08); }
   .poc-swiss-btn:focus-visible { outline:2px solid #0a1f8f; outline-offset:2px; border-radius:50%; }
+  .poc-swiss-ph { width:28px; height:28px; flex-shrink:0; }   /* keeps lifestyle rows aligned with dx rows */
   .poc-swiss-check { display:none; width:12px; height:12px; }
   .poc-swiss-btn.done .poc-swiss-check { display:block; }
   .poc-swiss-btn.busy { cursor:progress; }
@@ -4439,7 +4440,7 @@ function pocUwCard(dx, idx, withSwiss) {
   const hasTemp = !!(dx.tempLoading && (+dx.tempLoading.pct || +dx.tempLoading.permille));
   const hasNote = !!(dx.uwNote || '').trim();
   const sw = dx.swissState === 'busy' ? ' busy' : dx.swissState === 'done' ? ' done' : '';
-  const swissBtn = withSwiss === false ? '' : `<button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" aria-label="Scout" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`;
+  const swissBtn = withSwiss === false ? '<span class="poc-swiss-ph" aria-hidden="true"></span>' : `<button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" aria-label="Scout" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>`;
   return `<div class="itemuw" onclick="event.stopPropagation()">
     ${swissBtn}
     <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" id="loading-${ref}" min="0" step="25" value="${+dx.loading || 0}" onchange="onLoadingChange('${ref}', this.value)"><span>%</span></label>
