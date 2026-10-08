@@ -2391,7 +2391,13 @@
   /* POC: missing & completeness — per-diagnosis pill + checklist popup (soft system palette) */
   .poc-mc-btn { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; font-family:inherit; font-size:11px; font-weight:700; border-radius:999px; padding:3px 9px 3px 8px; cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--text-muted); white-space:nowrap; }
   .poc-mc-btn svg { width:13px; height:13px; flex-shrink:0; }
-  .poc-mc-btn.miss { color:var(--mig-blue); background:var(--bg-hover); border-color:#c5d3f5; }
+  .poc-mc-btn.ok { color:#2f7a52; background:#eef8f2; border-color:#c4e3d1; }
+  .poc-mc-btn.miss { color:#b04646; background:#fdf0f0; border-color:#f0caca; }
+  /* aligned dx row: name truncates, actions never wrap, fixed-width buttons line up across rows */
+  .poc-dx-full { flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .poc-dx-actions { display:flex; gap:8px; align-items:center; margin-right:auto; flex-wrap:nowrap; flex-shrink:0; }
+  .poc-dx-actions .itemuw { flex-wrap:nowrap; }
+  .poc-dx-actions .itemuw-btn { width:108px; text-align:center; overflow:hidden; text-overflow:ellipsis; }
   .poc-mc-btn:hover { border-color:var(--mig-blue); }
   .poc-mc-btn:focus-visible { outline:2px solid var(--mig-blue); outline-offset:2px; }
   #doc-popup { z-index:520; }   /* a source doc opened from the checklist stacks above it */
@@ -2647,18 +2653,18 @@
 
     <div>
       <div class="section-head">
-        <div class="section-title">עיסוק ותחביבים</div>
-        <div class="feedback-btns" id="fb-lifestyle"></div>
+        <div class="section-title">מסמכים</div>
+        <div class="feedback-btns" id="fb-docs"></div>
       </div>
-      <div class="diagnoses-list" id="lifestyle-list"></div>
+      <div id="docs-status"></div>
     </div>
 
     <div>
       <div class="section-head">
-        <div class="section-title">מדדים רפואיים</div>
-        <div class="feedback-btns" id="fb-metrics"></div>
+        <div class="section-title">עיסוק ותחביבים</div>
+        <div class="feedback-btns" id="fb-lifestyle"></div>
       </div>
-      <div id="metrics-section"></div>
+      <div class="diagnoses-list" id="lifestyle-list"></div>
     </div>
 
     <div>
@@ -2674,10 +2680,10 @@
 
     <div>
       <div class="section-head">
-        <div class="section-title">מסמכים</div>
-        <div class="feedback-btns" id="fb-docs"></div>
+        <div class="section-title">מדדים רפואיים</div>
+        <div class="feedback-btns" id="fb-metrics"></div>
       </div>
-      <div id="docs-status"></div>
+      <div id="metrics-section"></div>
     </div>
 
     <div>
@@ -2823,7 +2829,10 @@
         <div class="popup-title">מדדים רפואיים</div>
         <div class="popup-meta" id="metrics-popup-meta"></div>
       </div>
-      <button class="popup-close" onclick="closePopup('metrics-popup')">✕ סגור</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="feedback-btns" id="fb-metrics-modal"></div>
+        <button class="popup-close" onclick="closePopup('metrics-popup')">✕ סגור</button>
+      </div>
     </div>
     <div class="popup-body">
       <div style="font-size:12px;color:var(--text-light);margin-bottom:10px;">בחר/י מחשבון כדי להציג את המדדים הרלוונטיים לו:</div>
@@ -3351,6 +3360,12 @@
     <div class="popup-body">
       <span class="fb-field-label" id="editls-label">תיאור</span>
       <textarea class="fb-textarea" id="editls-text"></textarea>
+      <div id="editls-date-wrap" style="margin-top:12px;">
+        <span class="fb-field-label">תאריך תחילת עיסוק</span>
+        <input type="text" class="fb-input" id="editls-date" placeholder="לדוגמה: 03/2012">
+      </div>
+      <span class="fb-field-label" style="margin-top:12px;">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="editls-doc"></select>
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="saveEditLifestyle()">שמירה</button>
         <button class="btn-secondary" onclick="closePopup('editls-popup')">ביטול</button>
@@ -3371,7 +3386,9 @@
     </div>
     <div class="popup-body">
       <span class="fb-field-label">תחביב חדש</span>
-      <input type="text" class="fb-input" id="addhobby-text" placeholder="לדוגמה: צלילה ספורטיבית">
+      <input type="text" class="fb-input" id="addhobby-text" placeholder="לדוגמה: צלילה ספורטיבית" style="margin-bottom:12px;">
+      <span class="fb-field-label">מסמך מקור (מתוך רשימת המסמכים)</span>
+      <select class="fb-select" id="addhobby-doc"></select>
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button class="submit-btn" onclick="saveAddHobby()">הוספה</button>
         <button class="btn-secondary" onclick="closePopup('addhobby-popup')">ביטול</button>
@@ -3678,7 +3695,7 @@ const scoutResponses = {
 const lifestyleData = [
   {
     occupation: {
-      value: 'מפעיל ציוד כבד', source: 'doc-sarc-4', findingSource: 'OCCUPATION',
+      value: 'מפעיל ציוד כבד', source: 'doc-sarc-4', findingSource: 'OCCUPATION', startDate: '03/2012',
       swissResults: [
         _cell('RISK', 'CLEAN'),
         _cell('ACC_DIS', 'LOADING', { medicalAdditionPercent: 15, freeText: 'סיכון תעסוקתי — הפעלת ציוד כבד' }),
@@ -4367,11 +4384,11 @@ function buildCard(dx, idx) {
     <div class="diagnosis-card">
       <div class="diagnosis-header" onclick="toggleTl(${idx})">
         <span class="dx-toggle" id="toggle-${idx}">▶</span>
-        ${pocMcBtn(dx, idx)}
         <span class="dx-name">${dx.code}</span>
         ${tagHtml}
-        <span class="dx-full-name">— ${dx.fullName}</span>
-        <div onclick="event.stopPropagation()" style="display:flex;gap:8px;align-items:center;margin-right:auto;flex-wrap:wrap;">
+        <span class="dx-full-name poc-dx-full" title="${escapeHtml(dx.fullName || '')}">— ${dx.fullName}</span>
+        ${pocMcBtn(dx, idx)}
+        <div class="poc-dx-actions" onclick="event.stopPropagation()">
           ${pocUwCard(dx, idx)}
           ${dx.uploadedDoc ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openUploadedSource('${dx.uploadedDoc}')" title="צפייה במסמך מקור">📄</button>`
             : (dx.doc && docs[dx.doc] ? `<button class="dx-edit-btn" onclick="event.stopPropagation();openDoc('${dx.doc}')" title="צפייה במסמך מקור">📄</button>` : '')}
@@ -4408,7 +4425,7 @@ function pocUwCard(dx, idx) {
     <button type="button" class="poc-swiss-btn${sw}" id="swiss-btn-${idx}" data-tip="${swTip}" aria-label="${swTip}" onclick="runSwissUw(${idx})"><span class="poc-swiss-ring"><svg class="poc-swiss-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" fill="none" stroke="#0a1f8f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
     <label class="uwi-inp-wrap">תוספת <input type="number" class="uwi-inp" id="loading-${idx}" min="0" step="25" value="${+dx.loading || 0}" onchange="onLoadingChange(${idx}, this.value)"><span>%</span></label>
     <label class="uwi-inp-wrap">פרומיל <input type="number" class="uwi-inp" id="permille-${idx}" min="0" step="1" value="${+dx.loadingPermille || 0}" onchange="onPermilleChange(${idx}, this.value)"><span>‰</span></label>
-    <button class="itemuw-btn${hasTemp ? ' has' : ''}" onclick="openTempLoading(${idx})">⏱ ${escapeHtml(pocTempLabel(dx))}</button>
+    <button class="itemuw-btn${hasTemp ? ' has' : ''}" onclick="openTempLoading(${idx})" title="${escapeHtml(pocTempLabel(dx))}">⏱ ${escapeHtml(pocTempLabel(dx))}</button>
     <button class="itemuw-btn${hasNote ? ' has' : ''}" onclick="openPocUwNote(${idx})">תיאור חיתום${hasNote ? ' ✓' : ''} ▸</button>
   </div>`;
 }
@@ -5350,6 +5367,7 @@ function openMetrics() {
   }).join('');
   metricsActiveCalc = 'cmc';
   selectMetricsCalc('cmc');
+  renderFeedbackBtns('metricsModal');
   document.getElementById('metrics-popup').classList.add('open');
 }
 
@@ -5471,11 +5489,11 @@ function clearTempLoading() {
 
 // ===== MEDICAL EVENTS (timeline) CRUD =====
 // populate a <select> with the closed list of the patient's documents
-function fillDocSelect(selectId) {
+function fillDocSelect(selectId, selectedKey, placeholder) {
   const docsList = patientDocuments[currentIdx] || [];
-  const opts = ['<option value="">— ללא מסמך מקור —</option>']
+  const opts = [`<option value="">${placeholder || '— ללא מסמך מקור —'}</option>`]
     .concat(docsList.map((d, i) =>
-      `<option value="${i}">${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`));
+      `<option value="${i}"${selectedKey && d.docKey === selectedKey ? ' selected' : ''}>${escapeHtml(d.name)}${d.date && d.date !== '—' ? ' (' + d.date + ')' : ''}</option>`));
   document.getElementById(selectId).innerHTML = opts.join('');
 }
 // resolve the selected document's source key (only docs that have a viewable source)
@@ -5599,8 +5617,24 @@ function openEventInfo(dxIdx, evIdx, edit) {
     `<div class="ev-summary">${escapeHtml(ev.text || '—')}</div>
      <div class="ev-info-grid">${rows.map(r => `<div class="lbl">${r[0]}</div><div class="val">${r[1]}</div>`).join('')}</div>
      ${(ev.note || '').trim() ? `<div style="margin-top:10px;font-size:12px;line-height:1.6;"><b>הערה:</b> ${escapeHtml(ev.note)}</div>` : ''}
-     <div class="ev-source-row">${sourceBtn}<button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx}, true)">✎ עריכה</button><button class="doc-action-btn" onclick="uploadEventSource(${dxIdx}, ${evIdx})">📎 העלה מסמך</button></div>`;
+     <div class="ev-source-row">${sourceBtn}<button class="doc-action-btn" onclick="openEventInfo(${dxIdx}, ${evIdx}, true)">✎ עריכה</button></div>
+     <div class="ev-source-row"><select class="fb-select" id="evinfo-doc" onchange="linkEventDoc()" style="max-width:320px;"></select></div>`;
+  fillDocSelect('evinfo-doc', ev.doc, 'שייך מסמך מתוך רשימת המסמכים…');
   document.getElementById('evinfo-popup').classList.add('open');
+}
+function linkEventDoc() {
+  if (!evInfoCtx) return;
+  const { dxIdx, evIdx } = evInfoCtx;
+  const ev = patientsState[currentIdx].diagnoses[dxIdx].timeline[evIdx];
+  const sel = document.getElementById('evinfo-doc');
+  if (!ev || sel.value === '') return;
+  const key = selectedDocKey('evinfo-doc');
+  if (!key) { alert('למסמך זה אין קובץ מקור זמין לצפייה.'); openEventInfo(dxIdx, evIdx); return; }
+  ev.doc = key; ev.uploadedDoc = null;
+  renderDiagnoses();
+  const tl = document.getElementById('tl-' + dxIdx);
+  if (tl) { tl.classList.add('open'); document.getElementById('toggle-' + dxIdx).textContent = '▼'; }
+  openEventInfo(dxIdx, evIdx);
 }
 function saveEventInfo() {
   if (!evInfoCtx) return;
@@ -5636,10 +5670,11 @@ let emailMode = 'single'; // 'single' | 'aggregate'
 // POC: missing & completeness — per-diagnosis button (next to the collapse toggle) → checklist popup
 function pocMcBtn(dx, idx) {
   const reqs = dx.requiredDocs || [];
+  if (!reqs.length) return '';   // no documents required for this diagnosis → no docs pill
   const have = reqs.filter(d => d.received).length;
   const miss = reqs.length - have;
-  const label = !reqs.length ? 'מסמכים' : miss ? 'חסר ' + miss : 'מסמכים ' + have + '/' + reqs.length;
-  return `<button type="button" class="poc-mc-btn${miss ? ' miss' : ''}" onclick="event.stopPropagation();openMissingDocs(${idx})" title="Missing & Completeness — מסמכים נדרשים לאבחנה"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9.2l1.6 1.6L11 7.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${label}</button>`;
+  const label = miss ? 'חסר ' + miss : 'מסמכים ' + have + '/' + reqs.length;
+  return `<button type="button" class="poc-mc-btn ${miss ? 'miss' : 'ok'}" onclick="event.stopPropagation();openMissingDocs(${idx})" title="Missing & Completeness — מסמכים נדרשים לאבחנה"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9.2l1.6 1.6L11 7.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${label}</button>`;
 }
 // the popup edits a draft; only 'שמור' writes it back to the diagnosis (closing discards)
 let mcDraft = [];
@@ -5823,7 +5858,11 @@ function renderLifestyle() {
         </div>
       </div>
       <div class="timeline-container" id="ls-tl-${r.key}">
-        <div class="timeline-title">מקור המידע — המסמך שממנו נלקח ${r.kind}</div>
+        ${r.key === 'occupation' ? `<div class="timeline-item">
+          <div class="tl-date">${escapeHtml(r.data.startDate || '—')}</div>
+          <div class="tl-dot"></div>
+          <div class="tl-text">תחילת עיסוק — ${escapeHtml(r.data.value || '—')}</div>
+        </div>` : ''}
         <div class="ls-source-row">
           <span class="ls-mini-label">מקור:</span>
           <span class="ls-source-name" style="font-size:12px;color:var(--text);font-weight:600;">${r.data.source && docs[r.data.source] ? docs[r.data.source].title : 'לא צורף מקור'}</span>
@@ -5860,6 +5899,8 @@ function onLsSourceChange(key, val) {
 const LS_SOURCE_PDF = 'assets/enrollment-form-page1.pdf';
 function openLsSource(key) {
   const p = patientsState[currentIdx];
+  const it = p.lifestyle[key];
+  if (it && it.sourcePicked && docs[it.source]) { openDoc(it.source); return; }
   const kind = lifestyleLabels[key] || 'מקור';
   document.getElementById('doc-popup-title').textContent = 'מסמך מקור — ' + kind;
   document.getElementById('doc-popup-meta').textContent = p.name + ' · טופס הצטרפות (עמוד 1)';
@@ -5875,6 +5916,12 @@ function openLsSource(key) {
   document.getElementById('doc-popup').classList.add('open');
 }
 
+// source picked from the client's document list (same dropdown as add-metric / add-event)
+function pickLsSource(item, selectId) {
+  const key = selectedDocKey(selectId);
+  if (key) { item.source = key; item.sourcePicked = true; }
+  else if (document.getElementById(selectId).value === '' && item.sourcePicked) { item.source = null; item.sourcePicked = false; }
+}
 let editLsCtx = null;
 function editLifestyle(key) {
   editLsCtx = key;
@@ -5884,18 +5931,24 @@ function editLifestyle(key) {
   document.getElementById('editls-meta').textContent = 'עדכון תיאור ' + label;
   document.getElementById('editls-label').textContent = 'תיאור ' + label;
   document.getElementById('editls-text').value = (item.value && item.value !== '—') ? item.value : '';
+  document.getElementById('editls-date-wrap').style.display = key === 'occupation' ? '' : 'none';
+  document.getElementById('editls-date').value = item.startDate || '';
+  fillDocSelect('editls-doc', item.source);
   document.getElementById('editls-popup').classList.add('open');
 }
 function saveEditLifestyle() {
   if (!editLsCtx) return;
   const item = patientsState[currentIdx].lifestyle[editLsCtx];
   item.value = document.getElementById('editls-text').value.trim() || '—';
+  if (editLsCtx === 'occupation') item.startDate = document.getElementById('editls-date').value.trim();
+  pickLsSource(item, 'editls-doc');
   closePopup('editls-popup');
   renderLifestyle();
 }
 
 function addHobby() {
   document.getElementById('addhobby-text').value = '';
+  fillDocSelect('addhobby-doc');
   document.getElementById('addhobby-popup').classList.add('open');
 }
 function saveAddHobby() {
@@ -5904,6 +5957,7 @@ function saveAddHobby() {
   const item = patientsState[currentIdx].lifestyle.profession;
   const cur = (item.value && item.value !== '—' && !/לא נמצא/.test(item.value)) ? item.value : '';
   item.value = cur ? (cur + '; ' + nh) : nh;
+  if (document.getElementById('addhobby-doc').value !== '') pickLsSource(item, 'addhobby-doc');
   closePopup('addhobby-popup');
   renderLifestyle();
   const tl = document.getElementById('ls-tl-profession');
@@ -6365,6 +6419,7 @@ const feedbackSections = {
   'rguw':      { wrapId: 'fb-rguw',      label: 'חיתום פר קבוצת סיכון' },
   'uwnotes':   { wrapId: 'fb-uwnotes',   label: 'הערות חיתום' },
   'summary':   { wrapId: 'fb-summary',   label: 'סיכום תוספות' },
+  'metricsModal': { wrapId: 'fb-metrics-modal', label: 'טבלת מדדים רפואיים' },
 };
 
 function renderAllFeedback() {
@@ -6384,6 +6439,13 @@ function renderFeedbackBtns(key) {
 }
 
 function openFeedback(key, vote) {
+  if (vote === 'like') {   // a like needs no explanation — record it (click again to clear)
+    const cur = feedbackState[key];
+    if (cur && cur.vote === 'like') delete feedbackState[key];
+    else feedbackState[key] = { vote: 'like', text: '' };
+    renderFeedbackBtns(key);
+    return;
+  }
   fbContext = { key, vote };
   document.getElementById('feedback-popup-meta').textContent =
     'סקשן: ' + feedbackSections[key].label + (vote === 'like' ? ' · 👍' : ' · 👎');
@@ -6651,35 +6713,35 @@ function renderApiPanels() {
 // Structure modeled on Swiss Re LifeGuide CMC: Basics + toggleable sections.
 // =====================================================================
 const CMC_SECTIONS = [
-  { key: 'build', label: 'Build', icon: '⚖', fields: [
+  { key: 'build', label: 'Build', icon: '', fields: [
     { id: 'height', label: 'גובה', units: ['cm', 'in'], u: 'cm' },
     { id: 'weight', label: 'משקל', units: ['kg', 'lb'], u: 'kg' },
     { id: 'waist',  label: 'היקף מותניים', units: ['cm', 'in'], u: 'cm' },
   ]},
-  { key: 'bp', label: 'לחץ דם', icon: '🩺', fields: [
+  { key: 'bp', label: 'לחץ דם', icon: '', fields: [
     { id: 'sys', label: 'סיסטולי (mmHg)' },
     { id: 'dia', label: 'דיאסטולי (mmHg)' },
     { id: 'bpmeds', label: 'טיפול תרופתי', options: [['no', 'לא'], ['yes', 'כן']] },
   ]},
-  { key: 'bloods', label: 'סוכרת / דם', icon: '💉', fields: [
+  { key: 'bloods', label: 'סוכרת / דם', icon: '', fields: [
     { id: 'diabetes', label: 'סוכרת', options: [['no', 'ללא'], ['pre', 'Pre-diabetes'], ['type2', 'Type 2'], ['type1', 'Type 1']] },
     { id: 'hba1c', label: 'HbA1c (%)' },
     { id: 'glucose', label: 'גלוקוז בצום (mg/dL)' },
   ]},
-  { key: 'lipids', label: 'Lipids', icon: '🧪', fields: [
+  { key: 'lipids', label: 'Lipids', icon: '', fields: [
     { id: 'chol', label: 'כולסטרול כולל', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
     { id: 'hdl',  label: 'HDL', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
     { id: 'ldl',  label: 'LDL', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
     { id: 'tg',   label: 'טריגליצרידים', units: ['mg/dL', 'mmol/L'], u: 'mg/dL' },
   ]},
-  { key: 'cardiac', label: 'לב', icon: '❤', fields: [
+  { key: 'cardiac', label: 'לב', icon: '', fields: [
     { id: 'cardiac', label: 'היסטוריה קרדיאלית', options: [['none', 'ללא'], ['angina', 'אנגינה'], ['mi', 'אוטם בעבר'], ['arr', 'הפרעת קצב']] },
   ]},
-  { key: 'family', label: 'היסטוריה משפחתית', icon: '👪', fields: [
+  { key: 'family', label: 'היסטוריה משפחתית', icon: '', fields: [
     { id: 'famcvd', label: 'CVD מוקדם במשפחה', options: [['no', 'לא'], ['yes', 'כן (<60)']] },
     { id: 'famdm', label: 'סוכרת במשפחה', options: [['no', 'לא'], ['yes', 'כן']] },
   ]},
-  { key: 'lifestyle', label: 'עישון / אלכוהול', icon: '🍷', fields: [
+  { key: 'lifestyle', label: 'עישון / אלכוהול', icon: '', fields: [
     { id: 'smoke', label: 'עישון', options: [['never', 'לא'], ['past', 'בעבר'], ['current', 'פעיל']] },
     { id: 'alcohol', label: 'אלכוהול (יח׳/שבוע)' },
   ]},
@@ -6707,7 +6769,7 @@ function renderCMC() {
     </div>`;
   const cr = document.getElementById('cmc-chip-row');
   if (cr) cr.innerHTML = '<div class="cmc-basics-title">מקטעים (לחצו להוספה/הסרה)</div><div class="cmc-chips">' + CMC_SECTIONS.map(s =>
-    `<button class="cmc-chip ${cmcState.active[s.key] ? 'active' : ''}" onclick="toggleCmcSection('${s.key}')"><span class="cmc-chip-ic">${s.icon}</span>${s.label}</button>`).join('') + '</div>';
+    `<button class="cmc-chip ${cmcState.active[s.key] ? 'active' : ''}" onclick="toggleCmcSection('${s.key}')">${s.label}</button>`).join('') + '</div>';
   const sw = document.getElementById('cmc-sections');
   if (sw) sw.innerHTML = CMC_SECTIONS.filter(s => cmcState.active[s.key]).map(cmcSectionHtml).join('')
     || '<div class="uw-summary-empty" style="margin:8px 0;">בחר/י מקטע אחד או יותר להזנת נתונים</div>';
@@ -6722,7 +6784,7 @@ function cmcSectionHtml(s) {
     const val = cmcState.values[f.id] == null ? '' : cmcState.values[f.id];
     return `<div class="form-field"><label class="form-label">${f.label}</label><div class="cmc-num-wrap"><input type="number" class="form-input" value="${val}" onchange="cmcSet('${f.id}',this.value)">${unit}</div></div>`;
   }).join('');
-  return `<div class="cmc-section"><div class="cmc-section-head"><span class="cmc-chip-ic">${s.icon}</span>${s.label}</div><div class="form-grid">${fields}</div></div>`;
+  return `<div class="cmc-section"><div class="cmc-section-head">${s.label}</div><div class="form-grid">${fields}</div></div>`;
 }
 function cmcSet(id, val) { cmcState.values[id] = val; computeCMC(); }
 function toggleCmcSection(key) { cmcState.active[key] = !cmcState.active[key]; renderCMC(); computeCMC(); }
@@ -6775,7 +6837,7 @@ function computeCMC() {
   valEl.textContent = decline ? 'שקול דחייה / מבטח משנה' : '+' + loading + '%';
   valEl.style.fontSize = decline ? '18px' : '';
   const rows = factors.map(f => `<div class="cmc-bd-row ${f.ratio > 1 ? 'up' : ''}"><span class="cmc-bd-f">${f.label} <span style="color:var(--text-light)">(${f.detail})</span></span><span class="cmc-bd-r">×${f.ratio.toFixed(2)}</span></div>`).join('');
-  const flag = metSyn ? `<div class="cmc-flag">⚠ אשכול מטבולי — ${comps} גורמים משולבים (Metabolic syndrome)</div>` : '';
+  const flag = metSyn ? `<div class="cmc-flag">אשכול מטבולי — ${comps} גורמים משולבים (Metabolic syndrome)</div>` : '';
   document.getElementById('cmc-result-note').innerHTML = `<div class="cmc-bd">${rows}<div class="cmc-bd-total"><span>דירוג משולב (מכפלה)</span><span class="cmc-bd-r">×${product.toFixed(2)} → +${loading}%</span></div></div>${flag}<div style="margin-top:7px;font-size:10.5px;color:var(--text-light);">הדירוג מצרפי — מכפלת יחסי התמותה, לא סכום התוספות.</div>`;
   document.getElementById('cmc-result').classList.add('show');
 }
